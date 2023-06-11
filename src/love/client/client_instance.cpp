@@ -8,10 +8,10 @@ namespace love_engine {
         _running = true;
         
         auto previousTime = std::chrono::high_resolution_clock::now();
-        float128_t lag = 0.0f;
+        std::float128_t lag = 0.0f;
         while (_running) {
             auto currentTime = std::chrono::high_resolution_clock::now();
-            float128_t elapsedTime = std::chrono::duration<float128_t, std::chrono::milliseconds::period>(currentTime - previousTime).count();
+            std::float128_t elapsedTime = std::chrono::duration<std::float128_t, std::chrono::milliseconds::period>(currentTime - previousTime).count();
             previousTime = currentTime;
             lag += elapsedTime;
 

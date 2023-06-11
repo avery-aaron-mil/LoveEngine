@@ -7,7 +7,7 @@ project(launcher CXX)
 file(GLOB_RECURSE CLIENT_FILES "src/love/client/*.cpp")
 file(GLOB_RECURSE SERVER_FILES "src/love/server/*.cpp")
 file(GLOB_RECURSE COMMON_FILES "src/love/common/*.cpp")
-file(GLOB RESOURCE_FILE "resources.rc")
+file(GLOB RESOURCE_FILE "products/assets/resources.rc")
 
 # add the executable
 add_library(common SHARED "${COMMON_FILES}")
