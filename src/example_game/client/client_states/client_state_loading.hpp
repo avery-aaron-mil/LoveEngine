@@ -11,8 +11,8 @@ namespace example_game {
             Client_State_Loading() {}
             ~Client_State_Loading() {}
             
-            virtual void update() const noexcept override;
-            virtual void render(std::float128_t lag) const noexcept override;
+            void update() const noexcept override;
+            void render(std::float128_t lag) const noexcept override;
     };
 }
 
