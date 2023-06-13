@@ -6,10 +6,10 @@
 using namespace love_engine;
 
 namespace example_game {
-    class Client_State_Loading : public Client_State {
+    class ClientState_Loading : public ClientState {
         public:
-            Client_State_Loading() {}
-            ~Client_State_Loading() {}
+            ClientState_Loading() {}
+            ~ClientState_Loading() {}
             
             void update() const noexcept override;
             void render(std::float128_t lag) const noexcept override;

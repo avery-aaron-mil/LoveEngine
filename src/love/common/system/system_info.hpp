@@ -6,17 +6,12 @@
 
 namespace love_engine {
 
-    class Device_Info {
+    class SystemInfo {
         public:
-            Device_Info() {
-                _find_OS();
-                _find_CPU();
-                _find_CPU_Thread_Count();
-                _find_Video_Card();
-                _find_Physical_Memory();
-            }
-            ~Device_Info() {}
+            SystemInfo() {}
+            ~SystemInfo() {}
 
+            [[nodiscard]] std::string get_Consolidated_System_Info() const noexcept;
             const std::string& get_OS() const noexcept { return _OS_Name; }
             const std::string& get_CPU() const noexcept { return _CPU_Name; }
             uint32_t get_CPU_Thread_Count() const noexcept { return _CPU_Thread_Count; }

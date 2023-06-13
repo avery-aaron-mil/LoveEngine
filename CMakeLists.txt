@@ -93,6 +93,12 @@ target_link_directories(launcher PRIVATE "lib/" "build/")
 set(COMMON_LIBS
 	-Wl,-Bdynamic -lgcc -lstdc++ -lpthread -llzma-5
 )
+if(WIN32)
+set(COMMON_LIBS
+	${COMMON_LIBS}
+	-Wl,-Bdynamic -lole32 -loleaut32 -lwbemuuid
+)
+endif()
 set(SERVER_LIBS
 	${COMMON_LIBS}
 	-Wl,-Bdynamic -lcommon
@@ -110,6 +116,7 @@ set(HOST_LIBS
 	${SERVER_LIBS}
 	-Wl,-Bdynamic -lserver
 )
+
 target_link_libraries(common PRIVATE ${COMMON_LIBS})
 target_link_libraries(server PRIVATE ${SERVER_LIBS})
 target_link_libraries(client PRIVATE ${CLIENT_LIBS})

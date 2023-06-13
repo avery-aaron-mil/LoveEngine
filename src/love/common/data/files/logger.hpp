@@ -17,14 +17,14 @@ namespace love_engine {
 
    class Logger {
         public:
-            Logger(const std::string& file_Path) : _file_Path(file_Path) {}
+            Logger(const std::string& filePath) : _filePath(filePath) {}
             ~Logger() {}
            
             virtual void log(const std::string& message) const noexcept;
             virtual void log(const Log_Status status, const std::string& message) const noexcept;
 
         private:
-            std::string _file_Path;
+            std::string _filePath;
    };
 
 }

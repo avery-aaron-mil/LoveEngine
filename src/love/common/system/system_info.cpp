@@ -1,8 +1,9 @@
-#include "device_info.hpp"
+#include "system_info.hpp"
 
-#include <lzma.h>
+#include <sstream>
 
 #if defined(_WIN32)
+  #include "wmi_instance.hpp"
   #include <windows.h>
 #elif defined(__linux__)
   #include <unistd.h>
@@ -19,10 +20,9 @@
 #endif
 
 namespace love_engine {
-    void Device_Info::_find_OS() const noexcept {
-        // TODO Use a string buffer and make this neater
+    void SystemInfo::_find_OS() const noexcept {
 #if defined(_WIN32)
-        OS.append("Windows");
+        std::stringstream buffer("Windows");
 
         OSVERSIONINFOA versionInfo{};
         versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
@@ -32,54 +32,54 @@ namespace love_engine {
             case 10:
                 switch (versionInfo.dwMinorVersion) {
                     case 0:
-                        OS.append(" 10");
+                        buffer << " 10";
                     break;
                     default:
-                        OS.append(" v10 Other");
+                        buffer << " v10 Other";
                     break;
                 }
             break;
             case 6:
                 switch (versionInfo.dwMinorVersion) {
                     case 3:
-                        OS.append(" 8.1");
+                        buffer << " 8.1";
                     break;
                     case 2:
-                        OS.append(" 8");
+                        buffer << " 8";
                     break;
                     case 1:
-                        OS.append(" 7");
+                        buffer << " 7";
                     break;
                     case 0:
-                        OS.append(" Vista");
+                        buffer << " Vista";
                     break;
                     default:
-                        OS.append(" v6 Other");
+                        buffer << " v6 Other";
                     break;
                 }
             break;
             case 5:
-                OS.append(" XP");
+                buffer << " XP";
             break;
             default:
-                OS.append(" Other");
+                buffer << " Other";
             break;
         }
 
-        if (String::isAscii(versionInfo.szCSDVersion)) OS.append(versionInfo.szCSDVersion);
+        if (String::isAscii(versionInfo.szCSDVersion)) buffer << versionInfo.szCSDVersion);
 #elif defined(__unix__)
         struct utsname unameData;
         uname(&unameData);
-        OS.append(nameData.sysname);
-        OS.append(' ');
-        OS.append(nameData.release);
+        std::stringstream buffer(unameData.sysname);
+        buffer << " ";
+        buffer << nameData.release;
 #else
 #error "OS not supported"
 #endif
-        System::_OS = OS.str();
+        _OS_Name = buffer.str();
     }
     
-    void Device_Info::_find_CPU() const noexcept {
+    void SystemInfo::_find_CPU() const noexcept {
         char buffer[sizeof(uint32_t) * (3 /* 8.2-8.4 */) * (4 /* RAX-RDX */) + 1];
         // TODO Find a C++ way to do this that doesn't involve a for loop
     
@@ -94,29 +94,31 @@ namespace love_engine {
         _cpu_Name = std::string(buffer);
     }
     
-    void Device_Info::_find_CPU_Thread_Count() const noexcept {
-        _CPU_Thread_Count = lzma_cputhreads();
-        // TODO Check for errors or make custom device query
+    void SystemInfo::_find_CPU_Thread_Count() const noexcept {
+        // TODO
     }
     
-    void Device_Info::_find_Video_Card() const noexcept {
-        // TODO Find a way to get this without Vulcan
+    void SystemInfo::_find_Video_Card() const noexcept {
+        // TODO
     }
     
-    void Device_Info::_find_Physical_Memory() const noexcept {
-        _physical_Memory = lzma_physmem();
-        // TODO Check for errors or make custom device query
+    void SystemInfo::_find_Physical_Memory() const noexcept {
+        // TODO
     }
-    
-    // TODO Remove underscores. they're ugly.
     
     // TODO Find audio, monitor, and disk devices, and voltage/temp info using
     // sysconf and fscanf on hwmon (Linux), and GetSystemInfo and ManagementObjectSelector (Windows)
     // Linux: https://stackoverflow.com/questions/150355/ and https://stackoverflow.com/questions/23716135/
-    // Windows: https://www.codeproject.com/Articles/17973/
+    // Windows: https://www.codeproject.com/articles/17973/how-to-get-hardware-information-cpu-id-mainboard-i
     
     // TODO Get free space using statvfs (Linux) and GetDiskFreeSpaceA (Windows)
     
     // TODO Get battery info using GetSystemPowerStatus (Windows) and ACPID (Linux)
     // https://stackoverflow.com/questions/27613517/querying-the-power-status-of-a-linux-machine-programmatically
+
+    [[nodiscard]] std::string get_Consolidated_System_Info() const noexcept {
+        // TODO Return all information in a fancy little string
+        std::string info;
+        return std::move(info);
+    }
 }

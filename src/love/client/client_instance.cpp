@@ -4,7 +4,7 @@
 
 namespace love_engine {
 
-    void Client_Instance::run() noexcept {
+    void ClientInstance::run() noexcept {
         _running = true;
         
         auto previousTime = std::chrono::high_resolution_clock::now();
@@ -16,21 +16,21 @@ namespace love_engine {
             lag += elapsedTime;
 
             // Prioritize game update when behind, skip to rendering when ahead
-            while (lag >= _ms_Per_Tick) {
-                if (_next_Client_State) {
-                    _client_State = _next_Client_State;
-                    _next_Client_State = nullptr;
+            while (lag >= _msPerTick) {
+                if (_nextClientState) {
+                    _clientState = _nextClientState;
+                    _nextClientState = nullptr;
                     previousTime = std::chrono::high_resolution_clock::now();
                 }
 
-                _client_State->update();
-                lag -= _ms_Per_Tick;
+                _clientState->update();
+                lag -= _msPerTick;
             }
 
             // Render object positions between ticks (input is percentage of next tick)
             // Example: Bullet is on left of screen on tick 1, and right on tick two, but render happens
             // at tick 1.5. Input is 0.5, meaning the bullet should render in the middle of the screen.
-            _client_State->render(lag / _ms_Per_Tick);
+            _clientState->render(lag / _msPerTick);
         }
     }
 
