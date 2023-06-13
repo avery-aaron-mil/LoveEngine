@@ -22,61 +22,18 @@
 namespace love_engine {
     void SystemInfo::_find_OS() const noexcept {
 #if defined(_WIN32)
-        std::stringstream buffer("Windows");
-
-        OSVERSIONINFOA versionInfo{};
-        versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-        GetVersionExA(&versionInfo);
-
-        switch (versionInfo.dwMajorVersion) {
-            case 10:
-                switch (versionInfo.dwMinorVersion) {
-                    case 0:
-                        buffer << " 10";
-                    break;
-                    default:
-                        buffer << " v10 Other";
-                    break;
-                }
-            break;
-            case 6:
-                switch (versionInfo.dwMinorVersion) {
-                    case 3:
-                        buffer << " 8.1";
-                    break;
-                    case 2:
-                        buffer << " 8";
-                    break;
-                    case 1:
-                        buffer << " 7";
-                    break;
-                    case 0:
-                        buffer << " Vista";
-                    break;
-                    default:
-                        buffer << " v6 Other";
-                    break;
-                }
-            break;
-            case 5:
-                buffer << " XP";
-            break;
-            default:
-                buffer << " Other";
-            break;
-        }
-
-        if (String::isAscii(versionInfo.szCSDVersion)) buffer << versionInfo.szCSDVersion);
+        std::vector<std::string> queryResult = wmi_Instance.query_Devices("Win32_OperatingSystem");
+        _OS_Name = std::move(queryResult[0]); // TODO Find "Microsoft"?
 #elif defined(__unix__)
         struct utsname unameData;
         uname(&unameData);
         std::stringstream buffer(unameData.sysname);
         buffer << " ";
         buffer << nameData.release;
+        _OS_Name = buffer.str();
 #else
 #error "OS not supported"
 #endif
-        _OS_Name = buffer.str();
     }
     
     void SystemInfo::_find_CPU() const noexcept {

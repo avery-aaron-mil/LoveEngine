@@ -18,12 +18,16 @@ namespace love_engine {
             const std::string& get_Video_Card() const noexcept { return _video_Card_Name; }
             uint64_t get_Physical_Memory() const noexcept { return _physical_Memory; }
 
-        private:
+        private: 
             std::string _OS_Name;
             std::string _CPU_Name;
             uint64_t _CPU_Thread_Count;
             std::string _video_Card_Name;
             uint64_t _physical_Memory;
+
+#ifdef
+            WMI_Instance wmi_Instance;
+#endif 
 
             void _find_OS() const noexcept;
             void _find_CPU() const noexcept;

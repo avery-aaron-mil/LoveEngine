@@ -3,6 +3,7 @@
 #define LOVE_WMI_INSTANCE_HPP
 
 #include <string>
+#include <vector>
 
 namespace love_engine {
     class WMI_Instance {
@@ -10,13 +11,14 @@ namespace love_engine {
             WMI_Instance();
             ~WMI_Instance();
 
-            [[nodiscard]] std::vector<std::string> query_Devices();
+            [[nodiscard]] std::vector<std::string> query_Devices(const std::string& key);
 
         private:
             void _init_COM() const noexcept;
             void _create_COM_Instance() noexcept;
             void _connect_WMI_Server() noexcept;
 
+            bool _initialized = false;
             IWbemLocator *_wbemLocator = nullptr;
             IWbemServices *_wbemService = nullptr;
     };
