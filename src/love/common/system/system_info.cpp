@@ -3,8 +3,11 @@
 #include <sstream>
 
 #if defined(_WIN32)
-  #include "wmi_instance.hpp"
-  #include <windows.h>
+  #ifndef _WIN32_DCOM
+  #define _WIN32_DCOM
+  #endif
+  #include <comdef.h>
+  #include <Wbemidl.h>
 #elif defined(__linux__)
   #include <unistd.h>
   #include <sys/utsname.h>
@@ -20,46 +23,50 @@
 #endif
 
 namespace love_engine {
-    void SystemInfo::_find_OS() const noexcept {
+    void SystemInfo::_find_OS() noexcept {
 #if defined(_WIN32)
-        std::vector<std::string> queryResult = wmi_Instance.query_Devices("Win32_OperatingSystem");
-        _OS_Name = std::move(queryResult[0]); // TODO Find "Microsoft"?
+        IEnumWbemClassObject* queryResults = _wmi_Instance.query_System_Info(L"SELECT * FROM Win32_OperatingSystem");
+        IWbemClassObject* wbemClassObj = _wmi_Instance.get_Next_Query_Object(queryResults);
+        std::stringstream buffer;
+        buffer << _wmi_Instance.get_Object_Value(wbemClassObj, L"Caption")
+            << " v" << _wmi_Instance.get_Object_Value(wbemClassObj, L"Version");
+        wbemClassObj->Release();
+        queryResults->Release();
 #elif defined(__unix__)
         struct utsname unameData;
         uname(&unameData);
         std::stringstream buffer(unameData.sysname);
         buffer << " ";
         buffer << nameData.release;
-        _OS_Name = buffer.str();
 #else
 #error "OS not supported"
 #endif
+        _OS_Name.assign(buffer.str());
     }
     
-    void SystemInfo::_find_CPU() const noexcept {
-        char buffer[sizeof(uint32_t) * (3 /* 8.2-8.4 */) * (4 /* RAX-RDX */) + 1];
-        // TODO Find a C++ way to do this that doesn't involve a for loop
+    void SystemInfo::_find_CPU() noexcept {
+        std::stringstream buffer;
     
         for(uint32_t i = 0x80000002; i <= 0x80000004; i++) {
             CPU_ID cpu_ID(i, 0);
-            buffer << String::asAscii(reinterpret_cast<const char*>(&cpu_ID.RAX()), 4);
-            buffer << String::asAscii(reinterpret_cast<const char*>(&cpu_ID.RBX()), 4);
-            buffer << String::asAscii(reinterpret_cast<const char*>(&cpu_ID.RCX()), 4);
-            buffer << String::asAscii(reinterpret_cast<const char*>(&cpu_ID.RDX()), 4);
+            buffer << reinterpret_cast<const char*>(&cpu_ID.RAX());
+            buffer << reinterpret_cast<const char*>(&cpu_ID.RBX());
+            buffer << reinterpret_cast<const char*>(&cpu_ID.RCX());
+            buffer << reinterpret_cast<const char*>(&cpu_ID.RDX());
         }
-        
-        _cpu_Name = std::string(buffer);
+
+        _CPU_Name.assign(buffer.str());
     }
     
-    void SystemInfo::_find_CPU_Thread_Count() const noexcept {
+    void SystemInfo::_find_CPU_Thread_Count() noexcept {
         // TODO
     }
     
-    void SystemInfo::_find_Video_Card() const noexcept {
+    void SystemInfo::_find_Video_Card() noexcept {
         // TODO
     }
     
-    void SystemInfo::_find_Physical_Memory() const noexcept {
+    void SystemInfo::_find_Physical_Memory() noexcept {
         // TODO
     }
     
@@ -73,9 +80,9 @@ namespace love_engine {
     // TODO Get battery info using GetSystemPowerStatus (Windows) and ACPID (Linux)
     // https://stackoverflow.com/questions/27613517/querying-the-power-status-of-a-linux-machine-programmatically
 
-    [[nodiscard]] std::string get_Consolidated_System_Info() const noexcept {
+    std::string SystemInfo::get_Consolidated_System_Info() const noexcept {
         // TODO Return all information in a fancy little string
         std::string info;
-        return std::move(info);
+        return info;
     }
 }
