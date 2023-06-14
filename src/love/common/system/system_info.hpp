@@ -38,21 +38,40 @@ namespace love_engine {
                 uint32_t registers[4];
 
                 public:
-                explicit CPU_ID(unsigned func_Id, unsigned sub_Func_Id) {
-                    asm volatile(
-                        "cpuid"
-                        : "=a" (registers[0]), "=b" (registers[1]),
-                        "=c" (registers[2]), "=d" (registers[3])
-                        : "a" (funcId), "c" (subFuncId)
-                    );
-                    // RCX is set to zero for CPUID function 4
-                }
+                    explicit CPU_ID(unsigned func_Id, unsigned sub_Func_Id) {
+                        asm volatile(
+                            "cpuid"
+                            : "=a" (registers[0]), "=b" (registers[1]),
+                            "=c" (registers[2]), "=d" (registers[3])
+                            : "a" (funcId), "c" (subFuncId)
+                        );
+                        // RCX is set to zero for CPUID function 4
+                    }
 
-                const uint32_t &RAX() const {return regs[0];}
-                const uint32_t &RBX() const {return regs[1];}
-                const uint32_t &RCX() const {return regs[2];}
-                const uint32_t &RDX() const {return regs[3];}
+                    const uint32_t &RAX() const {return regs[0];}
+                    const uint32_t &RBX() const {return regs[1];}
+                    const uint32_t &RCX() const {return regs[2];}
+                    const uint32_t &RDX() const {return regs[3];}
             };
+#ifdef _WIN32 
+            class WMI_Instance {
+                public:
+                    WMI_Instance();
+                    ~WMI_Instance();
+
+                    [[nodiscard]] std::vector<std::string> query_Devices(const std::string& wmiClass);
+
+                private:
+                    void _init_COM() const noexcept;
+                    void _create_COM_Instance() noexcept;
+                    void _connect_WMI_Server() noexcept;
+
+                    bool _initialized = false;
+                    IWbemLocator *_wbemLocator = nullptr;
+                    IWbemServices *_wbemService = nullptr;
+    
+            };
+#endif // _WIN32 
     };
 
 }

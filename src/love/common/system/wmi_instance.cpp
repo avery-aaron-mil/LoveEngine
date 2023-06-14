@@ -1,5 +1,5 @@
 #ifdef _WIN32
-#include "wmi_instance.hpp"
+#include "system_info.hpp"
 
 #include <sstream>
 
@@ -8,34 +8,34 @@
 #include <Wbemidl.h>
 
 namespace love_engine {
-    WMI_Instance::WMI_Instance() {
+    SystemInfo::WMI_Instance::WMI_Instance() {
         _init_COM();
         _create_COM_Instance();
         _connect_WMI_Server();
     }
 
-    WMI_Instance::~WMI_Instance() {
+    SystemInfo::WMI_Instance::~WMI_Instance() {
         if (_wbemService) _wbemService->Release();
         if (_wbemLocator) _wbemLocator->Release();
         if (initialized) CoUninitialize();
     }
 
-    void WMI_Instance::_init_COM() noexcept {
+    void SystemInfo::WMI_Instance::_init_COM() noexcept {
         HRESULT hres = CoInitializeEx(0, COINIT_MULTITHREADED);
         if (FAILED(hres)) {
             // TODO "Failed to initialize COM library. Error code: 0x" << hex << hres
         }
         
         hres =  CoInitializeSecurity(
-            NULL,
+            nullptr,
             -1,                          // COM authentication
-            NULL,                        // Authentication services
-            NULL,                        // Reserved
+            nullptr,                     // Authentication services
+            nullptr,                     // Reserved
             RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
             RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation
-            NULL,                        // Authentication info
+            nullptr,                     // Authentication info
             EOAC_NONE,                   // Additional capabilities
-            NULL                         // Reserved
+            nullptr                      // Reserved
         );
         if (FAILED(hres)) {
             // TODO "Failed to initialize COM security. Error code: 0x" << hex << hres
@@ -44,7 +44,7 @@ namespace love_engine {
         _initialized = true;
     }
 
-    void WMI_Instance::_create_COM_Instance() noexcept {
+    void SystemInfo::WMI_Instance::_create_COM_Instance() noexcept {
         HRESULT hres = CoCreateInstance(
         CLSID_WbemLocator,             
         0, 
@@ -56,14 +56,14 @@ namespace love_engine {
         }
     }
 
-    void WMI_Instance::_connect_WMI_Server() noexcept {
+    void SystemInfo::WMI_Instance::_connect_WMI_Server() noexcept {
         BSTR wmiNamespace = SysAllocString(L"ROOT\\CIMV2");
         HRESULT hres = _wbemLocator->ConnectServer(
             wmiNamespace, // Object path of WMI namespace
-            NULL,         // User name. NULL = current user
-            NULL,         // User password. NULL = current
+            nullptr,      // User name. NULL = current user
+            nullptr,      // User password. NULL = current
             0,            // Locale. NULL indicates current
-            NULL,         // Security flags.
+            nullptr,      // Security flags.
             0,            // Authority (for example, Kerberos)
             0,            // Context object 
             &_wbemService // pointer to IWbemServices proxy
@@ -79,10 +79,10 @@ namespace love_engine {
             _wbemService,                // Indicates the proxy to set
             RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
             RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
-            NULL,                        // Server principal name
+            nullptr,                     // Server principal name
             RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx
             RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
-            NULL,                        // client identity
+            nullptr,                     // client identity
             EOAC_NONE                    // proxy capabilities
         );
         if (FAILED(hres)) {
@@ -93,19 +93,19 @@ namespace love_engine {
         }
     }
 
-    [[nodiscard]] std::vector<std::string> WMI_Instance::query_Devices(
-        const std::string& key
+    [[nodiscard]] std::vector<std::string> SystemInfo::WMI_Instance::query_Devices(
+        const std::string& wmiClass
     ) {
         std::stringstream queryBuffer("SELECT * FROM ");
-        queryBuffer << key;
+        queryBuffer << wmiClass;
         BSTR wql = SysAllocString("WQL");
         BSTR query = SysAllocString(queryBuffer);
-        IEnumWbemClassObject* wbemEnum = NULL;
+        IEnumWbemClassObject* wbemEnum = nullptr;
         HRESULT hres = _wbemService->ExecQuery(
             wql,
             query,
             WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
-            NULL,
+            nullptr,
             &wbemEnum
         );
         SysFreeString(wql);
@@ -117,19 +117,19 @@ namespace love_engine {
             CoUninitialize();
         }
 
-        IWbemClassObject *wbemClassObj = NULL;
+        IWbemClassObject *wbemClassObj = nullptr;
         ULONG uReturn = 0;
         using convert_utf8 = std::codecvt_utf8<wchar_t>;
         std::wstring_convert<convert_utf8, wchar_t> wstrConverter;
         std::vector<std::string> queryResults;
-        while (wbemEnum) {
+        while (wbemEnum != nullptr) {
             hres = webmEnum->Next(WBEM_INFINITE, 1, &wbemClassObj, &uReturn);
             if(uReturn == 0) break;
 
             VARIANT variantProperty;
             VariantInit(&variantProperty);
             // Get the value of the Name property
-            hres = wbemClassObj->Get(L"Name", 0, &variantProperty, 0, 0);
+            hres = wbemClassObj->Get(L"Name", 0, &variantProperty, 0, 0); // TODO This value is dependent on class
             queryResults.push_back(
                 std::move(
                     wstrConverter.to_bytes(
