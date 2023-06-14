@@ -1,7 +1,7 @@
 #ifndef LOVE_CLIENT_INSTANCE_HPP
 #define LOVE_CLIENT_INSTANCE_HPP
 
-#include "clientstate.hpp"
+#include "client_state.hpp"
 
 #include <stdfloat>
 

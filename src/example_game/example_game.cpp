@@ -14,7 +14,7 @@ using namespace example_game;
 int main(int argc, char** argv) {
     Logger logger("logs/latest.log");
     SystemInfo systemInfo;
-    systemInfo.logSystemInfo();
+    systemInfo.get_Consolidated_System_Info();
     
     ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);

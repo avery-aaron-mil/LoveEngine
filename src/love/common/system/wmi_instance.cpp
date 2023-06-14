@@ -109,17 +109,18 @@ namespace love_engine {
         return wbemEnum;
     }
 
-    [[nodiscard]] IWbemClassObject* WMI_Instance::get_Next_Query_Object(const IEnumWbemClassObject* queryResults) noexcept {
+    [[nodiscard]] IWbemClassObject* WMI_Instance::get_Next_Query_Object(IEnumWbemClassObject*const queryResults) noexcept {
         IWbemClassObject* wbemClassObj = nullptr;
         ULONG uReturn = 0;
         queryResults->Next(WBEM_INFINITE, 1, &wbemClassObj, &uReturn);
         if(uReturn == 0 || wbemClassObj == nullptr) {
             // TODO "Could not get next query result on IEnumWbemClassObject. Error code: 0x" << std::hex << uReturn;
         }
+        return wbemClassObj;
     }
 
     std::string WMI_Instance::get_Object_Value(
-        const IWbemClassObject*const wbemClassObj,
+        IWbemClassObject*const wbemClassObj,
         const wchar_t*const obj
     ) noexcept {
         VARIANT variantProperty;

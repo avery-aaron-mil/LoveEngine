@@ -22,8 +22,8 @@ namespace love_engine {
             // WARNING: Must call ->Release() on the object when finished using.
             [[nodiscard]] IEnumWbemClassObject* query_System_Info(const wchar_t*const query) const noexcept;
             // WARNING: Must call ->Release() on the object before reassigning, or when finished using.
-            [[nodiscard]] static IWbemClassObject* get_Next_Query_Object(const IEnumWbemClassObject* queryResults) noexcept;
-            static std::string get_Object_Value(const IWbemClassObject*const wbemClassObj, const wchar_t*const obj) noexcept;
+            [[nodiscard]] static IWbemClassObject* get_Next_Query_Object(IEnumWbemClassObject*const queryResults) noexcept;
+            std::string get_Object_Value(IWbemClassObject*const wbemClassObj, const wchar_t*const obj) noexcept;
 
         private:
             void _init_COM() noexcept;
@@ -35,7 +35,7 @@ namespace love_engine {
             IWbemServices *_wbemService = nullptr;
 
             using convert_utf8 = std::codecvt_utf8<wchar_t>;
-            static std::wstring_convert<convert_utf8, wchar_t> _wstrConverter;
+            std::wstring_convert<convert_utf8, wchar_t> _wstrConverter;
     };
 }
 
