@@ -15,26 +15,46 @@ namespace love_engine {
             SystemInfo() {}
             ~SystemInfo() {}
 
-            std::string get_Consolidated_System_Info() const noexcept;
-            const std::string& get_OS() const noexcept { return _OS_Name; }
-            const std::string& get_CPU() const noexcept { return _CPU_Name; }
-            uint32_t get_CPU_Thread_Count() const noexcept { return _CPU_Thread_Count; }
-            const std::string& get_Video_Card() const noexcept { return _video_Card_Name; }
-            uint64_t get_Physical_Memory() const noexcept { return _physical_Memory; }
+            std::string get_Consolidated_System_Info() noexcept;
+            const std::string& get_OS() noexcept {
+                if (_CPU_Name.empty()) _find_OS();
+                return _OS_Name;
+            }
+            const std::string& get_CPU() noexcept {
+                if (_CPU_Name.empty()) _find_CPU();
+                return _CPU_Name;
+            }
+            uint32_t get_CPU_Processor_Count() noexcept {
+                if (_CPU_Processor_Count < 0) _find_CPU_Count();
+                return _CPU_Processor_Count;
+            }
+            uint32_t get_CPU_Thread_Count() noexcept {
+                if (_CPU_Thread_Count < 0) _find_CPU_Count();
+                return _CPU_Thread_Count;
+            }
+            const std::string& get_Video_Card() noexcept {
+                if (_video_Card_Name.empty()) _find_Video_Card();
+                return _video_Card_Name;
+            }
+            uint64_t get_Physical_Memory() noexcept {
+                if (_physical_Memory < 0) _find_Physical_Memory();
+                return _physical_Memory;
+            }
 
         private:
 #ifdef _WIN32
             WMI_Instance _wmi_Instance;
 #endif 
-            std::string _OS_Name;
-            std::string _CPU_Name;
-            uint64_t _CPU_Thread_Count;
-            std::string _video_Card_Name;
-            uint64_t _physical_Memory;
+            std::string _OS_Name = "";
+            std::string _CPU_Name = "";
+            uint32_t _CPU_Processor_Count = -1;
+            uint32_t _CPU_Thread_Count = -1;
+            std::string _video_Card_Name = "";
+            uint64_t _physical_Memory = -1;
 
             void _find_OS() noexcept;
             void _find_CPU() noexcept;
-            void _find_CPU_Thread_Count() noexcept;
+            void _find_CPU_Count() noexcept;
             void _find_Video_Card() noexcept;
             void _find_Physical_Memory() noexcept;
             

@@ -28,8 +28,8 @@ namespace love_engine {
         IEnumWbemClassObject* queryResults = _wmi_Instance.query_System_Info(L"SELECT * FROM Win32_OperatingSystem");
         IWbemClassObject* wbemClassObj = _wmi_Instance.get_Next_Query_Object(queryResults);
         std::stringstream buffer;
-        buffer << _wmi_Instance.get_Object_Value(wbemClassObj, L"Caption")
-            << " v" << _wmi_Instance.get_Object_Value(wbemClassObj, L"Version");
+        buffer << _wmi_Instance.get_Object_Value_String(wbemClassObj, L"Caption")
+            << " v" << _wmi_Instance.get_Object_Value_String(wbemClassObj, L"Version");
         wbemClassObj->Release();
         queryResults->Release();
 #elif defined(__unix__)
@@ -58,8 +58,19 @@ namespace love_engine {
         _CPU_Name.assign(buffer.str());
     }
     
-    void SystemInfo::_find_CPU_Thread_Count() noexcept {
+    void SystemInfo::_find_CPU_Count() noexcept {
+#if defined(_WIN32)
+        IEnumWbemClassObject* queryResults = _wmi_Instance.query_System_Info(L"SELECT * FROM Win32_ComputerSystem");
+        IWbemClassObject* wbemClassObj = _wmi_Instance.get_Next_Query_Object(queryResults);
+        _CPU_Thread_Count = _wmi_Instance.get_Object_Value_UI32(wbemClassObj, L"NumberOfLogicalProcessors");
+        _CPU_Processor_Count = _wmi_Instance.get_Object_Value_UI32(wbemClassObj, L"NumberOfProcessors");
+        wbemClassObj->Release();
+        queryResults->Release();
+#elif defined(__unix__)
         // TODO
+#else
+#error "OS not supported"
+#endif
     }
     
     void SystemInfo::_find_Video_Card() noexcept {
@@ -79,10 +90,15 @@ namespace love_engine {
     
     // TODO Get battery info using GetSystemPowerStatus (Windows) and ACPID (Linux)
     // https://stackoverflow.com/questions/27613517/querying-the-power-status-of-a-linux-machine-programmatically
-
-    std::string SystemInfo::get_Consolidated_System_Info() const noexcept {
+#include <stdio.h> // TODO REMOVE
+    std::string SystemInfo::get_Consolidated_System_Info() noexcept {
         // TODO Return all information in a fancy little string
-        std::string info;
-        return info;
+        std::stringstream buffer;
+        buffer << "OS: " << get_OS() <<
+            "\nCPU Name: " << get_CPU() <<
+            "\nNumber of processors: " << get_CPU_Processor_Count() <<
+            "\nNumber of processor threads: " << get_CPU_Thread_Count() << "\n";
+        std::puts(buffer.str().c_str());
+        return buffer.str();
     }
 }

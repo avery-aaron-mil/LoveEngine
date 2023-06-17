@@ -5,19 +5,23 @@
 
 namespace love_engine {
 
-    enum Log_Status {
-        IGNORE,
-        STATUS,
-        UPDATE,
-        INFO,
-        WARNING,
-        ERROR,
-        FATAL,
+    enum class Log_Status {
+        LOG_IGNORE,
+        LOG_STATUS,
+        LOG_UPDATE,
+        LOG_INFO,
+        LOG_WARNING,
+        LOG_ERROR,
+        LOG_FATAL,
     };
 
    class Logger {
         public:
-            Logger(const std::string& filePath) : _filePath(filePath) {}
+            Logger(const std::string& filePath) : _filePath(filePath) {
+#ifdef _WIN32
+                setConsole();
+#endif
+            }
             ~Logger() {}
            
             virtual void log(const std::string& message) const noexcept;
@@ -25,6 +29,10 @@ namespace love_engine {
 
         private:
             std::string _filePath;
+
+#ifdef _WIN32
+            void setConsole();
+#endif
    };
 
 }

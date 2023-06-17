@@ -100,7 +100,7 @@ namespace love_engine {
         );
         SysFreeString(wqlStr);
         SysFreeString(queryStr);
-        if (FAILED(hres)) {
+        if (FAILED(hres) || wbemEnum == nullptr) {
             // TODO "Query for " << key << " failed. Error code: 0x" << hex << hres
             _wbemService->Release();
             _wbemLocator->Release();
@@ -119,20 +119,55 @@ namespace love_engine {
         return wbemClassObj;
     }
 
-    std::string WMI_Instance::get_Object_Value(
+    uint32_t WMI_Instance::get_Object_Value_UI32(
         IWbemClassObject*const wbemClassObj,
         const wchar_t*const obj
     ) noexcept {
         VARIANT variantProperty;
         VariantInit(&variantProperty);
         wbemClassObj->Get(obj, 0, &variantProperty, 0, 0);
+        if (variantProperty.vt != VT_UI4) {
+            VariantClear(&variantProperty);
+            return -1; // TODO "Variant property was not UI4 when requesting a uint32_t." 
+        }
+        uint32_t value = variantProperty.uintVal;
         VariantClear(&variantProperty);
-        return _wstrConverter.to_bytes(
+        return value;
+    }
+    uint64_t WMI_Instance::get_Object_Value_UI64(
+        IWbemClassObject*const wbemClassObj,
+        const wchar_t*const obj
+    ) noexcept {
+        VARIANT variantProperty;
+        VariantInit(&variantProperty);
+        wbemClassObj->Get(obj, 0, &variantProperty, 0, 0);
+        if (variantProperty.vt != VT_UI8) {
+            VariantClear(&variantProperty);
+            return -1; // TODO "Variant property was not UI8 when requesting a uint64_t."
+        }
+        uint64_t value = variantProperty.ullVal;
+        VariantClear(&variantProperty);
+        return value;
+    }
+    std::string WMI_Instance::get_Object_Value_String(
+        IWbemClassObject*const wbemClassObj,
+        const wchar_t*const obj
+    ) noexcept {
+        VARIANT variantProperty;
+        VariantInit(&variantProperty);
+        wbemClassObj->Get(obj, 0, &variantProperty, 0, 0);
+        if (variantProperty.vt != VT_BSTR) {
+            VariantClear(&variantProperty);
+            return "Variant property was not BSTR when requesting a string."; // TODO Crash 
+        }
+        std::string value = _wstrConverter.to_bytes(
             std::wstring(
                 variantProperty.bstrVal,
                 SysStringLen(variantProperty.bstrVal)
             )
         );
+        VariantClear(&variantProperty);
+        return value;
     }
 }
 

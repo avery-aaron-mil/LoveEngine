@@ -3,10 +3,8 @@
 
 #include <love/client/client_state.hpp>
 
-using namespace love_engine;
-
 namespace example_game {
-    class ClientState_Loading : public ClientState {
+    class ClientState_Loading : public love_engine::ClientState {
         public:
             ClientState_Loading() {}
             ~ClientState_Loading() {}

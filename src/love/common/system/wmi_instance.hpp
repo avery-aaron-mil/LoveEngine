@@ -5,6 +5,7 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <cstdint>
 
 #ifndef _WIN32_DCOM
 #define _WIN32_DCOM
@@ -23,7 +24,9 @@ namespace love_engine {
             [[nodiscard]] IEnumWbemClassObject* query_System_Info(const wchar_t*const query) const noexcept;
             // WARNING: Must call ->Release() on the object before reassigning, or when finished using.
             [[nodiscard]] static IWbemClassObject* get_Next_Query_Object(IEnumWbemClassObject*const queryResults) noexcept;
-            std::string get_Object_Value(IWbemClassObject*const wbemClassObj, const wchar_t*const obj) noexcept;
+            uint32_t get_Object_Value_UI32(IWbemClassObject*const wbemClassObj, const wchar_t*const obj) noexcept;
+            uint64_t get_Object_Value_UI64(IWbemClassObject*const wbemClassObj, const wchar_t*const obj) noexcept;
+            std::string get_Object_Value_String(IWbemClassObject*const wbemClassObj, const wchar_t*const obj) noexcept;
 
         private:
             void _init_COM() noexcept;

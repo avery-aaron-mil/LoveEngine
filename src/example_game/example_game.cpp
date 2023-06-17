@@ -15,10 +15,10 @@ int main(int argc, char** argv) {
     Logger logger("logs/latest.log");
     SystemInfo systemInfo;
     systemInfo.get_Consolidated_System_Info();
-    
-    ClientState_Loading loading_State;
+
+    /*ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);
-    client.run();
+    client.run();*/
 
     exit(EXIT_SUCCESS);
 }

@@ -7,8 +7,6 @@ namespace love_engine {
 
     class ClientState {
         public:
-            virtual ~ClientState() {}
-            
             virtual void update() const noexcept = 0;
             virtual void render(std::float128_t lag) const noexcept = 0;
     };
