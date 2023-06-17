@@ -16,26 +16,24 @@ namespace love_engine {
             SystemInfo() {}
             ~SystemInfo() {}
 
-            std::string get_Consolidated_System_Info() noexcept;
+            typedef struct CPU_Info_ {
+                std::string name;
+                uint32_t cores = 0;
+                uint32_t threads = 0;
+                uint32_t speed = 0;
+            } CPU_Info;
+
+            std::string get_Consolidated_System_Info() noexcept {
+                if (_consolidated_System_Info.empty()) _set_Consolidated_System_Info();
+                return _OS_Name;
+            }
             const std::string& get_OS() noexcept {
                 if (_OS_Name.empty()) _find_OS();
                 return _OS_Name;
             }
-            const std::string& get_CPU() noexcept {
-                if (_CPU_Names_Consolidated.empty()) _find_CPU();
-                return _CPU_Names_Consolidated;
-            }
-            uint32_t get_CPU_Processor_Count() noexcept {
-                if (_CPU_Processor_Count <= 0) _find_CPU();
-                return _CPU_Processor_Count;
-            }
-            uint32_t get_CPU_Core_Count() noexcept {
-                if (_CPU_Core_Count <= 0) _find_CPU();
-                return _CPU_Core_Count;
-            }
-            uint32_t get_CPU_Thread_Count() noexcept {
-                if (_CPU_Thread_Count <= 0) _find_CPU();
-                return _CPU_Thread_Count;
+            const std::vector<CPU_Info> get_CPUs() noexcept {
+                if (_CPUs.empty()) _find_CPUs();
+                return _CPUs;
             }
             const std::string& get_Video_Card() noexcept {
                 if (_video_Card_Name.empty()) _find_Video_Card();
@@ -50,17 +48,15 @@ namespace love_engine {
 #ifdef _WIN32
             WMI_Instance _wmi_Instance;
 #endif 
+            std::string _consolidated_System_Info;
             std::string _OS_Name;
-            std::string _CPU_Names_Consolidated;
-            uint32_t _CPU_Processor_Count = 0;
-            std::vector<std::string> _CPU_Names;
-            uint32_t _CPU_Core_Count = 0;
-            uint32_t _CPU_Thread_Count = 0;
+            std::vector<CPU_Info> _CPUs;
             std::string _video_Card_Name;
             uint64_t _physical_Memory = 0;
 
+            void _set_Consolidated_System_Info() noexcept;
             void _find_OS() noexcept;
-            void _find_CPU() noexcept;
+            void _find_CPUs() noexcept;
             void _find_Video_Card() noexcept;
             void _find_Physical_Memory() noexcept;
     };
