@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 #include "wmi_instance.hpp"
@@ -17,19 +18,23 @@ namespace love_engine {
 
             std::string get_Consolidated_System_Info() noexcept;
             const std::string& get_OS() noexcept {
-                if (_CPU_Name.empty()) _find_OS();
+                if (_OS_Name.empty()) _find_OS();
                 return _OS_Name;
             }
             const std::string& get_CPU() noexcept {
-                if (_CPU_Name.empty()) _find_CPU();
-                return _CPU_Name;
+                if (_CPU_Names_Consolidated.empty()) _find_CPU();
+                return _CPU_Names_Consolidated;
             }
             uint32_t get_CPU_Processor_Count() noexcept {
-                if (_CPU_Processor_Count < 0) _find_CPU_Count();
+                if (_CPU_Processor_Count <= 0) _find_CPU();
                 return _CPU_Processor_Count;
             }
+            uint32_t get_CPU_Core_Count() noexcept {
+                if (_CPU_Core_Count <= 0) _find_CPU();
+                return _CPU_Core_Count;
+            }
             uint32_t get_CPU_Thread_Count() noexcept {
-                if (_CPU_Thread_Count < 0) _find_CPU_Count();
+                if (_CPU_Thread_Count <= 0) _find_CPU();
                 return _CPU_Thread_Count;
             }
             const std::string& get_Video_Card() noexcept {
@@ -37,7 +42,7 @@ namespace love_engine {
                 return _video_Card_Name;
             }
             uint64_t get_Physical_Memory() noexcept {
-                if (_physical_Memory < 0) _find_Physical_Memory();
+                if (_physical_Memory <= 0) _find_Physical_Memory();
                 return _physical_Memory;
             }
 
@@ -45,38 +50,19 @@ namespace love_engine {
 #ifdef _WIN32
             WMI_Instance _wmi_Instance;
 #endif 
-            std::string _OS_Name = "";
-            std::string _CPU_Name = "";
-            uint32_t _CPU_Processor_Count = -1;
-            uint32_t _CPU_Thread_Count = -1;
-            std::string _video_Card_Name = "";
-            uint64_t _physical_Memory = -1;
+            std::string _OS_Name;
+            std::string _CPU_Names_Consolidated;
+            uint32_t _CPU_Processor_Count = 0;
+            std::vector<std::string> _CPU_Names;
+            uint32_t _CPU_Core_Count = 0;
+            uint32_t _CPU_Thread_Count = 0;
+            std::string _video_Card_Name;
+            uint64_t _physical_Memory = 0;
 
             void _find_OS() noexcept;
             void _find_CPU() noexcept;
-            void _find_CPU_Count() noexcept;
             void _find_Video_Card() noexcept;
             void _find_Physical_Memory() noexcept;
-            
-            class CPU_ID {
-                uint32_t registers[4];
-
-                public:
-                    explicit CPU_ID(unsigned funcID, unsigned subFuncID) {
-                        asm volatile(
-                            "cpuid"
-                            : "=a" (registers[0]), "=b" (registers[1]),
-                            "=c" (registers[2]), "=d" (registers[3])
-                            : "a" (funcID), "c" (subFuncID)
-                        );
-                        // RCX is set to zero for CPUID function 4
-                    }
-
-                    const uint32_t &RAX() const {return registers[0];}
-                    const uint32_t &RBX() const {return registers[1];}
-                    const uint32_t &RCX() const {return registers[2];}
-                    const uint32_t &RDX() const {return registers[3];}
-            };
     };
 
 }

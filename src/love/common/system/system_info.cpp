@@ -1,6 +1,10 @@
 #include "system_info.hpp"
 
+#include <algorithm>
+#include <cstring>
+#include <iterator>
 #include <sstream>
+#include <iostream> // TODO Remove
 
 #if defined(_WIN32)
   #ifndef _WIN32_DCOM
@@ -26,12 +30,12 @@ namespace love_engine {
     void SystemInfo::_find_OS() noexcept {
 #if defined(_WIN32)
         IEnumWbemClassObject* queryResults = _wmi_Instance.query_System_Info(L"SELECT * FROM Win32_OperatingSystem");
-        IWbemClassObject* wbemClassObj = _wmi_Instance.get_Next_Query_Object(queryResults);
+        IWbemClassObject* wbemClassObj = _wmi_Instance.get_Next_Query_Object(&queryResults);
         std::stringstream buffer;
         buffer << _wmi_Instance.get_Object_Value_String(wbemClassObj, L"Caption")
             << " v" << _wmi_Instance.get_Object_Value_String(wbemClassObj, L"Version");
         wbemClassObj->Release();
-        queryResults->Release();
+        if (queryResults) queryResults->Release();
 #elif defined(__unix__)
         struct utsname unameData;
         uname(&unameData);
@@ -45,32 +49,30 @@ namespace love_engine {
     }
     
     void SystemInfo::_find_CPU() noexcept {
-        std::stringstream buffer;
-    
-        for(uint32_t i = 0x80000002; i <= 0x80000004; i++) {
-            CPU_ID cpu_ID(i, 0);
-            buffer << reinterpret_cast<const char*>(&cpu_ID.RAX());
-            buffer << reinterpret_cast<const char*>(&cpu_ID.RBX());
-            buffer << reinterpret_cast<const char*>(&cpu_ID.RCX());
-            buffer << reinterpret_cast<const char*>(&cpu_ID.RDX());
+#ifdef _WIN32
+        IEnumWbemClassObject* queryResults = _wmi_Instance.query_System_Info(L"SELECT * FROM Win32_Processor");
+        do {
+            IWbemClassObject* wbemClassObj = _wmi_Instance.get_Next_Query_Object(&queryResults);
+            if (wbemClassObj) {
+                _CPU_Processor_Count++;
+                _CPU_Core_Count += _wmi_Instance.get_Object_Value_UI32(wbemClassObj, L"NumberOfCores");
+                _CPU_Thread_Count += _wmi_Instance.get_Object_Value_UI32(wbemClassObj, L"NumberOfLogicalProcessors");
+                _CPU_Names.push_back(_wmi_Instance.get_Object_Value_String(wbemClassObj, L"Name"));
+                wbemClassObj->Release();
+            }
         }
-
-        _CPU_Name.assign(buffer.str());
-    }
-    
-    void SystemInfo::_find_CPU_Count() noexcept {
-#if defined(_WIN32)
-        IEnumWbemClassObject* queryResults = _wmi_Instance.query_System_Info(L"SELECT * FROM Win32_ComputerSystem");
-        IWbemClassObject* wbemClassObj = _wmi_Instance.get_Next_Query_Object(queryResults);
-        _CPU_Thread_Count = _wmi_Instance.get_Object_Value_UI32(wbemClassObj, L"NumberOfLogicalProcessors");
-        _CPU_Processor_Count = _wmi_Instance.get_Object_Value_UI32(wbemClassObj, L"NumberOfProcessors");
-        wbemClassObj->Release();
-        queryResults->Release();
+        while (queryResults);
 #elif defined(__unix__)
-        // TODO
+        // TODO Use /proc/cpuinfo
 #else
 #error "OS not supported"
 #endif
+        std::stringstream buffer;
+        for (size_t i = 0; i < _CPU_Names.size(); i++) {
+            buffer << _CPU_Names[i];
+            if (i < _CPU_Names.size() - 1) buffer << "; ";
+        }
+        _CPU_Names_Consolidated.assign(buffer.str());
     }
     
     void SystemInfo::_find_Video_Card() noexcept {
@@ -96,7 +98,7 @@ namespace love_engine {
         std::stringstream buffer;
         buffer << "OS: " << get_OS() <<
             "\nCPU Name: " << get_CPU() <<
-            "\nNumber of processors: " << get_CPU_Processor_Count() <<
+            "\nNumber of cores: " << get_CPU_Core_Count() <<
             "\nNumber of processor threads: " << get_CPU_Thread_Count() << "\n";
         std::puts(buffer.str().c_str());
         return buffer.str();

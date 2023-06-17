@@ -1,6 +1,9 @@
 #ifdef _WIN32
 #include "wmi_instance.hpp"
 
+#include <iostream> // TODO Remove
+#include <stdio.h> // TODO Remove
+
 namespace love_engine {
     WMI_Instance::WMI_Instance() {
         _init_COM();
@@ -17,7 +20,7 @@ namespace love_engine {
     void WMI_Instance::_init_COM() noexcept {
         HRESULT hres = CoInitializeEx(0, COINIT_MULTITHREADED);
         if (FAILED(hres)) {
-            // TODO "Failed to initialize COM library. Error code: 0x" << hex << hres
+            std::cout << "Failed to initialize COM library. Error code: 0x" << std::hex << hres; // TODO Crash
         }
         
         hres =  CoInitializeSecurity(
@@ -32,7 +35,7 @@ namespace love_engine {
             nullptr                      // Reserved
         );
         if (FAILED(hres)) {
-            // TODO "Failed to initialize COM security. Error code: 0x" << hex << hres
+            std::cout << "Failed to initialize COM security. Error code: 0x" << std::hex << hres; // TODO Crash
             CoUninitialize();
         }
         _initialized = true;
@@ -45,7 +48,7 @@ namespace love_engine {
         CLSCTX_INPROC_SERVER, 
         IID_IWbemLocator, (LPVOID*) &_wbemLocator);
         if (FAILED(hres)) {
-            // TODO "Failed to create IWbemLocator object. Error code: 0x" << hex << hres
+            std::cout << "Failed to create IWbemLocator object. Error code: 0x" << std::hex << hres; // TODO Crash
             CoUninitialize();
         }
     }
@@ -64,7 +67,7 @@ namespace love_engine {
         );
         SysFreeString(wmiNamespace);
         if (FAILED(hres)) {
-            // TODO "Could not connect to WMI server. Error code: 0x" << hex << hres
+            std::cout << "Could not connect to WMI server. Error code: 0x" << std::hex << hres; // TODO Crash
             _wbemLocator->Release();
             CoUninitialize();
         }
@@ -80,7 +83,7 @@ namespace love_engine {
             EOAC_NONE                    // proxy capabilities
         );
         if (FAILED(hres)) {
-            // TODO "Could not set COM proxy blanket. Error code: 0x" << hex << hres
+            std::cout << "Could not set COM proxy blanket. Error code: 0x" << std::hex << hres; // TODO Crash
             _wbemService->Release();
             _wbemLocator->Release();
             CoUninitialize();
@@ -101,7 +104,7 @@ namespace love_engine {
         SysFreeString(wqlStr);
         SysFreeString(queryStr);
         if (FAILED(hres) || wbemEnum == nullptr) {
-            // TODO "Query for " << key << " failed. Error code: 0x" << hex << hres
+            std::wcout << "Query for " << query << " failed. Error code: 0x" << std::hex << hres; // TODO Crash
             _wbemService->Release();
             _wbemLocator->Release();
             CoUninitialize();
@@ -109,16 +112,16 @@ namespace love_engine {
         return wbemEnum;
     }
 
-    [[nodiscard]] IWbemClassObject* WMI_Instance::get_Next_Query_Object(IEnumWbemClassObject*const queryResults) noexcept {
+    [[nodiscard]] IWbemClassObject* WMI_Instance::get_Next_Query_Object(IEnumWbemClassObject**const queryResults) noexcept {
         IWbemClassObject* wbemClassObj = nullptr;
         ULONG uReturn = 0;
-        queryResults->Next(WBEM_INFINITE, 1, &wbemClassObj, &uReturn);
+        (*queryResults)->Next(WBEM_INFINITE, 1, &wbemClassObj, &uReturn);
         if(uReturn == 0 || wbemClassObj == nullptr) {
-            // TODO "Could not get next query result on IEnumWbemClassObject. Error code: 0x" << std::hex << uReturn;
+            (*queryResults)->Release();
+            *queryResults = nullptr;
         }
         return wbemClassObj;
     }
-
     uint32_t WMI_Instance::get_Object_Value_UI32(
         IWbemClassObject*const wbemClassObj,
         const wchar_t*const obj
@@ -126,10 +129,6 @@ namespace love_engine {
         VARIANT variantProperty;
         VariantInit(&variantProperty);
         wbemClassObj->Get(obj, 0, &variantProperty, 0, 0);
-        if (variantProperty.vt != VT_UI4) {
-            VariantClear(&variantProperty);
-            return -1; // TODO "Variant property was not UI4 when requesting a uint32_t." 
-        }
         uint32_t value = variantProperty.uintVal;
         VariantClear(&variantProperty);
         return value;
@@ -141,10 +140,6 @@ namespace love_engine {
         VARIANT variantProperty;
         VariantInit(&variantProperty);
         wbemClassObj->Get(obj, 0, &variantProperty, 0, 0);
-        if (variantProperty.vt != VT_UI8) {
-            VariantClear(&variantProperty);
-            return -1; // TODO "Variant property was not UI8 when requesting a uint64_t."
-        }
         uint64_t value = variantProperty.ullVal;
         VariantClear(&variantProperty);
         return value;
@@ -156,10 +151,6 @@ namespace love_engine {
         VARIANT variantProperty;
         VariantInit(&variantProperty);
         wbemClassObj->Get(obj, 0, &variantProperty, 0, 0);
-        if (variantProperty.vt != VT_BSTR) {
-            VariantClear(&variantProperty);
-            return "Variant property was not BSTR when requesting a string."; // TODO Crash 
-        }
         std::string value = _wstrConverter.to_bytes(
             std::wstring(
                 variantProperty.bstrVal,
