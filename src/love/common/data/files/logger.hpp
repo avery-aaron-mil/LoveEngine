@@ -17,11 +17,7 @@ namespace love_engine {
 
    class Logger {
         public:
-            Logger(const std::string& filePath) : _filePath(filePath) {
-#ifdef _WIN32
-                setConsole();
-#endif
-            }
+            Logger(const std::string& filePath) : _filePath(filePath) {}
             ~Logger() {}
            
             virtual void log(const std::string& message) const noexcept;

@@ -85,7 +85,7 @@ namespace love_engine {
             L"~MHz"
         )) + "MHz";
 #elif defined(__APPLE__)
-        // TODO Use sysctlbyname
+        // TODO Use sysctlbyname https://stackoverflow.com/questions/853798
         if (sysctlbyname("hw.cpufrequency", &freq, &size, NULL, 0) < 0) {
             // Error
         }

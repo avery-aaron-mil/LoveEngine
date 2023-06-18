@@ -1,8 +1,6 @@
 #ifdef _WIN32
 #include "windows_registry.hpp"
 
-#include <memory>
-
 namespace love_engine {
     std::string WindowsRegistry::_get_System_Message(LSTATUS resultCode) noexcept {
         LPSTR systemMessageBuffer = nullptr;
