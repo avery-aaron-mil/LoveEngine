@@ -12,8 +12,8 @@ namespace love_engine {
                     FileContent(void*const data, const size_t size) : _data(data), _size(size) {}
                     ~FileContent() { std::free(_data); }
 
-                    const void*const data() { return _data; }
-                    size_t size() { return _size; }
+                    const void*const data() const noexcept  { return _data; }
+                    size_t size() const noexcept { return _size; }
 
                 private:
                     void* _data;
@@ -26,6 +26,9 @@ namespace love_engine {
             static void write_File(const char*const filePath, const std::string& data);
             static void write_File(const char*const filePath, FileContent& content);
             static void append_File(const char*const filePath, const std::string& data);
+
+            static void lock();
+            static void unlock();
     };
 }
 

@@ -2,12 +2,14 @@
 
 #include <cstdio>
 #include <future>
+#include <sstream>
 
 namespace love_engine {
     void Logger::log(const Log_Status status, const std::string& message) const noexcept {
-        std::puts(message.c_str());
-        std::puts("\n");
-        std::string prefix;
+        std::stringstream outputMessageBuffer;
+
+        // TODO Get time
+
         switch (status) {
             case Log_Status::LOG_IGNORE: {
                 // TODO Set prefix
@@ -17,6 +19,18 @@ namespace love_engine {
                 // TODO Set prefix
             } break;
         }
-        auto task = std::async(std::launch::async, FileIO::append_File, _filePath.c_str(), message + "\n");
+
+        outputMessageBuffer << message << "\n";
+
+        std::string outputMessage = outputMessageBuffer.str();
+        auto task = std::async(std::launch::async, _logAsync, _filePath, outputMessage);
+    }
+
+    void Logger::_logAsync(const std::string& filePath, const std::string& message) {
+        try {
+            FileIO::append_File(filePath.c_str(), message);
+        } catch (std::runtime_error &e) {
+            // TODO Crash
+        }
     }
 }

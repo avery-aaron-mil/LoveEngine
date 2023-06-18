@@ -40,7 +40,7 @@ namespace love_engine {
             return children;
         }
 
-        size_t bufferSize = 0xff;
+        size_t bufferSize = BUFSIZ;
         std::wstring childKeyBuf;
         DWORD cchName = static_cast<DWORD>(bufferSize * sizeof(wchar_t));
         childKeyBuf.resize(bufferSize);
@@ -48,7 +48,7 @@ namespace love_engine {
             rc = RegEnumKeyExW(
                 parentKey,
                 i,
-                static_cast<LPWSTR>(childKeyBuf.data()),
+                reinterpret_cast<LPWSTR>(childKeyBuf.data()),
                 &cchName,
                 nullptr,
                 nullptr,
@@ -67,7 +67,7 @@ namespace love_engine {
                 rc = RegEnumKeyExW(
                     parentKey,
                     i,
-                    static_cast<LPWSTR>(childKeyBuf.data()),
+                    reinterpret_cast<LPWSTR>(childKeyBuf.data()),
                     &cchName,
                     nullptr,
                     nullptr,
@@ -93,7 +93,7 @@ namespace love_engine {
 
     std::string WindowsRegistry::get_HKLM_Value_String(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
         std::wstring valueBuf;
-        size_t bufferSize = 0xff;
+        size_t bufferSize = BUFSIZ;
         valueBuf.resize(bufferSize);
         DWORD cbData = static_cast<DWORD>(bufferSize * sizeof(wchar_t));
         auto rc = RegGetValueW(
@@ -102,7 +102,7 @@ namespace love_engine {
             registryValue.c_str(),
             RRF_RT_ANY,
             nullptr,
-            static_cast<void*>(valueBuf.data()),
+            reinterpret_cast<void*>(valueBuf.data()),
             &cbData
         );
         while (rc == ERROR_MORE_DATA) {
@@ -120,7 +120,7 @@ namespace love_engine {
                 registryValue.c_str(),
                 RRF_RT_REG_SZ,
                 nullptr,
-                static_cast<void*>(valueBuf.data()),
+                reinterpret_cast<void*>(valueBuf.data()),
                 &cbData
             );
         }
@@ -145,7 +145,7 @@ namespace love_engine {
             registryValue.c_str(),
             RRF_RT_ANY,
             nullptr,
-            static_cast<void*>(&value),
+            reinterpret_cast<void*>(&value),
             &cbData
         );
         if (rc == ERROR_SUCCESS) {
@@ -167,7 +167,7 @@ namespace love_engine {
             registryValue.c_str(),
             RRF_RT_ANY,
             nullptr,
-            static_cast<void*>(&value),
+            reinterpret_cast<void*>(&value),
             &cbData
         );
         if (rc == ERROR_SUCCESS) {

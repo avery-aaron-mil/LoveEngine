@@ -5,7 +5,7 @@
 
 #include "client/client_states/client_state_loading.hpp"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace love_engine;
 using namespace example_game;

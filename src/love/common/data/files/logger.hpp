@@ -26,7 +26,11 @@ namespace love_engine {
             void log(const std::string& message) const noexcept { log(Log_Status::LOG_INFO, message); }
             virtual void log(const Log_Status status, const std::string& message) const noexcept;
 
-            void set_File_Path(const std::string& filePath) { _filePath.assign(filePath); }
+            void set_File_Path(const std::string& filePath) noexcept { _filePath.assign(filePath); }
+
+        protected:
+            // NOTE: Recommended to run this function asynchronously
+            static void _logAsync(const std::string&, const std::string& message);
 
         private:
             std::string _filePath;

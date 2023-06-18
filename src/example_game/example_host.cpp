@@ -2,7 +2,7 @@
 
 #include <love/common/system/system_info.hpp>
 
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace love_engine;
 

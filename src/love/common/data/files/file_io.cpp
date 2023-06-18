@@ -43,8 +43,7 @@ namespace love_engine {
         
         std::string data;
         data.resize(size);
-        size_t result = std::fread(data.data(), 1, size, file);
-        if (result != size) {
+        if (std::fread(data.data(), 1, size, file) != size) {
             std::stringstream error;
             error << "Could not read from file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
@@ -73,8 +72,7 @@ namespace love_engine {
         std::rewind(file);
 
         void* data = std::malloc(size);
-        size_t result = std::fread(data, 1, size, file);
-        if (result != size) {
+        if (std::fread(data, 1, size, file) != size) {
             std::stringstream error;
             error << "Could not read from file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
@@ -98,8 +96,7 @@ namespace love_engine {
             throw std::runtime_error(error.str());
         }
 
-        size_t result = std::fwrite(data.data(), 1, data.length(), file);
-        if (result != data.length()) {
+        if (std::fwrite(data.data(), 1, data.length(), file) != data.length()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
@@ -122,8 +119,7 @@ namespace love_engine {
             throw std::runtime_error(error.str());
         }
 
-        size_t result = std::fwrite(content.data(), 1, content.size(), file);
-        if (result != content.size()) {
+        if (std::fwrite(content.data(), 1, content.size(), file) != content.size()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
@@ -146,8 +142,7 @@ namespace love_engine {
             throw std::runtime_error(error.str());
         }
 
-        size_t result = std::fwrite(data.data(), 1, data.length(), file);
-        if (result != data.length()) {
+        if (std::fwrite(data.data(), 1, data.length(), file) != data.length()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
@@ -158,6 +153,14 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
+        fileMutex.unlock();
+    }
+
+    void FileIO::lock() {
+        fileMutex.lock();
+    }
+    
+    void FileIO::unlock() {
         fileMutex.unlock();
     }
 }
