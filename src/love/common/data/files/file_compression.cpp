@@ -10,6 +10,40 @@
 #include <lzma.h>
 
 namespace love_engine {
+    void _initEncoder(lzma_stream* stream, const char*__restrict__ filePath) {
+        lzma_mt mt = {
+            .flags = 0,
+            .threads = std::min(std::thread::hardware_concurrency(), 8u),
+            .block_size = 0,
+            .timeout = 0,
+            .preset = FileCompression::COMPRESSION_PRESET,
+            .filters = nullptr, // Filters must be null with a preset
+            .check = LZMA_CHECK_CRC64,
+        };
+
+        lzma_ret ret = lzma_stream_encoder_mt(stream, &mt);
+
+        if (ret != LZMA_OK) {
+            switch (ret) {
+                case LZMA_MEM_ERROR: {
+                    throw std::runtime_error(std::string("Ran out of memory while decompressing file: ") + filePath);
+                }
+
+                case LZMA_OPTIONS_ERROR: {
+                    throw std::runtime_error(std::string("Unsupported decompressor flags for file: ") + filePath);
+                }
+                
+                case LZMA_UNSUPPORTED_CHECK: {
+                    throw std::runtime_error(std::string("Unsupported integrity check for file: ") + filePath);
+                }
+
+                default: {
+                    throw std::runtime_error(std::string("Unknown error occurred while decompressing file: ") + filePath);
+                }
+            }
+        }
+    }
+    
     void _initDecoder(lzma_stream *stream, const char*__restrict__ filePath) {
         // The .xz format allows concatenating compressed files as is:
         //
@@ -37,40 +71,6 @@ namespace love_engine {
 
                 case LZMA_OPTIONS_ERROR: {
                     throw std::runtime_error(std::string("Unsupported decompressor flags for file: ") + filePath);
-                }
-
-                default: {
-                    throw std::runtime_error(std::string("Unknown error occurred while decompressing file: ") + filePath);
-                }
-            }
-        }
-    }
-
-    void _initEncoder(lzma_stream* stream, const char*__restrict__ filePath) {
-        lzma_mt mt = {
-            .flags = 0,
-            .threads = std::min(std::thread::hardware_concurrency(), 8u),
-            .block_size = 0,
-            .timeout = 0,
-            .preset = FileCompression::COMPRESSION_PRESET,
-            .filters = nullptr, // Filters must be null with a preset
-            .check = LZMA_CHECK_CRC64,
-        };
-
-        lzma_ret ret = lzma_stream_encoder_mt(stream, &mt);
-
-        if (ret != LZMA_OK) {
-            switch (ret) {
-                case LZMA_MEM_ERROR: {
-                    throw std::runtime_error(std::string("Ran out of memory while decompressing file: ") + filePath);
-                }
-
-                case LZMA_OPTIONS_ERROR: {
-                    throw std::runtime_error(std::string("Unsupported decompressor flags for file: ") + filePath);
-                }
-                
-                case LZMA_UNSUPPORTED_CHECK: {
-                    throw std::runtime_error(std::string("Unsupported integrity check for file: ") + filePath);
                 }
 
                 default: {
@@ -156,8 +156,8 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-	    lzma_end(&stream);
         FileIO::unlock();
+	    lzma_end(&stream);
     }
 
     std::string FileCompression::decompress_File_String(const char*const filePath) {
@@ -262,8 +262,8 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-	    lzma_end(&stream);
         FileIO::unlock();
+	    lzma_end(&stream);
 	    data = std::realloc(data, head);
         return FileIO::FileContent(data, head);
     }
