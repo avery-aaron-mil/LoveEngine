@@ -10,14 +10,16 @@ namespace love_engine {
             class FileContent {
                 public:
                     FileContent(void*const data, const size_t size) : _data(data), _size(size) {}
-                    ~FileContent() { std::free(_data); }
+                    ~FileContent() { if (_hasAlloc) std::free(_data); }
 
                     const void*const data() const noexcept  { return _data; }
                     size_t size() const noexcept { return _size; }
-
+                    void set_Alloc(const bool alloc) noexcept { _hasAlloc = alloc; }
+ 
                 private:
                     void* _data;
                     size_t _size;
+                    bool _hasAlloc;
             };
 
             static std::string get_Executable_Directory();
