@@ -1,8 +1,15 @@
 #ifdef _WIN32
 #include "windows_registry.hpp"
 
+#include <codecvt>
+#include <locale>
+#include <Windows.h>
+
 namespace love_engine {
-    std::string WindowsRegistry::_get_System_Message(LSTATUS resultCode) noexcept {
+    using convert_utf8 = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_utf8, wchar_t> _wstrConverter;
+
+    std::string _get_System_Message(LSTATUS resultCode) noexcept {
         LPSTR systemMessageBuffer = nullptr;
         FormatMessageA(
             FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -69,7 +76,7 @@ namespace love_engine {
                 );
             }
             if (rc == ERROR_SUCCESS) {
-                children.push_back(childKeyBuf);
+                children.push_back(std::move(childKeyBuf));
                 continue;
             }
             else if (rc == ERROR_NO_MORE_ITEMS) break;
@@ -120,8 +127,7 @@ namespace love_engine {
         if (rc == ERROR_SUCCESS) {
             cbData /= sizeof(wchar_t);
             valueBuf.resize(static_cast<size_t>(cbData - 1));
-            std::wstring_convert<convert_utf8, wchar_t> wstrConverter;
-            return wstrConverter.to_bytes(valueBuf);
+            return _wstrConverter.to_bytes(valueBuf);
         } else if (rc == ERROR_FILE_NOT_FOUND) {
             return "";
         } else {

@@ -1,6 +1,9 @@
 #ifndef LOVE_LOGGER_HPP
 #define LOVE_LOGGER_HPP
 
+#include "file_io.hpp"
+
+#include <future>
 #include <string>
 
 namespace love_engine {
@@ -17,18 +20,16 @@ namespace love_engine {
 
    class Logger {
         public:
-            Logger(const std::string& filePath) : _filePath(filePath) {}
+            Logger(const std::string& filePath) : _filePath(filePath) { FileIO::clear_File(filePath.c_str()); }
             ~Logger() {}
            
-            virtual void log(const std::string& message) const noexcept;
+            void log(const std::string& message) const noexcept { log(Log_Status::LOG_INFO, message); }
             virtual void log(const Log_Status status, const std::string& message) const noexcept;
+
+            void set_File_Path(const std::string& filePath) { _filePath.assign(filePath); }
 
         private:
             std::string _filePath;
-
-#ifdef _WIN32
-            void setConsole();
-#endif
    };
 
 }

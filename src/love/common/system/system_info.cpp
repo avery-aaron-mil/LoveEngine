@@ -4,7 +4,6 @@
 #include <cstring>
 #include <sstream>
 #include <thread>
-#include <iostream> // TODO Remove
 
 #ifdef _WIN32
   #ifndef _WIN32_DCOM

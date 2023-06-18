@@ -6,15 +6,14 @@
 #include "client/client_states/client_state_loading.hpp"
 
 #include <stdlib.h>
-#include <iostream> // TODO Remove
 
 using namespace love_engine;
 using namespace example_game;
 
 int main(int argc, char** argv) {
-    Logger logger("logs/latest.log");
+    Logger logger("latest.log");
     SystemInfo systemInfo;
-    std::cout << systemInfo.get_Consolidated_System_Info() << std::endl;
+    logger.log(systemInfo.get_Consolidated_System_Info());
 
     /*ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);
