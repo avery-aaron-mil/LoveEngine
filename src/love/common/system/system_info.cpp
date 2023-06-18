@@ -21,7 +21,15 @@
 #endif
 
 namespace love_engine {
-    void SystemInfo::_find_OS() noexcept {
+    std::string _consolidated_System_Info;
+    std::string _OS;
+    std::string _systemName;
+    SystemInfo::CPU_Info _CPU;
+    std::vector<SystemInfo::VideoCardInfo> _video_Cards;
+    SystemInfo::BaseBoardInfo _baseBoard;
+    std::string _physicalMemory;
+
+    void SystemInfo::_find_OS() {
 #ifdef _WIN32
         std::stringstream buffer;
         buffer << WindowsRegistry::get_HKLM_Value_String(
@@ -53,7 +61,7 @@ namespace love_engine {
     }
 
     
-    void SystemInfo::_find_System_Name() noexcept {
+    void SystemInfo::_find_System_Name() {
 #ifdef _WIN32
         _systemName = WindowsRegistry::get_HKLM_Value_String(
             L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\DataStore\\Machine\\0",
@@ -64,7 +72,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_CPU() noexcept {
+    void SystemInfo::_find_CPU() {
 #ifdef _WIN32
         _CPU.name = WindowsRegistry::get_HKLM_Value_String(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
@@ -102,7 +110,7 @@ namespace love_engine {
         _CPU.threads = std::to_string(std::thread::hardware_concurrency());
     }
     
-    void SystemInfo::_find_Video_Cards() noexcept {
+    void SystemInfo::_find_Video_Cards() {
 #ifdef _WIN32
         std::vector<std::wstring> registryKeys = WindowsRegistry::get_HKLM_Children(
             L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}"
@@ -141,7 +149,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_Base_Board() noexcept {
+    void SystemInfo::_find_Base_Board() {
 #ifdef _WIN32
         _baseBoard.name = WindowsRegistry::get_HKLM_Value_String(
             L"HARDWARE\\DESCRIPTION\\System\\BIOS",
@@ -164,7 +172,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_Physical_Memory() noexcept {
+    void SystemInfo::_find_Physical_Memory() {
 #ifdef _WIN32
         MEMORYSTATUSEX memory;
         memory.dwLength = sizeof(memory);
@@ -181,7 +189,7 @@ namespace love_engine {
     
     // TODO Get free space using statvfs (Linux) and GetDiskFreeSpaceA (Windows)
 
-    void SystemInfo::_set_Consolidated_System_Info() noexcept {
+    void SystemInfo::_set_Consolidated_System_Info() {
         // TODO Make a table generator
         std::stringstream buffer;
         buffer << "OS: " << get_OS();
@@ -210,5 +218,34 @@ namespace love_engine {
         buffer << "\n\tSystem Product Name: " << _baseBoard.systemName;
 
         _consolidated_System_Info.assign(buffer.str());
+    }
+
+    std::string SystemInfo::get_Consolidated_System_Info() {
+        if (_consolidated_System_Info.empty()) _set_Consolidated_System_Info();
+        return _consolidated_System_Info;
+    }
+    std::string SystemInfo::get_OS() {
+        if (_OS.empty()) _find_OS();
+        return _OS;
+    }
+    std::string SystemInfo::get_System_Name() {
+        if (_systemName.empty()) _find_System_Name();
+        return _systemName;
+    }
+    SystemInfo::CPU_Info SystemInfo::get_CPU() {
+        if (_CPU.name.empty()) _find_CPU();
+        return _CPU;
+    }
+    std::vector<SystemInfo::VideoCardInfo> SystemInfo::get_Video_Cards() {
+        if (_video_Cards.empty()) _find_Video_Cards();
+        return _video_Cards;
+    }
+    SystemInfo::BaseBoardInfo SystemInfo::get_Base_Board() {
+        if (_baseBoard.name.empty()) _find_Base_Board();
+        return _baseBoard;
+    }
+    std::string SystemInfo::get_Physical_Memory() {
+        if (_physicalMemory.empty()) _find_Physical_Memory();
+        return _physicalMemory;
     }
 }

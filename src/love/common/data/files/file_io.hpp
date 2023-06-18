@@ -20,6 +20,8 @@ namespace love_engine {
                     size_t _size;
             };
 
+            static std::string get_Executable_Directory();
+            static void ensure_Parent_Directory(const char*const path);
             static void clear_File(const char*const filePath);
             static std::string read_File(const char*const filePath);
             static FileContent read_File_Content(const char*const filePath);

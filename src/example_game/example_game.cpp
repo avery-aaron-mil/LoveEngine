@@ -11,7 +11,7 @@ using namespace love_engine;
 using namespace example_game;
 
 int main(int argc, char** argv) {
-    Logger logger("latest.log");
+    Logger logger(FileIO::get_Executable_Directory() + "../logs/latest.log");
     SystemInfo systemInfo;
     logger.log(systemInfo.get_Consolidated_System_Info());
 
