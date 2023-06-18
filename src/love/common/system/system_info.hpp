@@ -31,7 +31,7 @@ namespace love_engine {
 
             std::string get_Consolidated_System_Info() noexcept {
                 if (_consolidated_System_Info.empty()) _set_Consolidated_System_Info();
-                return _OS;
+                return _consolidated_System_Info;
             }
             const std::string& get_OS() noexcept {
                 if (_OS.empty()) _find_OS();

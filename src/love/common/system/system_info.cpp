@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstring>
 #include <sstream>
+#include <thread>
 #include <iostream> // TODO Remove
 
 #ifdef _WIN32
@@ -11,24 +12,19 @@
   #endif
   #include <Windows.h>
   #include "windows_registry.hpp"
-#elif defined(__linux__)
-  #include <unistd.h>
-  #include <sys/utsname.h>
-  #include <iterator>
-  #include <stdlib.h>
 #elif defined(__APPLE__)
   #include <mach-o/dyld.h>
   #include <sys/utsname.h>
-  #include <iterator>
-  #include <stdlib.h>
-#else
-#error "OS not supported"
+  #include <sys/sysctl.h>
+#elif defined(__unix__)
+  #include <sys/utsname.h>
+  #include <sys/sysinfo.h>
 #endif
 
 namespace love_engine {
     void SystemInfo::_find_OS() noexcept {
-        std::stringstream buffer;
 #ifdef _WIN32
+        std::stringstream buffer;
         buffer << WindowsRegistry::get_HKLM_Value_String(
             L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
             L"ProductName"
@@ -45,16 +41,16 @@ namespace love_engine {
             L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
             L"CurrentBuildNumber"
         );
+        _OS.assign(buffer.str());
 #elif defined(__unix__)
+        std::stringstream buffer;
         struct utsname unameData;
-        uname(&unameData);
+        std::uname(&unameData);
         std::stringstream buffer(unameData.sysname);
         buffer << " ";
-        buffer << nameData.release;
-#else
-#error "OS not supported"
-#endif
+        buffer << unameData.release;
         _OS.assign(buffer.str());
+#endif
     }
 
     
@@ -66,8 +62,6 @@ namespace love_engine {
         );
 #elif defined(__unix__)
         // TODO
-#else
-#error "OS not supported"
 #endif
     }
     
@@ -86,18 +80,27 @@ namespace love_engine {
             L"VendorIdentifier"
         );
         _CPU.description = buffer.str();
-        _CPU.threads = std::to_string(WindowsRegistry::get_HKLM_Children(
-            L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor"
-        ).size());
         _CPU.speed = std::to_string(WindowsRegistry::get_HKLM_Value_I32(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
             L"~MHz"
         )) + "MHz";
+#elif defined(__APPLE__)
+        // TODO Use sysctlbyname
+        if (sysctlbyname("hw.cpufrequency", &freq, &size, NULL, 0) < 0) {
+            // Error
+        }
 #elif defined(__unix__)
         // TODO Use /proc/cpuinfo
-#else
-#error "OS not supported"
+        FILE *cpuinfo = std::fopen("/proc/cpuinfo", "rb");
+        char *arg = 0;
+        size_t size = 0;
+        while(std::getdelim(&arg, &size, 0, cpuinfo) != -1) { // TODO Search for requested information
+            std::puts(arg);
+        }
+        std::free(arg);
+        std::fclose(cpuinfo);
 #endif
+        _CPU.threads = std::to_string(std::thread::hardware_concurrency());
     }
     
     void SystemInfo::_find_Video_Cards() noexcept {
@@ -135,9 +138,7 @@ namespace love_engine {
             }
         }
 #elif defined(__unix__)
-        // TODO
-#else
-#error "OS not supported"
+        // TODO Use lspci -mm
 #endif
     }
     
@@ -160,9 +161,7 @@ namespace love_engine {
             L"SystemProductName"
         );
 #elif defined(__unix__)
-        // TODO
-#else
-#error "OS not supported"
+        // TODO https://stackoverflow.com/questions/52762707 Use /sys/devices/virtual/dmi/id/board_xxx where xxx is things like name and vendor.
 #endif
     }
     
@@ -173,20 +172,15 @@ namespace love_engine {
         GlobalMemoryStatusEx(&memory);
         _physicalMemory = std::to_string(memory.ullTotalPhys / (1024 * 1024)) + "MB";
 #elif defined(__unix__)
-        // TODO
-#else
-#error "OS not supported"
+        struct sysinfo systemInfo;
+        sysinfo(&systemInfo);
+        _physicalMemory = std::to_string(systemInfo.totalram / (1024 * 1024)) + "MB"; // TODO Check if this works on Mac, and make sure it doesn't overflow
 #endif
     }
-    
-    // TODO Find audio, monitor, and disk devices, and voltage/temp info using
     // sysconf and fscanf on hwmon (Linux)
-    // Linux: https://stackoverflow.com/questions/150355/ and https://stackoverflow.com/questions/23716135/
+    // Linux: https://stackoverflow.com/questions/23716135/
     
     // TODO Get free space using statvfs (Linux) and GetDiskFreeSpaceA (Windows)
-    
-    // TODO Get battery info using GetSystemPowerStatus (Windows) and ACPID (Linux)
-    // https://stackoverflow.com/questions/27613517/querying-the-power-status-of-a-linux-machine-programmatically
 
     void SystemInfo::_set_Consolidated_System_Info() noexcept {
         // TODO Make a table generator
@@ -216,7 +210,6 @@ namespace love_engine {
         buffer << "\n\tBIOS Version: " << _baseBoard.biosVersion;
         buffer << "\n\tSystem Product Name: " << _baseBoard.systemName;
 
-        std::cout << buffer.str() << std::endl;
         _consolidated_System_Info.assign(buffer.str());
     }
 }
