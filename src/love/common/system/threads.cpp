@@ -3,10 +3,11 @@
 #include <unordered_map>
 
 namespace love_engine {
-    std::unordered_map<std::thread::id, std::string> Threads::_threads;
+    std::unordered_map<std::thread::id, std::string> _threads;
 
-    explicit std::thread Threads::create_Thread(const std::string& name, Function&& f, Args&&... args) {
-        std::thread thread(f, args);
+    template<class Function, class... Args>
+    std::thread Threads::create_Thread(const std::string& name, Function&& f, Args&&... args) {
+        std::thread thread(f, args...);
         register_Thread(thread.get_id(), name);
         std::thread parent(_unregister_On_Finish, thread.get_id());
         return thread;
@@ -23,7 +24,7 @@ namespace love_engine {
         _threads.erase(id);
     }
 
-    void Threads::_unregister_On_Finish(const std::thread& thread) {
+    void Threads::_unregister_On_Finish(std::thread& thread) {
         thread.join();
         unregister_Thread(thread.get_id());
     }

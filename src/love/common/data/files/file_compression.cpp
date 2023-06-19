@@ -1,5 +1,6 @@
 #include "file_compression.hpp"
 
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
