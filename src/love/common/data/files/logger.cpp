@@ -11,16 +11,16 @@
 #include <sys/time.h>
 
 namespace love_engine {
-    void Logger::log(const Log_Status status, const std::string& message) const noexcept {
+    void Logger::log(const Log_Status status, const std::string message) const noexcept {
         std::thread::id id = std::this_thread::get_id();
         //auto thread = Threads::create_Thread("LogAsync", _create_and_Log_Message, status, std::cref(message), std::cref(id));
-        std::thread thread(_create_and_Log_Message, status, std::cref(message), std::cref(id));
+        std::thread thread(_create_and_Log_Message, status, std::cref(message), id);
     }
 
     void Logger::_create_and_Log_Message(
         const Log_Status status,
         const std::string& message,
-        const std::thread::id& threadId
+        const std::thread::id threadId
     ) const noexcept {
         // Get time
         struct timeval tv;
