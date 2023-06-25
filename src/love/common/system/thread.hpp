@@ -46,6 +46,8 @@ namespace love_engine {
             // NOTE: Recommended to not use this functions unless native threads are absolutely necessary.
             static void unregister_Thread(const std::thread::id& id);
 
+            static void wait_For_Threads();
+
         private:
             template<class F, class... Args>
             static void _handle_Thread(const std::string name, F&& f, Args&&... args) {

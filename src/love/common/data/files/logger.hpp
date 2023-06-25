@@ -32,23 +32,15 @@ namespace love_engine {
         };
         
         public:
-            Logger(const std::string& filePath) : _logPath(filePath) { FileIO::clear_File(filePath.c_str()); }
-            // TODO Override copy constructor with _logPath = logger._logPath
+            Logger(const std::string& filePath) : _logPath(filePath) {}
+            Logger(const std::string& filePath, const bool clearFile) : _logPath(filePath) { if (clearFile) clear(); }
             ~Logger() = default;
            
             void log(const std::string& message) const noexcept { log(Log_Status::LOG_INFO, message); }
             virtual void log(const Log_Status status, const std::string& message) const noexcept;
 
             void set_Log_Path(const std::string& filePath) noexcept { _logPath.assign(filePath); }
-
-        protected:
-            // NOTE: Recommended to run this function asynchronously on its own thread
-            static void _create_and_Log_Message(
-                const std::string logPath,
-                const Log_Status status,
-                const std::string message,
-                const std::thread::id threadId
-            );
+            void clear() { FileIO::clear_File(_logPath.c_str()); }
 
         private:
             std::string _logPath;

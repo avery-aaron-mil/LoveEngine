@@ -14,24 +14,25 @@
 using namespace love_engine;
 using namespace example_game;
 
-void test(const Logger logger) {
+void test() {
+    Logger logger(FileIO::get_Executable_Directory() + "../logs/latest.log");
     logger.log("Hello from test thread!");
 }
 
 int main(int argc, char** argv) {
     LoveEngineInstance::init();
-    Logger logger(FileIO::get_Executable_Directory() + "../logs/latest.log");
+    Logger logger(FileIO::get_Executable_Directory() + "../logs/latest.log", true);
     SystemInfo systemInfo;
     logger.log("System Info:\n" + systemInfo.get_Consolidated_System_Info());
 
     logger.log("Hello from main thread!");
-    Thread testThread("Test", test, logger);
+    Thread testThread("Test", test);
     testThread.join();
-    logger.log(Thread::get_Thread_Name(testThread.get_id()));
 
     /*ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);
     client.run();*/
 
+    Thread::wait_For_Threads();
     exit(EXIT_SUCCESS);
 }
