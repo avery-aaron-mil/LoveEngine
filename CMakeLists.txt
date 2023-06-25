@@ -7,14 +7,16 @@ project(launcher CXX)
 file(GLOB_RECURSE CLIENT_FILES "src/love/client/*.cpp")
 file(GLOB_RECURSE SERVER_FILES "src/love/server/*.cpp")
 file(GLOB_RECURSE COMMON_FILES "src/love/common/*.cpp")
+file(GLOB_RECURSE EXAMPLE_GAME_CLIENT_FILES "src/example_game/client/*.cpp")
+file(GLOB_RECURSE EXAMPLE_GAME_SERVER_FILES "src/example_game/server/*.cpp")
 file(GLOB RESOURCE_FILE "products/assets/resources.rc")
 
 # add the executable
 add_library(common SHARED "${COMMON_FILES}")
 add_library(server SHARED "${SERVER_FILES}")
 add_library(client SHARED "${CLIENT_FILES}")
-add_executable(game "src/example_game/example_game.cpp")
-add_executable(host "src/example_game/example_host.cpp")
+add_executable(game "src/example_game/example_game.cpp;${EXAMPLE_GAME_CLIENT_FILES}")
+add_executable(host "src/example_game/example_host.cpp;${EXAMPLE_GAME_SERVER_FILES}")
 add_executable(launcher "src/example_game/example_launcher.cpp")
 
 # specify the C++ standard
@@ -67,6 +69,7 @@ target_compile_options(server PRIVATE ${CMAKE_CPP_FLAGS})
 target_link_options(server PRIVATE ${CMAKE_L_FLAGS})
 target_compile_options(common PRIVATE ${CMAKE_CPP_FLAGS})
 target_link_options(common PRIVATE ${CMAKE_L_FLAGS})
+
 target_compile_options(game PRIVATE ${CMAKE_CPP_FLAGS})
 target_link_options(game PRIVATE ${CMAKE_L_FLAGS})
 target_compile_options(host PRIVATE ${CMAKE_CPP_FLAGS})
@@ -82,6 +85,7 @@ target_include_directories(server PRIVATE "lib/include/" "src/")
 target_link_directories(server PRIVATE "lib/" "build/")
 target_include_directories(common PRIVATE "lib/include/" "src/")
 target_link_directories(common PRIVATE "lib/" "build/")
+
 target_include_directories(game PRIVATE "lib/include/" "src/")
 target_link_directories(game PRIVATE "lib/" "build/")
 target_include_directories(host PRIVATE "lib/include/" "src/")
@@ -103,8 +107,8 @@ set(CLIENT_LIBS
 	-Wl,-Bdynamic -lglfw3 -lsoft_oal -lsndfile -lserver
 )
 set(GAME_LIBS
-	${COMMON_LIBS}
-	-Wl,-Bdynamic -lcommon -lclient
+	${CLIENT_LIBS}
+	-Wl,-Bdynamic -lclient
 )
 set(HOST_LIBS
 	${SERVER_LIBS}

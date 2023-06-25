@@ -17,9 +17,9 @@ int main(int argc, char** argv) {
     SystemInfo systemInfo;
     logger.log("System Info:\n" + systemInfo.get_Consolidated_System_Info());
 
-    /*ClientState_Loading loading_State;
+    ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);
-    client.run();*/
+    //client.run();
 
     LoveEngineInstance::cleanup();
     exit(EXIT_SUCCESS);
