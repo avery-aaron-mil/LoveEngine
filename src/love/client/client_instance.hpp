@@ -13,7 +13,7 @@ namespace love_engine {
             : _msPerTick(ms_Per_Tick), _clientState(clientState) {
                 // TODO crash_Assert(clientState != nullptr, "clientState must not be NULL.");
             }
-            ~ClientInstance() {}
+            ~ClientInstance() = default;
             
             void run() noexcept;
             

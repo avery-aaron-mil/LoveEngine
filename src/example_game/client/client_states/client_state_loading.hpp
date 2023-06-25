@@ -6,8 +6,8 @@
 namespace example_game {
     class ClientState_Loading : public love_engine::ClientState {
         public:
-            ClientState_Loading() {}
-            ~ClientState_Loading() {}
+            ClientState_Loading() = default;
+            ~ClientState_Loading() = default;
             
             void update() const noexcept override;
             void render(std::float128_t lag) const noexcept override;
