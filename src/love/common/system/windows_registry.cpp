@@ -44,7 +44,7 @@ namespace love_engine {
         std::wstring childKeyBuf;
         DWORD cchName = static_cast<DWORD>(bufferSize * sizeof(wchar_t));
         childKeyBuf.resize(bufferSize);
-        for (DWORD i = 0; rc == ERROR_SUCCESS; i++) {
+        for (DWORD i = 0; rc == ERROR_SUCCESS; ++i) {
             rc = RegEnumKeyExW(
                 parentKey,
                 i,
