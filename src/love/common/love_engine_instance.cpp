@@ -12,4 +12,8 @@ namespace love_engine {
         SystemInfo::get_Consolidated_System_Info();
         FileIO::get_Executable_Directory();
     }
+    
+    void LoveEngineInstance::cleanup() {
+        Thread::wait_For_Threads();
+    }
 }

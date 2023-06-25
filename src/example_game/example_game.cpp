@@ -27,12 +27,11 @@ int main(int argc, char** argv) {
 
     logger.log("Hello from main thread!");
     Thread testThread("Test", test);
-    testThread.join();
 
     /*ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);
     client.run();*/
 
-    Thread::wait_For_Threads();
+    LoveEngineInstance::cleanup();
     exit(EXIT_SUCCESS);
 }

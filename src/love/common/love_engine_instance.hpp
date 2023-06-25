@@ -5,6 +5,7 @@ namespace love_engine {
     class LoveEngineInstance {
         public:
             static void init();
+            static void cleanup();
     };
 }
 

@@ -10,6 +10,7 @@ namespace love_engine {
         public:
             template<class F, class... Args>
             Thread(const std::string& name, F&& f, Args&&... args) {
+                _add_To_Thread_Count(); // NOTE: Must be done asynchronously to avoid race conditions.
                 _thread = std::thread(
                     [](auto&&... fwd){
                         _handle_Thread(std::forward<decltype(fwd)>(fwd)...);
@@ -46,6 +47,7 @@ namespace love_engine {
             // NOTE: Recommended to not use this functions unless native threads are absolutely necessary.
             static void unregister_Thread(const std::thread::id& id);
 
+            // NOTE: Should only be called by main thread.
             static void wait_For_Threads();
 
         private:
@@ -55,6 +57,8 @@ namespace love_engine {
                 f(args...);
                 unregister_Thread(std::this_thread::get_id());
             }
+
+            void _add_To_Thread_Count();
 
             std::thread _thread;
     };
