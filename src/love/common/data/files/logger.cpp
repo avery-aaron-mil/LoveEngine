@@ -3,7 +3,6 @@
 #include "../../system/thread.hpp"
 
 #include <cerrno>
-#include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -11,7 +10,7 @@
 #include <sys/time.h>
 
 namespace love_engine {
-    void Logger::log(const Log_Status status, const std::string& message) const noexcept {
+    void _generate_Log_Message(const Log_Status status, const std::string& message) {
         // Get time
         struct timeval tv;
         if (gettimeofday(&tv, nullptr)) {
@@ -40,10 +39,13 @@ namespace love_engine {
             LOG_TYPE_STRINGS[static_cast<int>(status)] << "]: " <<
             message << "\n"
         ;
+        return outputMessageBuffer.str();
+    }
 
-        std::string outputMessage = outputMessageBuffer.str();
+    void Logger::log(const Log_Status status, const std::string& message) const noexcept {
+        std::string outputMessage = std::move(_generate_Log_Message(status, message));
+
         std::puts(outputMessage.c_str());
-
         if (!_logPath.empty()) {
             try {
                 Thread asyncLogThread(
