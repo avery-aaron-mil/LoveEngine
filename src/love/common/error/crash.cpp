@@ -55,8 +55,9 @@ namespace love_engine {
         return outputMessageBuffer.str();
     }
 
-    void _log_Crash_Report(const std::string& report, std::tm* now) {
-        // Get time
+    std::string _get_Crash_Path(std::tm* now) {
+        if (!_crashPath.empty()) return _crashPath;
+        
         char crashFileBuffer[] = "crash-YYYY-MM-DD_HH.mm.SS.txt";
         if (now != nullptr) {
             std::snprintf(crashFileBuffer, sizeof(crashFileBuffer), "crash-%04d-%02d-%02d_%02d.%02d.%02d.txt", // crash-2016-09-20_04.20.59.txt
@@ -64,13 +65,20 @@ namespace love_engine {
                 now->tm_hour, now->tm_min, now->tm_sec // Time
             );
         }
+        std::stringstream crashPath(_crashDir);
+        crashPath << "/" << crashFileBuffer;
+        return crashPath.str();
+    }
+
+    void _log_Crash_Report(const std::string& report, std::tm* now) {
+        std::string crashPath = _get_Crash_Path(now);
 
         std::fputs(report.c_str(), stderr);
-        std::string crashPath;
-        if (_crashPath.empty()) {
-            crashPath = _crashDir + "/" + crashFileBuffer;
-        } else crashPath.swap(_crashPath);
-        FileIO::write_File(crashPath.c_str(), report);
+        try {
+            FileIO::write_File(crashPath.c_str(), report);
+        } catch (std::runtime_error &e) {
+            std::fputs(e.what(), stderr);
+        }
     }
 
     void _cleanup_and_Exit() {
