@@ -1,6 +1,6 @@
 #include "logger.hpp"
 
-#include "../../system/threads.hpp"
+#include "../../system/thread.hpp"
 
 #include <cerrno>
 #include <chrono>
@@ -12,17 +12,19 @@
 
 namespace love_engine {
     void Logger::log(const Log_Status status, const std::string& message) const noexcept {
-        //std::thread::id id = std::this_thread::get_id();
-        //auto thread = Threads::create_Thread("LogAsync", _create_and_Log_Message, status, std::cref(message), std::cref(id));
-        //std::thread thread(_create_and_Log_Message, status, std::cref(message), id);
-        _create_and_Log_Message(status, message, std::this_thread::get_id());
+        Thread asyncLogThread(
+            "ASYNC_LOG",
+            _create_and_Log_Message,
+            _logPath, status, message, std::this_thread::get_id()
+        );
     }
 
     void Logger::_create_and_Log_Message(
+        const std::string logPath,
         const Log_Status status,
-        const std::string& message,
+        const std::string message,
         const std::thread::id threadId
-    ) const noexcept {
+    ) {
         // Get time
         struct timeval tv;
         if (gettimeofday(&tv, nullptr)) {
@@ -47,13 +49,15 @@ namespace love_engine {
         std::stringstream outputMessageBuffer;
         outputMessageBuffer <<
             timeBuffer <<
-            " [" << Threads::get_Thread_Name(threadId) << "/" <<
+            " [" << Thread::get_Thread_Name(threadId) << "/" <<
             LOG_TYPE_STRINGS[static_cast<int>(status)] << "]: " <<
             message << "\n"
         ;
 
+        std::string outputMessage = outputMessageBuffer.str();
+        std::puts(outputMessage.c_str());
         try {
-            FileIO::append_File(_logPath.c_str(), message);
+            FileIO::append_File(logPath.c_str(), outputMessage);
         } catch (std::runtime_error &e) {
             std::stringstream error;
             error << "FileIO::append_File() failed. Error:\n\t" << e.what();

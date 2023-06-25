@@ -9,25 +9,25 @@
 #include <cstdlib>
 
 #include <thread> // TODO Remove
-#include <love/common/system/threads.hpp>
+#include <love/common/system/thread.hpp>
 
 using namespace love_engine;
 using namespace example_game;
 
-void test() {
-    Logger::log("Hello from test thread!");
+void test(const Logger logger) {
+    logger.log("Hello from test thread!");
 }
 
 int main(int argc, char** argv) {
     LoveEngineInstance::init();
     Logger logger(FileIO::get_Executable_Directory() + "../logs/latest.log");
     SystemInfo systemInfo;
-    logger.log(systemInfo.get_Consolidated_System_Info());
+    logger.log("System Info:\n" + systemInfo.get_Consolidated_System_Info());
 
-    Logger::log("Hello from main thread!");
-    std::thread testThread = Threads::create_Thread("TestThread", test);
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    Logger::log(Threads::get_Thread_Name(testThread.get_id()));
+    logger.log("Hello from main thread!");
+    Thread testThread("Test", test, logger);
+    testThread.join();
+    logger.log(Thread::get_Thread_Name(testThread.get_id()));
 
     /*ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);
