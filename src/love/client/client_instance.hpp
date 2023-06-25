@@ -3,6 +3,8 @@
 
 #include "client_state.hpp"
 
+#include <love/common/error/crash.hpp>
+
 #include <stdfloat>
 
 namespace love_engine {
@@ -11,7 +13,7 @@ namespace love_engine {
         public:
             ClientInstance(const ClientState *const clientState, const std::float32_t ms_Per_Tick)
             : _msPerTick(ms_Per_Tick), _clientState(clientState) {
-                // TODO crash_Assert(clientState != nullptr, "clientState must not be NULL.");
+                if (clientState == nullptr) Crash::crash("clientState must not be NULL.");
             }
             ~ClientInstance() = default;
             

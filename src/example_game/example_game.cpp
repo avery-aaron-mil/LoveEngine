@@ -8,8 +8,6 @@
 
 #include <cstdlib>
 
-#include <love/common/error/crash.hpp> // TODO Remove
-
 using namespace love_engine;
 using namespace example_game;
 
@@ -22,8 +20,6 @@ int main(int argc, char** argv) {
     ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);
     //client.run();
-
-    Crash::crash("Test!");
 
     LoveEngineInstance::cleanup();
     exit(EXIT_SUCCESS);

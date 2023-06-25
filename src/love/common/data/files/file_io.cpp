@@ -24,6 +24,8 @@
   #include <unistd.h>
 #endif
 
+#include "../../error/crash.hpp"
+
 namespace love_engine {
     std::mutex _fileMutex;
     std::string _executable_Directory;
@@ -51,7 +53,7 @@ namespace love_engine {
             // Read the contents of the link.
             int count = readlink(link.get(), &buffer[0], bufferSize);
             if(count == -1) {
-                // TODO Crash "Could not read symbolic link."
+                Crash::crash("Could not read symbolic link.");
             }
             buffer[count] = '\0';
 #endif
