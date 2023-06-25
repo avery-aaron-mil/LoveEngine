@@ -19,7 +19,7 @@ namespace love_engine {
             
             void run() noexcept;
             
-            void set_ClientState(const ClientState *clientState) noexcept {
+            inline void set_ClientState(const ClientState *clientState) noexcept {
                 _nextClientState = clientState;
             }
             

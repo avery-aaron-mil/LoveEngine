@@ -6,7 +6,7 @@
 namespace love_engine {
     class LoveEngineInstance {
         public:
-            static void init() { init(FileIO::get_Executable_Directory() + "crash-reports"); }
+            static inline void init() { init(FileIO::get_Executable_Directory() + "crash-reports"); }
             static void init(const std::string& crashDirectory);
             static void cleanup();
     };

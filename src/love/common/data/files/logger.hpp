@@ -36,7 +36,7 @@ namespace love_engine {
             Logger(const std::string& filePath, const bool clearFile) : _logPath(filePath) { if (clearFile) clear(); }
             ~Logger() = default;
            
-            void log(const std::string& message) const noexcept { log(Log_Status::LOG_INFO, message); }
+            inline void log(const std::string& message) const noexcept { log(Log_Status::LOG_INFO, message); }
             virtual void log(const Log_Status status, const std::string& message) const noexcept;
 
             void set_Log_Path(const std::string& filePath) noexcept { _logPath.assign(filePath); }
