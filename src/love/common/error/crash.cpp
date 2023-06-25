@@ -19,12 +19,64 @@ namespace love_engine {
     volatile bool _crashed = false;
     std::string _crashDir(".");
     std::string _crashPath;
+    void _default_Crash_Function(const std::string& message);
+    std::function<void(const std::string&)> _crashFunction = _default_Crash_Function;
+    std::vector<std::string> _flavorTexts = {
+        "Everything's going to plan. No, really, that was supposed to happen.",
+        "Sorry :(",
+        "On the bright side, I bought you a teddy bear!",
+        "What did you do??",
+        "You're mean.",
+        "Whoopsie daisy!",
+        "Oops.",
+        "Who set off the TNT?",
+        "I bet Riley wouldn't have this problem.",
+        "I'm sorry, Steve.",
+        "Would you like a cupcake?",
+        "This is why we have a warranty...",
+        "I just don't know what went wrong :(",
+        "I feel sad now :(",
+        "Surprise! Haha. Well, this is awkward.",
+        "Wanna talk about it?",
+        "Hey, that tickles! Hehehe!",
+        "Ooh. Shiny.",
+        "Uh... Did I do that?",
+        "My bad.",
+#ifdef _WIN32
+        "I blame Microsoft.",
+#elif defined(__APPLE__)
+        "I blame Apple.",
+#else
+        "I blame Linux masterrace.",
+#endif
+        "Don't be sad. I'll do better next time, I promise!",
+        "You've got this!",
+        "Hmm...",
+        "Maybe try something else next time?",
+        "Why did you do that?",
+        "Shucks.",
+        "No game here! :')",
+        "It'll be okay.",
+        "Time to surf the web!",
+        "Work smarter, not harder.",
+        "It's okay to ask for help, you know.",
+        "Better luck next time!",
+        "I hope your day improves."
+    };
+
+    void Crash::set_Crash_Function(std::function<void(const std::string&)> crashFunction) {
+        _crashFunction = crashFunction;
+    }
 
     void Crash::set_Crash_Directory(const std::string& directory) {
         _crashDir.assign(directory);
     }
     void Crash::set_Crash_Path(const std::string& filePath) {
         _crashPath.assign(filePath);
+    }
+
+    void Crash::set_Flavor_Texts(const std::vector<std::string>& flavorTexts) {
+        _flavorTexts = flavorTexts;
     }
 
     std::string _generate_Crash_Report(const std::string& message, std::tm*& now) {
@@ -34,6 +86,7 @@ namespace love_engine {
         struct timeval tv;
         if (!gettimeofday(&tv, nullptr)) {
             time_t time = static_cast<time_t>(tv.tv_sec);
+            std::srand(tv.tv_sec);
             now = std::localtime(&time);
             if (now != nullptr) {
                 std::snprintf(timeBuffer, sizeof(timeBuffer), "%d/%d/%d %d:%02d %s (+%2d.%6lds)",
@@ -48,6 +101,7 @@ namespace love_engine {
         std::stringstream outputMessageBuffer;
         outputMessageBuffer <<
             "---- Crash Report ----\n"
+            "// " << _flavorTexts[std::rand() % _flavorTexts.size()] << "\n\n"
             "Time: " << timeBuffer << "\n"
             "Crashing Thread: " << Thread::get_Thread_Name(std::this_thread::get_id()) << "\n"
             "Description: " << message << "\n\n"
@@ -95,12 +149,16 @@ namespace love_engine {
         exit(EXIT_FAILURE);
     }
 
+    void _default_Crash_Function(const std::string& message) {
+        std::tm* time;
+        std::string crashReport = _generate_Crash_Report(message.empty() ? std::string(std::strerror(errno)) : message, time);
+        _log_Crash_Report(crashReport, time);
+    }
+
     [[noreturn]] void Crash::crash(const std::string& message) {
         if (!_crashed) {
             _crashed = true;
-            std::tm* time;
-            std::string crashReport = _generate_Crash_Report(message.empty() ? std::string(std::strerror(errno)) : message, time);
-            _log_Crash_Report(crashReport, time);
+            _crashFunction(message);
             _cleanup_and_Exit();
         }
         throw std::runtime_error(message);
