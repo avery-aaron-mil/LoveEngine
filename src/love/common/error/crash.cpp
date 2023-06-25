@@ -57,7 +57,7 @@ namespace love_engine {
             // NOTE: Waiting for MSYS2 to implement libstdc++_libbacktrace.a, or GCC to implement <stacktrace> fully
             std::to_string(std::stacktrace::current())
 #else
-            "MSYS2 UCRT G++ has not yet implemented stack traces defined in C++23. :)"
+            "G++ has not yet fully implemented stack traces defined in C++23. :)"
 #endif
             << "\n"
         ;
