@@ -33,6 +33,7 @@ set(CMAKE_CPP_FLAGS
 	-O0 -pipe -m64
 	-Og -g -DDEBUG
 	-std=c++23
+	#--enable-libstdcxx-backtrace=yes
 )
 set(CMAKE_L_FLAGS
 	-Wl,--export-all-symbol
@@ -47,6 +48,7 @@ set(CMAKE_CPP_FLAGS
 	-Ofast -pipe -m64
 	-Os -fdata-sections -ffunction-sections
 	-std=c++23
+	#--enable-libstdcxx-backtrace=yes
 )
 set(CMAKE_L_FLAGS
     -s -Wl,--gc-sections
@@ -95,6 +97,7 @@ target_link_directories(launcher PRIVATE "lib/" "build/")
 
 # link libraries
 set(COMMON_LIBS
+	#-Wl,-Bstatic -lstdc++_libbacktrace
 	-Wl,-Bdynamic -lgcc -lstdc++ -lpthread -llzma-5
 )
 set(SERVER_LIBS

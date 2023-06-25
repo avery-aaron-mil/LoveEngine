@@ -12,6 +12,7 @@
 #include <ctime>
 #include <stdexcept>
 #include <sstream>
+#include <stacktrace>
 #include <sys/time.h>
 
 namespace love_engine {
@@ -41,7 +42,7 @@ namespace love_engine {
                 );
             }
         }
-        
+
         // Set crash message
         // Who/what/when/where/why/how
         std::stringstream outputMessageBuffer;
@@ -50,7 +51,15 @@ namespace love_engine {
             "Time: " << timeBuffer << "\n"
             "Crashing Thread: " << Thread::get_Thread_Name(std::this_thread::get_id()) << "\n"
             "Description: " << message << "\n\n"
-            "--- System Details ---\n" << SystemInfo::get_Consolidated_System_Info() << "\n";
+            "--- System Details ---\n" << SystemInfo::get_Consolidated_System_Info() << "\n\n"
+            "---- Stack Trace -----\n" <<
+#ifdef _GLIBCXX_HAS_STACKTRACE
+            // NOTE: Waiting for MSYS2 to implement libstdc++_libbacktrace.a, or GCC to implement <stacktrace> fully
+            std::to_string(std::stacktrace::current())
+#else
+            "MSYS2 UCRT G++ has not yet implemented stack traces defined in C++23. :)"
+#endif
+            << "\n"
         ;
         return outputMessageBuffer.str();
     }
@@ -61,12 +70,12 @@ namespace love_engine {
         char crashFileBuffer[] = "crash-YYYY-MM-DD_HH.mm.SS.txt";
         if (now != nullptr) {
             std::snprintf(crashFileBuffer, sizeof(crashFileBuffer), "crash-%04d-%02d-%02d_%02d.%02d.%02d.txt", // crash-2016-09-20_04.20.59.txt
-                (now->tm_year - 100), (now->tm_mon + 1), now->tm_mday, // Date
+                (now->tm_year + 1900), (now->tm_mon + 1), now->tm_mday, // Date
                 now->tm_hour, now->tm_min, now->tm_sec // Time
             );
         }
-        std::stringstream crashPath(_crashDir);
-        crashPath << "/" << crashFileBuffer;
+        std::stringstream crashPath;
+        crashPath << _crashDir << "/" << crashFileBuffer;
         return crashPath.str();
     }
 

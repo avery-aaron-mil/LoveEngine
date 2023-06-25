@@ -1,5 +1,6 @@
 #include "logger.hpp"
 
+#include "../../error/crash.hpp"
 #include "../../system/thread.hpp"
 
 #include <cerrno>
@@ -16,14 +17,14 @@ namespace love_engine {
         if (gettimeofday(&tv, nullptr)) {
             std::stringstream error;
             error << "gettimeofday() failed. Error: " << std::strerror(errno);
-            // TODO Crash error.str()
+            Crash::crash(error.str());
         }
         time_t time = static_cast<time_t>(tv.tv_sec);
         std::tm* now = std::localtime(&time);
         if (now == nullptr) {
             std::stringstream error;
             error << "localtime() failed. Error: " << std::strerror(errno);
-            // TODO Crash error.str()
+            Crash::crash(error.str());
         }
 
         // Set log message
@@ -56,7 +57,7 @@ namespace love_engine {
             } catch (std::runtime_error &e) {
                 std::stringstream error;
                 error << "FileIO::append_File() failed. Error:\n\t" << e.what();
-                // TODO Crash error.str()
+                Crash::crash(error.str());
             }
         }
     }

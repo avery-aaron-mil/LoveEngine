@@ -8,11 +8,13 @@
 
 #include <cstdlib>
 
+#include <love/common/error/crash.hpp> // TODO Remove
+
 using namespace love_engine;
 using namespace example_game;
 
 int main(int argc, char** argv) {
-    LoveEngineInstance::init(FileIO::get_Executable_Directory() + "../crash-reports/");
+    LoveEngineInstance::init(FileIO::get_Executable_Directory() + "../crash-reports");
     Logger logger(FileIO::get_Executable_Directory() + "../logs/latest.log", true);
     SystemInfo systemInfo;
     logger.log("System Info:\n" + systemInfo.get_Consolidated_System_Info());
@@ -20,6 +22,8 @@ int main(int argc, char** argv) {
     ClientState_Loading loading_State;
     ClientInstance client(&loading_State, 50.f);
     //client.run();
+
+    Crash::crash("Test!");
 
     LoveEngineInstance::cleanup();
     exit(EXIT_SUCCESS);
