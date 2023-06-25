@@ -197,13 +197,13 @@ namespace love_engine {
         buffer << "\nPhysical Memory: " << get_Physical_Memory();
 
         get_CPU();
-        buffer << "\n\nCPU:";
+        buffer << "\nCPU:";
         buffer << "\n\tName: " << _CPU.name;
         buffer << "\n\tDescription: " << _CPU.description;
         buffer << "\n\tThreads: " << _CPU.threads;
         buffer << "\n\tMax Speed: " << _CPU.speed;
 
-        buffer << "\n\nVideo Cards:";
+        buffer << "\nVideo Cards:";
         for (auto gpu : get_Video_Cards()) {
             buffer << "\n\t" << gpu.name;
             buffer << "\n\t\tDriver Version: " << gpu.driverVersion;
@@ -211,7 +211,7 @@ namespace love_engine {
         }
 
         get_Base_Board();
-        buffer << "\n\nBase Board:";
+        buffer << "\nBase Board:";
         buffer << "\n\tName: " << _baseBoard.name;
         buffer << "\n\tBIOS Vendor: " << _baseBoard.biosVendor;
         buffer << "\n\tBIOS Version: " << _baseBoard.biosVersion;
