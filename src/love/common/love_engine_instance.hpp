@@ -1,6 +1,8 @@
 #ifndef LOVE_LOVE_ENGINE_INSTANCE_HPP
 #define LOVE_LOVE_ENGINE_INSTANCE_HPP
 
+#include "data/files/file_io.hpp"
+
 namespace love_engine {
     class LoveEngineInstance {
         public:

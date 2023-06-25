@@ -3,10 +3,12 @@
 #include "../love_engine_instance.hpp"
 #include "../data/files/file_io.hpp"
 #include "../system/system_info.hpp"
+#include "../system/thread.hpp"
 
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <stdexcept>
 #include <sstream>
@@ -24,7 +26,7 @@ namespace love_engine {
         _crashPath.assign(filePath);
     }
 
-    std::string& _generate_Crash_Report(const std::string& message, std::tm*& now) {
+    std::string _generate_Crash_Report(const std::string& message, std::tm*& now) {
         // Get time
         char timeBuffer[] = "MM/DD/YYYY HH:mm XM (+SS.UUUUUUs)"; // 2/17/2008 7:35 AM (+20.276508s)
 
@@ -68,7 +70,7 @@ namespace love_engine {
         if (_crashPath.empty()) {
             crashPath = _crashDir + "/" + crashFileBuffer;
         } else crashPath.swap(_crashPath);
-        FileIO::write_File(crashPath, report);
+        FileIO::write_File(crashPath.c_str(), report);
     }
 
     void _cleanup_and_Exit() {
@@ -80,7 +82,7 @@ namespace love_engine {
         if (!_crashed) {
             _crashed = true;
             std::tm* time;
-            std::string& crashReport = _generate_Crash_Report(message.empty() ? std::string(std::strerror(errno)) : message, time);
+            std::string crashReport = _generate_Crash_Report(message.empty() ? std::string(std::strerror(errno)) : message, time);
             _log_Crash_Report(crashReport, time);
             _cleanup_and_Exit();
         }
