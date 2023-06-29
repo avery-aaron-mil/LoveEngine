@@ -71,7 +71,7 @@ namespace love_engine {
     
     bool String::is_ASCII(const std::string& str) noexcept {
         const size_t len = str.length();
-        char *const data = str.data();
+        const char *const data = str.data();
 
         char c;
         for (size_t i = 0; i < len; i++) {
