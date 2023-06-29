@@ -23,13 +23,15 @@ namespace love_engine {
             };
 
             static std::string get_Executable_Directory();
-            static void ensure_Parent_Directory(const char*const path);
-            static void clear_File(const char*const filePath);
-            static std::string read_File(const char*const filePath);
-            static FileContent read_File_Content(const char*const filePath);
-            static void write_File(const char*const filePath, const std::string& data);
-            static void write_File(const char*const filePath, FileContent& content);
-            static void append_File(const char*const filePath, const std::string& data);
+            [[nodiscard]] static std::string remove_Excess_Directory_Slashes(std::string path);
+            static void ensure_Parent_Directory_Exists(const std::string& path);
+            static void validate_Path(std::string& path);
+            static void clear_File(std::string filePath);
+            static std::string read_File(std::string filePath);
+            static FileContent read_File_Content(std::string filePath);
+            static void write_File(std::string filePath, const std::string& data);
+            static void write_File(std::string filePath, FileContent& content);
+            static void append_File(std::string filePath, const std::string& data);
 
             static void lock();
             static void unlock();

@@ -69,17 +69,50 @@ namespace love_engine {
         return _executable_Directory;        
     }
 
-    void FileIO::ensure_Parent_Directory(const char*const path) {
-        if (!std::filesystem::exists(path)) {
+    [[nodiscard]] std::string FileIO::remove_Excess_Directory_Slashes(std::string path) {
+        std::string buffer;
+        buffer.resize(path.length());
+        const char *in = path.data();
+        char *out = buffer.data();
+
+        // Copy first character
+        *out = *in;
+
+        // Return if empty
+        if (*out == '\0') return out;
+
+        for (in++; *in; ++in) {
+            if (*out != *in || (*out != '\\' && *out != '/')) {
+                // Only copy if not duplicate slash
+                *(++out) = *in;
+            }
+        }
+
+        *(++out) = '\0';
+        return buffer;
+    }
+
+    void FileIO::ensure_Parent_Directory_Exists(const std::string& path) {
+        if (!std::filesystem::exists(path.c_str())) {
             std::filesystem::path p = path;
             std::filesystem::create_directories(p.parent_path());
         }
     }
 
-    void FileIO::clear_File(const char*const filePath) {
+    void FileIO::validate_Path(std::string& path) {
+        if (path.empty()) throw std::runtime_error("The file path passed is empty.");
+
+        path.assign(remove_Excess_Directory_Slashes(path));
+        ensure_Parent_Directory_Exists(path);
+    }
+
+    void FileIO::clear_File(std::string filePath) {
+        try {
+            validate_Path(filePath);
+        } catch (std::runtime_error& e) { throw e; }
+
         _fileMutex.lock();
-        ensure_Parent_Directory(filePath);
-        FILE* file = std::fopen(filePath, "wb");
+        FILE* file = std::fopen(filePath.c_str(), "wb");
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
@@ -94,10 +127,13 @@ namespace love_engine {
         _fileMutex.unlock();
     }
 
-    std::string FileIO::read_File(const char*const filePath) {
+    std::string FileIO::read_File(std::string filePath) {
+        try {
+            validate_Path(filePath);
+        } catch (std::runtime_error& e) { throw e; }
+
         _fileMutex.lock();
-        ensure_Parent_Directory(filePath);
-        FILE* file = std::fopen(filePath, "rb");
+        FILE* file = std::fopen(filePath.c_str(), "rb");
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
@@ -125,10 +161,13 @@ namespace love_engine {
         return data;
     }
     
-    FileIO::FileContent FileIO::read_File_Content(const char*const filePath) {
+    FileIO::FileContent FileIO::read_File_Content(std::string filePath) {
+        try {
+            validate_Path(filePath);
+        } catch (std::runtime_error& e) { throw e; }
+
         _fileMutex.lock();
-        ensure_Parent_Directory(filePath);
-        FILE* file = std::fopen(filePath, "rb");
+        FILE* file = std::fopen(filePath.c_str(), "rb");
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
@@ -155,10 +194,13 @@ namespace love_engine {
         return FileContent(data, size);
     }
     
-    void FileIO::write_File(const char*const filePath, const std::string& data) {
+    void FileIO::write_File(std::string filePath, const std::string& data) {
+        try {
+            validate_Path(filePath);
+        } catch (std::runtime_error& e) { throw e; }
+
         _fileMutex.lock();
-        ensure_Parent_Directory(filePath);
-        FILE* file = std::fopen(filePath, "wb");
+        FILE* file = std::fopen(filePath.c_str(), "wb");
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
@@ -179,10 +221,13 @@ namespace love_engine {
         _fileMutex.unlock();
     }
 
-    void FileIO::write_File(const char*const filePath, FileIO::FileContent& content) {
+    void FileIO::write_File(std::string filePath, FileIO::FileContent& content) {
+        try {
+            validate_Path(filePath);
+        } catch (std::runtime_error& e) { throw e; }
+
         _fileMutex.lock();
-        ensure_Parent_Directory(filePath);
-        FILE* file = std::fopen(filePath, "wb");
+        FILE* file = std::fopen(filePath.c_str(), "wb");
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
@@ -203,10 +248,13 @@ namespace love_engine {
         _fileMutex.unlock();
     }
     
-    void FileIO::append_File(const char*const filePath, const std::string& data) {
+    void FileIO::append_File(std::string filePath, const std::string& data) {
+        try {
+            validate_Path(filePath);
+        } catch (std::runtime_error& e) { throw e; }
+
         _fileMutex.lock();
-        ensure_Parent_Directory(filePath);
-        FILE* file = std::fopen(filePath, "ab");
+        FILE* file = std::fopen(filePath.c_str(), "ab");
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
