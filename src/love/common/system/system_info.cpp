@@ -31,24 +31,27 @@ namespace love_engine {
 
     void SystemInfo::_find_OS() {
 #ifdef _WIN32
-        std::stringstream buffer;
-        buffer << WindowsRegistry::get_HKLM_Value_String(
+        std::string version = WindowsRegistry::get_HKLM_Value_String(
             L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
             L"ProductName"
-        ) << " (" << WindowsRegistry::get_HKLM_Value_String(
-            L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-            L"DisplayVersion"
-        ) << ") v" << WindowsRegistry::get_HKLM_Value_I32(
-            L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-            L"CurrentMajorVersionNumber"
-        ) << "." << WindowsRegistry::get_HKLM_Value_I32(
-            L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-            L"CurrentMinorVersionNumber"
-        ) << "." << WindowsRegistry::get_HKLM_Value_String(
-            L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-            L"CurrentBuildNumber"
         );
-        _OS.assign(buffer.str());
+        if (version != "Not found") {
+            std::stringstream buffer;
+            buffer << version << " (" << WindowsRegistry::get_HKLM_Value_String(
+                L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                L"DisplayVersion"
+            ) << ") v" << WindowsRegistry::get_HKLM_Value_I32(
+                L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                L"CurrentMajorVersionNumber"
+            ) << "." << WindowsRegistry::get_HKLM_Value_I32(
+                L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                L"CurrentMinorVersionNumber"
+            ) << "." << WindowsRegistry::get_HKLM_Value_String(
+                L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                L"CurrentBuildNumber"
+            );
+            _OS.assign(buffer.str());
+        } else _OS.assign("Not found");
 #elif defined(__unix__)
         std::stringstream buffer;
         struct utsname unameData;
@@ -139,7 +142,9 @@ namespace love_engine {
                         )
                     );
                 }
-                gpu.memory = std::to_string(memory / (1024 * 1024)) + "MB";
+                if (memory < 0) {
+                    gpu.memory = "Not found";
+                } else gpu.memory = std::to_string(memory / (1024 * 1024)) + "MB";
                 
                 _video_Cards.push_back(std::move(gpu));
             }
@@ -204,10 +209,14 @@ namespace love_engine {
         buffer << "\n\tMax Speed: " << _CPU.speed;
 
         buffer << "\nVideo Cards:";
-        for (auto gpu : get_Video_Cards()) {
-            buffer << "\n\t" << gpu.name;
-            buffer << "\n\t\tDriver Version: " << gpu.driverVersion;
-            buffer << "\n\t\tMemory: " << gpu.memory;
+        if (get_Video_Cards().empty()) {
+            buffer << "\n\tNo video cards found.";
+        } else {
+            for (auto gpu : get_Video_Cards()) {
+                buffer << "\n\t" << gpu.name;
+                buffer << "\n\t\tDriver Version: " << gpu.driverVersion;
+                buffer << "\n\t\tMemory: " << gpu.memory;
+            }
         }
 
         get_Base_Board();

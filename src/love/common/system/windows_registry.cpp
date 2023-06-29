@@ -129,7 +129,7 @@ namespace love_engine {
             valueBuf.resize(static_cast<size_t>(cbData - 1));
             return _wstrConverter.to_bytes(valueBuf);
         } else if (rc == ERROR_FILE_NOT_FOUND) {
-            return "";
+            return "Not found";
         } else {
             Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _get_System_Message(rc));
         }
