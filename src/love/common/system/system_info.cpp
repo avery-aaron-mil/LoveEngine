@@ -31,7 +31,7 @@ namespace love_engine {
 
     void SystemInfo::_find_OS() noexcept {
 #ifdef _WIN32
-        std::string version = WindowsRegistry::get_HKLM_Value_String(
+        const std::string version = WindowsRegistry::get_HKLM_Value_String(
             L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
             L"ProductName"
         );
@@ -81,15 +81,18 @@ namespace love_engine {
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
             L"ProcessorNameString"
         );
-        std::stringstream buffer;
-        buffer << WindowsRegistry::get_HKLM_Value_String(
+        const std::string description = WindowsRegistry::get_HKLM_Value_String(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
             L"Identifier"
-        ) << " " << WindowsRegistry::get_HKLM_Value_String(
-            L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
-            L"VendorIdentifier"
         );
-        _CPU.description = buffer.str();
+        if (description != "Not found") {
+            std::stringstream buffer;
+            buffer << description << " " << WindowsRegistry::get_HKLM_Value_String(
+                L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
+                L"VendorIdentifier"
+            );
+            _CPU.description = buffer.str();
+        }
         _CPU.speed = std::to_string(WindowsRegistry::get_HKLM_Value_I32(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
             L"~MHz"
