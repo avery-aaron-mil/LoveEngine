@@ -11,7 +11,7 @@
 #include <sys/time.h>
 
 namespace love_engine {
-    std::string Logger::_generate_Log_Message(const Log_Status status, const std::string& message) {
+    std::string Logger::_generate_Log_Message(const Log_Status status, const std::string& message) noexcept {
         // Get time
         struct timeval tv;
         if (gettimeofday(&tv, nullptr)) {

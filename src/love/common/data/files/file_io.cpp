@@ -30,7 +30,7 @@ namespace love_engine {
     std::mutex _fileMutex;
     std::string _executable_Directory;
 
-    std::string FileIO::get_Executable_Directory() {
+    std::string FileIO::get_Executable_Directory() noexcept {
         if (_executable_Directory.empty()) {
             unsigned int bufferSize = 1024;
             std::vector<char> buffer(bufferSize + 1);
@@ -69,7 +69,7 @@ namespace love_engine {
         return _executable_Directory;        
     }
 
-    [[nodiscard]] std::string FileIO::remove_Excess_Directory_Slashes(std::string path) {
+    [[nodiscard]] std::string FileIO::remove_Excess_Directory_Slashes(std::string path) noexcept {
         std::string buffer;
         buffer.resize(path.length());
         const char *in = path.data();
@@ -92,7 +92,7 @@ namespace love_engine {
         return buffer;
     }
 
-    void FileIO::ensure_Parent_Directory_Exists(const std::string& path) {
+    void FileIO::ensure_Parent_Directory_Exists(const std::string& path) noexcept {
         if (!std::filesystem::exists(path.c_str())) {
             std::filesystem::path p = path;
             std::filesystem::create_directories(p.parent_path());
@@ -275,11 +275,11 @@ namespace love_engine {
         _fileMutex.unlock();
     }
 
-    void FileIO::lock() {
+    void FileIO::lock() noexcept {
         _fileMutex.lock();
     }
     
-    void FileIO::unlock() {
+    void FileIO::unlock() noexcept {
         _fileMutex.unlock();
     }
 }

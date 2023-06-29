@@ -26,22 +26,22 @@ namespace love_engine {
                 std::string systemName;
             } BaseBoardInfo;
 
-            static std::string get_Consolidated_System_Info();
-            static std::string get_OS();
-            static std::string get_System_Name();
-            static CPU_Info get_CPU();
-            static std::vector<VideoCardInfo> get_Video_Cards();
-            static BaseBoardInfo get_Base_Board();
-            static std::string get_Physical_Memory();
+            static std::string get_Consolidated_System_Info() noexcept;
+            static std::string get_OS() noexcept;
+            static std::string get_System_Name() noexcept;
+            static CPU_Info get_CPU() noexcept;
+            static std::vector<VideoCardInfo> get_Video_Cards() noexcept;
+            static BaseBoardInfo get_Base_Board() noexcept;
+            static std::string get_Physical_Memory() noexcept;
 
         private:
-            static void _set_Consolidated_System_Info();
-            static void _find_OS();
-            static void _find_System_Name();
-            static void _find_CPU();
-            static void _find_Video_Cards();
-            static void _find_Base_Board();
-            static void _find_Physical_Memory();
+            static void _set_Consolidated_System_Info() noexcept;
+            static void _find_OS() noexcept;
+            static void _find_System_Name() noexcept;
+            static void _find_CPU() noexcept;
+            static void _find_Video_Cards() noexcept;
+            static void _find_Base_Board() noexcept;
+            static void _find_Physical_Memory() noexcept;
     };
 
 }

@@ -29,7 +29,7 @@ namespace love_engine {
     SystemInfo::BaseBoardInfo _baseBoard;
     std::string _physicalMemory;
 
-    void SystemInfo::_find_OS() {
+    void SystemInfo::_find_OS() noexcept {
 #ifdef _WIN32
         std::string version = WindowsRegistry::get_HKLM_Value_String(
             L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
@@ -64,7 +64,7 @@ namespace love_engine {
     }
 
     
-    void SystemInfo::_find_System_Name() {
+    void SystemInfo::_find_System_Name() noexcept {
 #ifdef _WIN32
         _systemName = WindowsRegistry::get_HKLM_Value_String(
             L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\DataStore\\Machine\\0",
@@ -75,7 +75,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_CPU() {
+    void SystemInfo::_find_CPU() noexcept {
 #ifdef _WIN32
         _CPU.name = WindowsRegistry::get_HKLM_Value_String(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
@@ -113,7 +113,7 @@ namespace love_engine {
         _CPU.threads = std::to_string(std::thread::hardware_concurrency());
     }
     
-    void SystemInfo::_find_Video_Cards() {
+    void SystemInfo::_find_Video_Cards() noexcept {
 #ifdef _WIN32
         std::vector<std::wstring> registryKeys = WindowsRegistry::get_HKLM_Children(
             L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}"
@@ -154,7 +154,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_Base_Board() {
+    void SystemInfo::_find_Base_Board() noexcept {
 #ifdef _WIN32
         _baseBoard.name = WindowsRegistry::get_HKLM_Value_String(
             L"HARDWARE\\DESCRIPTION\\System\\BIOS",
@@ -177,7 +177,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_Physical_Memory() {
+    void SystemInfo::_find_Physical_Memory() noexcept {
 #ifdef _WIN32
         MEMORYSTATUSEX memory;
         memory.dwLength = sizeof(memory);
@@ -194,7 +194,7 @@ namespace love_engine {
     
     // TODO Get free space using statvfs (Linux) and GetDiskFreeSpaceA (Windows)
 
-    void SystemInfo::_set_Consolidated_System_Info() {
+    void SystemInfo::_set_Consolidated_System_Info() noexcept {
         // TODO Make a table generator
         std::stringstream buffer;
         buffer << "OS: " << get_OS();
@@ -229,31 +229,31 @@ namespace love_engine {
         _consolidated_System_Info.assign(buffer.str());
     }
 
-    std::string SystemInfo::get_Consolidated_System_Info() {
+    std::string SystemInfo::get_Consolidated_System_Info() noexcept {
         if (_consolidated_System_Info.empty()) _set_Consolidated_System_Info();
         return _consolidated_System_Info;
     }
-    std::string SystemInfo::get_OS() {
+    std::string SystemInfo::get_OS() noexcept {
         if (_OS.empty()) _find_OS();
         return _OS;
     }
-    std::string SystemInfo::get_System_Name() {
+    std::string SystemInfo::get_System_Name() noexcept {
         if (_systemName.empty()) _find_System_Name();
         return _systemName;
     }
-    SystemInfo::CPU_Info SystemInfo::get_CPU() {
+    SystemInfo::CPU_Info SystemInfo::get_CPU() noexcept {
         if (_CPU.name.empty()) _find_CPU();
         return _CPU;
     }
-    std::vector<SystemInfo::VideoCardInfo> SystemInfo::get_Video_Cards() {
+    std::vector<SystemInfo::VideoCardInfo> SystemInfo::get_Video_Cards() noexcept {
         if (_video_Cards.empty()) _find_Video_Cards();
         return _video_Cards;
     }
-    SystemInfo::BaseBoardInfo SystemInfo::get_Base_Board() {
+    SystemInfo::BaseBoardInfo SystemInfo::get_Base_Board() noexcept {
         if (_baseBoard.name.empty()) _find_Base_Board();
         return _baseBoard;
     }
-    std::string SystemInfo::get_Physical_Memory() {
+    std::string SystemInfo::get_Physical_Memory() noexcept {
         if (_physicalMemory.empty()) _find_Physical_Memory();
         return _physicalMemory;
     }

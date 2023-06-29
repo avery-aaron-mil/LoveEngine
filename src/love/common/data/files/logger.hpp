@@ -43,7 +43,7 @@ namespace love_engine {
             void clear() { FileIO::clear_File(_logPath.c_str()); }
 
         private:
-            static std::string _generate_Log_Message(const Log_Status status, const std::string& message);
+            static std::string _generate_Log_Message(const Log_Status status, const std::string& message) noexcept;
 
             std::string _logPath;
    };

@@ -33,7 +33,7 @@ namespace love_engine {
             std::string get_Thread_Name() const noexcept {
                 return get_Thread_Name(get_id());
             }
-            static std::string get_Thread_Name(const std::thread::id& id);
+            static std::string get_Thread_Name(const std::thread::id& id) noexcept;
 
             void rename_Thread(const std::string& name) noexcept {
                 register_Thread(get_id(), name);
@@ -43,12 +43,12 @@ namespace love_engine {
             }
 
             // NOTE: Recommended to not use this functions unless native threads are absolutely necessary.
-            static void register_Thread(const std::thread::id& id, const std::string& name);
+            static void register_Thread(const std::thread::id& id, const std::string& name) noexcept;
             // NOTE: Recommended to not use this functions unless native threads are absolutely necessary.
-            static void unregister_Thread(const std::thread::id& id);
+            static void unregister_Thread(const std::thread::id& id) noexcept;
 
             // NOTE: Should only be called by main thread.
-            static void wait_For_Threads();
+            static void wait_For_Threads() noexcept;
 
         private:
             template<class F, class... Args>
@@ -58,7 +58,7 @@ namespace love_engine {
                 unregister_Thread(std::this_thread::get_id());
             }
 
-            void _add_To_Thread_Count();
+            static void _add_To_Thread_Count() noexcept;
 
             std::thread _thread;
     };

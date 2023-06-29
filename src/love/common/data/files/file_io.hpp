@@ -22,9 +22,9 @@ namespace love_engine {
                     bool _hasAlloc;
             };
 
-            static std::string get_Executable_Directory();
-            [[nodiscard]] static std::string remove_Excess_Directory_Slashes(std::string path);
-            static void ensure_Parent_Directory_Exists(const std::string& path);
+            static std::string get_Executable_Directory() noexcept;
+            [[nodiscard]] static std::string remove_Excess_Directory_Slashes(std::string path) noexcept;
+            static void ensure_Parent_Directory_Exists(const std::string& path) noexcept;
             static void validate_Path(std::string& path);
             static void clear_File(std::string filePath);
             static std::string read_File(std::string filePath);
@@ -33,8 +33,8 @@ namespace love_engine {
             static void write_File(std::string filePath, FileContent& content);
             static void append_File(std::string filePath, const std::string& data);
 
-            static void lock();
-            static void unlock();
+            static void lock() noexcept;
+            static void unlock() noexcept;
     };
 }
 
