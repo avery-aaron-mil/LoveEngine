@@ -88,7 +88,7 @@ namespace love_engine {
 
         // Open file
         FileIO::lock();
-        FILE* file = fopen(filePath, "wb");
+        FILE* file = std::fopen(filePath, "wb");
         if (!file) throw std::runtime_error(std::string("Error opening file: ") + filePath);
 
         size_t head = 0, charsWritten = 0;

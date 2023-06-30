@@ -12,6 +12,7 @@ namespace love_engine {
             static void set_Crash_Directory(const std::string& directory);
             static void set_Crash_Path(const std::string& filePath);
             static void set_Flavor_Texts(const std::vector<std::string>& flavorTexts);
+            // @throw std::logic_error If a crash is already initiated.
             [[noreturn]] static void crash(const std::string& message);
     };
 }
