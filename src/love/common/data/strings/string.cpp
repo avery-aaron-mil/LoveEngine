@@ -24,7 +24,7 @@ namespace love_engine {
         // Input validdation
         if (pos > len) return str;
         
-        str.resize(len + 1);
+        str.reserve(len + 1);
         char *const dst = str.data();
         // Copy character to be replaced
         char temp = dst[pos];
@@ -49,7 +49,7 @@ namespace love_engine {
         if ((pos > strLen) || insertStr.empty()) return str;
 
         const size_t insertLen = insertStr.length();
-        str.resize(strLen + insertLen);
+        str.reserve(strLen + insertLen);
         char *const dst = str.data();
 
         // Copy str to buffer after pos
