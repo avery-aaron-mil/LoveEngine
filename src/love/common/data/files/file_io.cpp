@@ -65,6 +65,12 @@ namespace love_engine {
             _executable_Directory.assign(p.parent_path().string() + "/");
 #endif
         }
+
+        try {
+            validate_Path(_executable_Directory);
+        } catch (std::runtime_error& e) {
+            Crash::crash(std::string("Failed to validate executable path: ") + e.what());
+        }
         
         return _executable_Directory;        
     }
@@ -133,7 +139,7 @@ namespace love_engine {
         } catch (std::runtime_error& e) { throw e; }
 
         _fileMutex.lock();
-        if (std::remove(filePath)) {
+        if (std::remove(filePath.c_str())) {
             std::stringstream error;
             error << "Could not delete file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
