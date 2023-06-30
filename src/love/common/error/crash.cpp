@@ -139,7 +139,7 @@ namespace love_engine {
         std::fputs(report.c_str(), stderr);
         try {
             FileIO::write_File(crashPath.c_str(), report);
-        } catch (std::runtime_error &e) {
+        } catch (std::exception& e) {
             std::fputs(e.what(), stderr);
         }
     }
@@ -161,6 +161,6 @@ namespace love_engine {
             _crashFunction(message);
             _cleanup_and_Exit();
         }
-        throw std::runtime_error(message);
+        throw std::logic_error(message);
     }
 }

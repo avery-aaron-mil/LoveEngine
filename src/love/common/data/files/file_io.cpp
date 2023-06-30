@@ -68,7 +68,7 @@ namespace love_engine {
 
         try {
             validate_Path(_executable_Directory);
-        } catch (std::runtime_error& e) {
+        } catch (std::invalid_argument& e) {
             Crash::crash(std::string("Failed to validate executable path: ") + e.what());
         }
         
@@ -106,7 +106,7 @@ namespace love_engine {
     }
 
     void FileIO::validate_Path(std::string& path) {
-        if (path.empty()) throw std::runtime_error("The file path passed is empty.");
+        if (path.empty()) throw std::invalid_argument("The file path passed is empty.");
 
         path.assign(remove_Excess_Directory_Slashes(path));
         ensure_Parent_Directory_Exists(path);
@@ -115,7 +115,7 @@ namespace love_engine {
     void FileIO::clear_File(std::string filePath) {
         try {
             validate_Path(filePath);
-        } catch (std::runtime_error& e) { throw e; }
+        } catch (std::invalid_argument& e) { throw e; }
 
         _fileMutex.lock();
         FILE* file = std::fopen(filePath.c_str(), "wb");
@@ -136,7 +136,7 @@ namespace love_engine {
     void FileIO::delete_File(std::string filePath) {
         try {
             validate_Path(filePath);
-        } catch (std::runtime_error& e) { throw e; }
+        } catch (std::invalid_argument& e) { throw e; }
 
         _fileMutex.lock();
         if (std::remove(filePath.c_str())) {
@@ -150,7 +150,7 @@ namespace love_engine {
     std::string FileIO::read_File(std::string filePath) {
         try {
             validate_Path(filePath);
-        } catch (std::runtime_error& e) { throw e; }
+        } catch (std::invalid_argument& e) { throw e; }
 
         _fileMutex.lock();
         FILE* file = std::fopen(filePath.c_str(), "rb");
@@ -184,7 +184,7 @@ namespace love_engine {
     FileIO::FileContent FileIO::read_File_Content(std::string filePath) {
         try {
             validate_Path(filePath);
-        } catch (std::runtime_error& e) { throw e; }
+        } catch (std::invalid_argument& e) { throw e; }
 
         _fileMutex.lock();
         FILE* file = std::fopen(filePath.c_str(), "rb");
@@ -217,7 +217,7 @@ namespace love_engine {
     void FileIO::write_File(std::string filePath, const std::string& data) {
         try {
             validate_Path(filePath);
-        } catch (std::runtime_error& e) { throw e; }
+        } catch (std::invalid_argument& e) { throw e; }
 
         _fileMutex.lock();
         FILE* file = std::fopen(filePath.c_str(), "wb");
@@ -244,7 +244,7 @@ namespace love_engine {
     void FileIO::write_File(std::string filePath, FileIO::FileContent& content) {
         try {
             validate_Path(filePath);
-        } catch (std::runtime_error& e) { throw e; }
+        } catch (std::invalid_argument& e) { throw e; }
 
         _fileMutex.lock();
         FILE* file = std::fopen(filePath.c_str(), "wb");
@@ -271,7 +271,7 @@ namespace love_engine {
     void FileIO::append_File(std::string filePath, const std::string& data) {
         try {
             validate_Path(filePath);
-        } catch (std::runtime_error& e) { throw e; }
+        } catch (std::invalid_argument& e) { throw e; }
 
         _fileMutex.lock();
         FILE* file = std::fopen(filePath.c_str(), "ab");

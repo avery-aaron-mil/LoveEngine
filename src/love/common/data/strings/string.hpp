@@ -9,8 +9,8 @@ namespace love_engine {
         public:
             static std::string& reverse(std::string& str);
 
-            static std::string& insert(std::string& str, const char c, const size_t pos) noexcept;
-            static std::string& insert(std::string& str, const std::string& insertStr, const size_t pos) noexcept;
+            static std::string& insert(std::string& str, const char c, const size_t pos);
+            static std::string& insert(std::string& str, const std::string& insertStr, const size_t pos);
 
             static std::string& prepend(std::string& str, const std::string& prependStr) {
                 return insert(str, prependStr, 0);

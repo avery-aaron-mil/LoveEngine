@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 
 namespace love_engine {
     std::string& String::reverse(std::string& str) {
@@ -19,10 +20,12 @@ namespace love_engine {
         return str;
     }
     
-    std::string& String::insert(std::string& str, const char c, const size_t pos) noexcept {
+    std::string& String::insert(std::string& str, const char c, const size_t pos) {
         const size_t len = str.length();
-        // Input validdation
-        if (pos > len) return str;
+        // Input validation
+        if (pos > len) {
+            throw std::length_error("Position to insert a character into a string is greater than the string's length.");
+        }
         
         str.reserve(len + 1);
         char *const dst = str.data();
@@ -43,10 +46,13 @@ namespace love_engine {
         return str;
     }
 
-    std::string& String::insert(std::string& str, const std::string& insertStr, const size_t pos) noexcept {
+    std::string& String::insert(std::string& str, const std::string& insertStr, const size_t pos) {
         const size_t strLen = str.length();
         // Input validation
-        if ((pos > strLen) || insertStr.empty()) return str;
+        if (pos > strLen) {
+            throw std::length_error("Position to insert a substring into a string is greater than the string's length.");
+        }
+        if (insertStr.empty()) return str;
 
         const size_t insertLen = insertStr.length();
         str.reserve(strLen + insertLen);

@@ -54,7 +54,7 @@ namespace love_engine {
                     FileIO::append_File,
                     _logPath.c_str(), outputMessage
                 );
-            } catch (std::runtime_error &e) {
+            } catch (std::exception& e) {
                 std::stringstream error;
                 error << "FileIO::append_File() failed. Error:\n\t" << e.what();
                 Crash::crash(error.str());
