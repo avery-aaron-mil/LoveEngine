@@ -27,6 +27,7 @@ namespace love_engine {
             static void ensure_Parent_Directory_Exists(const std::string& path) noexcept;
             static void validate_Path(std::string& path);
             static void clear_File(std::string filePath);
+            static void delete_File(std::string filePath);
             static std::string read_File(std::string filePath);
             static FileContent read_File_Content(std::string filePath);
             static void write_File(std::string filePath, const std::string& data);

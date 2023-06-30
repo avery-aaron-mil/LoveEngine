@@ -127,6 +127,20 @@ namespace love_engine {
         _fileMutex.unlock();
     }
 
+    void FileIO::delete_File(std::string filePath) {
+        try {
+            validate_Path(filePath);
+        } catch (std::runtime_error& e) { throw e; }
+
+        _fileMutex.lock();
+        if (std::remove(filePath)) {
+            std::stringstream error;
+            error << "Could not delete file \"" << filePath << "\": " << std::strerror(errno);
+            throw std::runtime_error(error.str());
+        }
+        _fileMutex.unlock();
+    }
+
     std::string FileIO::read_File(std::string filePath) {
         try {
             validate_Path(filePath);
