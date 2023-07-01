@@ -261,7 +261,7 @@ namespace love_engine {
             throw std::runtime_error(error.str());
         }
 	    lzma_end(&stream);
-	    data.resize(head);
+	    data.shrink_to_fit();
         return FileIO::FileContent(data, head);
     }
 }
