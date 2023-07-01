@@ -20,24 +20,21 @@ namespace love_engine {
         return str;
     }
     
-    std::string& String::insert(std::string& str, const char c, const size_t pos) {
+    std::string& String::insert(std::string& str, const size_t pos, const char c) {
         const size_t len = str.length();
         // Input validation
         if (pos > len) {
             throw std::length_error("Position to insert a character into a string is greater than the string's length.");
         }
         
-        str.reserve(len + 1);
+        str.resize(len + 1);
         char *const dst = str.data();
         // Copy character to be replaced
         char temp = dst[pos];
 
-        // Insert at pos
-        dst[pos] = c;
-
         // Copy remaining characters
         char temp2;
-        for (size_t i = pos + 1; i < len + 1; i++) {
+        for (size_t i = pos + 1; i < len + 1; ++i) {
             temp2 = dst[i];
             dst[i] = temp;
             temp = temp2;
@@ -45,8 +42,34 @@ namespace love_engine {
         
         return str;
     }
+    
+    std::string& String::insert(std::string& str, const size_t pos, size_t count, const char c) {
+        if (count < 1) return str;
+        const size_t len = str.length();
+        // Input validation
+        if (pos > len) {
+            throw std::length_error("Position to insert characters into a string is greater than the string's length.");
+        }
+        
+        str.resize(len + count);
+        char*const dst = str.data() + pos;
 
-    std::string& String::insert(std::string& str, const std::string& insertStr, const size_t pos) {
+        // Copy str to buffer after pos
+        const size_t rem = len - pos;
+        char* buffer = static_cast<char*>(std::malloc(rem));
+        std::memcpy(buffer, dst, rem);
+
+        // Insert at pos
+        std::memset(dst, c, count);
+
+        // Copy remaining characters
+        std::memcpy(dst + count, buffer, rem);
+
+        std::free(buffer);
+        return str;
+    }
+
+    std::string& String::insert(std::string& str, const size_t pos, const std::string& insertStr) {
         const size_t strLen = str.length();
         // Input validation
         if (pos > strLen) {
@@ -55,21 +78,19 @@ namespace love_engine {
         if (insertStr.empty()) return str;
 
         const size_t insertLen = insertStr.length();
-        str.reserve(strLen + insertLen);
-        char *const dst = str.data();
+        str.resize(strLen + insertLen);
+        char*const dst = str.data();
 
         // Copy str to buffer after pos
         const size_t rem = strLen - pos;
         char* buffer = static_cast<char*>(std::malloc(rem));
-        std::memcpy(buffer, dst + pos, rem);
+        std::memcpy(buffer, dst, rem);
 
         // Insert at pos
-        size_t currentLen = pos;
-        std::memcpy(dst + currentLen, insertStr.c_str(), insertLen);
-        currentLen += insertLen;
+        std::memcpy(dst, insertStr.c_str(), insertLen);
 
         // Copy remaining characters
-        std::memcpy(dst + currentLen, buffer, rem);
+        std::memcpy(dst + insertLen, buffer, rem);
 
         std::free(buffer);
         return str;
@@ -80,7 +101,7 @@ namespace love_engine {
         const char *const data = str.data();
 
         char c;
-        for (size_t i = 0; i < len; i++) {
+        for (size_t i = 0; i < len; ++i) {
             c = data[i];
             if (c < ' ' || c > '~') return false;
         }
