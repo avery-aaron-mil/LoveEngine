@@ -1,6 +1,7 @@
 #include "love_engine_instance.hpp"
 
 #include <csignal>
+#include <stack>
 #include <thread>
 
 #include "error/crash.hpp"
@@ -8,6 +9,8 @@
 #include "system/thread.hpp"
 
 namespace love_engine {
+    std::stack<std::function<void()>> _callbacks;
+
     [[noreturn]] void _signal_Handler(int signum) {
         switch (signum) {
             case SIGINT:
@@ -46,5 +49,13 @@ namespace love_engine {
     
     void LoveEngineInstance::cleanup() {
         Thread::wait_For_Threads();
+        while (!_callbacks.empty()) {
+            _callbacks.top()();
+            _callbacks.pop();
+        }
+    }
+    
+    void LoveEngineInstance::add_Exit_Callback(std::function<void()> callback) {
+        _callbacks.push(callback);
     }
 }
