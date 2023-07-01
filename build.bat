@@ -22,4 +22,8 @@ copy "game.exe" "..\products\bin\"
 copy "host.exe" "..\products\bin\"
 copy "launcher.exe" "..\products\"
 
+:: Copy all depedencies
+cd "..\lib\"
+for /R . %%f in (*.dll) do copy %%f "..\products\bin\"
+
 PAUSE
