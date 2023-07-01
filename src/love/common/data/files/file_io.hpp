@@ -1,25 +1,25 @@
 #ifndef LOVE_FILE_IO_HPP
 #define LOVE_FILE_IO_HPP
 
-#include <cstdlib>
+#include <cstdint>
+#include <mutex>
 #include <string>
+#include <vector>
 
 namespace love_engine {
     class FileIO {
         public:
             class FileContent {
                 public:
-                    FileContent(void*const data, const size_t size) : _data(data), _size(size) {}
-                    ~FileContent() { if (_hasAlloc) std::free(_data); }
+                    FileContent(std::vector<uint8_t> data, const size_t size) : _data(data), _size(size) {}
+                    ~FileContent() = default;
 
-                    const void*const data() const noexcept  { return _data; }
+                    const uint8_t*const data() const noexcept  { return _data.data(); }
                     size_t size() const noexcept { return _size; }
-                    void set_Alloc(const bool alloc) noexcept { _hasAlloc = alloc; }
  
                 private:
-                    void* _data;
+                    std::vector<uint8_t> _data;
                     size_t _size;
-                    bool _hasAlloc;
             };
 
             static std::string get_Executable_Directory() noexcept;
@@ -49,8 +49,7 @@ namespace love_engine {
             // @throw std::runtime_error If a file error occurs.
             static void append_File(std::string filePath, const std::string& data);
 
-            static void lock() noexcept;
-            static void unlock() noexcept;
+            static std::mutex& get_Mutex() noexcept;
     };
 }
 
