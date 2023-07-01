@@ -2,10 +2,8 @@
 
 #include <cerrno>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <filesystem>
-#include <mutex>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -13,12 +11,10 @@
 #ifdef _WIN32
 #include <Windows.h>
 #elif defined(__APPLE__)
-  #include <cstdlib>
   #include <execinfo.h>
   #include <iterator>
   #include <mach-o/dyld.h>
 #elif defined(__unix__)
-  #include <cstdlib>
   #include <execinfo.h>
   #include <iterator>
   #include <unistd.h>
@@ -29,6 +25,10 @@
 namespace love_engine {
     std::mutex _fileMutex;
     std::string _executable_Directory;
+
+    std::mutex& FileIO::get_Mutex() noexcept {
+        return _fileMutex;
+    }
 
     std::string FileIO::get_Executable_Directory() noexcept {
         if (_executable_Directory.empty()) {
@@ -117,7 +117,7 @@ namespace love_engine {
             validate_Path(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
-        _fileMutex.lock();
+        std::lock_guard<std::mutex> lock(_fileMutex);
         FILE* file = std::fopen(filePath.c_str(), "wb");
         if (!file) {
             std::stringstream error;
@@ -130,7 +130,6 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        _fileMutex.unlock();
     }
 
     void FileIO::delete_File(std::string filePath) {
@@ -138,13 +137,12 @@ namespace love_engine {
             validate_Path(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
-        _fileMutex.lock();
+        std::lock_guard<std::mutex> lock(_fileMutex);
         if (std::remove(filePath.c_str())) {
             std::stringstream error;
             error << "Could not delete file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        _fileMutex.unlock();
     }
 
     std::string FileIO::read_File(std::string filePath) {
@@ -152,7 +150,7 @@ namespace love_engine {
             validate_Path(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
-        _fileMutex.lock();
+        std::lock_guard<std::mutex> lock(_fileMutex);
         FILE* file = std::fopen(filePath.c_str(), "rb");
         if (!file) {
             std::stringstream error;
@@ -177,7 +175,6 @@ namespace love_engine {
             error << "Could not save file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        _fileMutex.unlock();
         return data;
     }
     
@@ -186,7 +183,7 @@ namespace love_engine {
             validate_Path(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
-        _fileMutex.lock();
+        std::lock_guard<std::mutex> lock(_fileMutex);
         FILE* file = std::fopen(filePath.c_str(), "rb");
         if (!file) {
             std::stringstream error;
@@ -198,8 +195,8 @@ namespace love_engine {
         size_t size = std::ftell(file);
         std::rewind(file);
 
-        void* data = std::malloc(size);
-        if (std::fread(data, 1, size, file) != size) {
+        std::vector<uint8_t> data(size);
+        if (std::fread(data.data(), 1, size, file) != size) {
             std::stringstream error;
             error << "Could not read from file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
@@ -210,7 +207,6 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        _fileMutex.unlock();
         return FileContent(data, size);
     }
     
@@ -219,7 +215,7 @@ namespace love_engine {
             validate_Path(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
-        _fileMutex.lock();
+        std::lock_guard<std::mutex> lock(_fileMutex);
         FILE* file = std::fopen(filePath.c_str(), "wb");
         if (!file) {
             std::stringstream error;
@@ -238,7 +234,6 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        _fileMutex.unlock();
     }
 
     void FileIO::write_File(std::string filePath, FileIO::FileContent& content) {
@@ -246,7 +241,7 @@ namespace love_engine {
             validate_Path(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
-        _fileMutex.lock();
+        std::lock_guard<std::mutex> lock(_fileMutex);
         FILE* file = std::fopen(filePath.c_str(), "wb");
         if (!file) {
             std::stringstream error;
@@ -265,7 +260,6 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        _fileMutex.unlock();
     }
     
     void FileIO::append_File(std::string filePath, const std::string& data) {
@@ -273,7 +267,7 @@ namespace love_engine {
             validate_Path(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
-        _fileMutex.lock();
+        std::lock_guard<std::mutex> lock(_fileMutex);
         FILE* file = std::fopen(filePath.c_str(), "ab");
         if (!file) {
             std::stringstream error;
@@ -292,14 +286,5 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        _fileMutex.unlock();
-    }
-
-    void FileIO::lock() noexcept {
-        _fileMutex.lock();
-    }
-    
-    void FileIO::unlock() noexcept {
-        _fileMutex.unlock();
     }
 }

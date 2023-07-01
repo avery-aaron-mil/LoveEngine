@@ -2,7 +2,6 @@
 
 #include <cerrno>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <sstream>
 #include <stdexcept>
@@ -87,7 +86,7 @@ namespace love_engine {
 	    lzma_action action = LZMA_RUN;
 
         // Open file
-        FileIO::lock();
+        std::lock_guard<std::mutex>(FileIO::get_Mutex());
         FILE* file = std::fopen(filePath, "wb");
         if (!file) throw std::runtime_error(std::string("Error opening file: ") + filePath);
 
@@ -157,7 +156,6 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        FileIO::unlock();
 	    lzma_end(&stream);
     }
 
@@ -166,7 +164,6 @@ namespace love_engine {
         std::string strContent;
         strContent.resize(content.size());
         std::memmove(strContent.data(), content.data(), content.size());
-        content.set_Alloc(false);
         return strContent;
     }
     
@@ -176,14 +173,14 @@ namespace love_engine {
 	    lzma_action action = LZMA_RUN;
 
         // Open file
-        FileIO::lock();
+        std::lock_guard<std::mutex>(FileIO::get_Mutex());
         FILE* file = std::fopen(filePath, "rb");
         if (!file) throw std::runtime_error(std::string("Error opening file: ") + filePath);
         
         size_t head = 0, charsRead = 0;
         uint8_t inbuf[BUFSIZ], outbuf[BUFSIZ];
         size_t capacity = sizeof(inbuf);
-        void* data = std::malloc(capacity);
+        std::vector<uint8_t> data(capacity);
 
         stream.next_in = nullptr;
         stream.avail_in = 0;
@@ -218,9 +215,9 @@ namespace love_engine {
                 // Check if data can fit buffer
                 if (capacity < head) {
                     capacity = head * 2;
-                    data = std::realloc(data, capacity);
+                    data.resize(capacity);
                 }
-                std::memcpy(reinterpret_cast<uint8_t*>(data) + (head - charsRead), outbuf, charsRead);
+                std::memcpy(data.data() + (head - charsRead), outbuf, charsRead);
                 
                 stream.next_out = outbuf;
                 stream.avail_out = sizeof(outbuf);
@@ -263,9 +260,8 @@ namespace love_engine {
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
             throw std::runtime_error(error.str());
         }
-        FileIO::unlock();
 	    lzma_end(&stream);
-	    data = std::realloc(data, head);
+	    data.resize(head);
         return FileIO::FileContent(data, head);
     }
 }

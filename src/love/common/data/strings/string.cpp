@@ -1,7 +1,7 @@
 #include "string.hpp"
 
-#include <cstdlib>
 #include <cstring>
+#include <memory>
 #include <stdexcept>
 
 namespace love_engine {
@@ -56,16 +56,15 @@ namespace love_engine {
 
         // Copy str to buffer after pos
         const size_t rem = len - pos;
-        char* buffer = static_cast<char*>(std::malloc(rem));
-        std::memcpy(buffer, dst, rem);
+        auto buffer = std::make_unique<char[]>(rem);
+        std::memcpy(buffer.get(), dst, rem);
 
         // Insert at pos
         std::memset(dst, c, count);
 
         // Copy remaining characters
-        std::memcpy(dst + count, buffer, rem);
+        std::memcpy(dst + count, buffer.get(), rem);
 
-        std::free(buffer);
         return str;
     }
 
@@ -83,16 +82,15 @@ namespace love_engine {
 
         // Copy str to buffer after pos
         const size_t rem = strLen - pos;
-        char* buffer = static_cast<char*>(std::malloc(rem));
-        std::memcpy(buffer, dst, rem);
+        auto buffer = std::make_unique<char[]>(rem);
+        std::memcpy(buffer.get(), dst, rem);
 
         // Insert at pos
         std::memcpy(dst, insertStr.c_str(), insertLen);
 
         // Copy remaining characters
-        std::memcpy(dst + insertLen, buffer, rem);
+        std::memcpy(dst + insertLen, buffer.get(), rem);
 
-        std::free(buffer);
         return str;
     }
     
