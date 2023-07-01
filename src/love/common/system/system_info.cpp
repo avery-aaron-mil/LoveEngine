@@ -198,7 +198,6 @@ namespace love_engine {
     // TODO Get free space using statvfs (Linux) and GetDiskFreeSpaceA (Windows)
 
     void SystemInfo::_set_Consolidated_System_Info() noexcept {
-        // TODO Make a table generator
         std::stringstream buffer;
         buffer << "OS: " << get_OS();
         buffer << "\nSystem Name: " << get_System_Name();
