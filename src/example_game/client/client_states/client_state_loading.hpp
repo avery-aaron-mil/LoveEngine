@@ -9,8 +9,8 @@ namespace example_game {
             ClientState_Loading() = default;
             ~ClientState_Loading() = default;
             
-            void update() const noexcept override;
-            void render(std::float128_t lag) const noexcept override;
+            void update() noexcept override;
+            void render(std::float128_t lag) noexcept override;
     };
 }
 
