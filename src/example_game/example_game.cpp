@@ -7,17 +7,24 @@
 #include "client/client_states/client_state_loading.hpp"
 
 #include <cstdlib>
+#include <memory>
 
 using namespace love_engine;
 using namespace example_game;
 
+std::shared_ptr<Logger> logger;
+
+void glfwCallback(int e, const char*desc) {
+    logger.get()->log("System Info:\n" + SystemInfo::get_Consolidated_System_Info());
+}
+
 int main(int argc, char** argv) {
     LoveEngineInstance::init(FileIO::get_Executable_Directory() + "../crash-reports");
-    Logger logger(FileIO::get_Executable_Directory() + "../logs/latest.log", true);
-    logger.log("System Info:\n" + SystemInfo::get_Consolidated_System_Info());
+    logger = std::make_shared<Logger>(Logger(FileIO::get_Executable_Directory() + "../logs/latest.log", true));
+    logger.get()->log("System Info:\n" + SystemInfo::get_Consolidated_System_Info());
 
     ClientState_Loading loading_State;
-    ClientInstance client(&loading_State, ClientInstance::Settings{.msPerTick = 50.f});
+    ClientInstance client(&loading_State, ClientInstance::Settings{.glfwErrorCallback = glfwCallback, .msPerTick = 50.f});
     client.run();
 
     LoveEngineInstance::cleanup();

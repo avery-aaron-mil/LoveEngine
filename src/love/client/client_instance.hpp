@@ -15,7 +15,7 @@ namespace love_engine {
         public:
             typedef struct Settings_ {
                 GraphicsInstance::ApplicationInfo applicationInfo{};
-                std::function<void(int, const char*)> glfwErrorCallback;
+                std::function<void(int, const char*)> glfwErrorCallback = _default_glfwErrorCallback;
                 std::float32_t msPerTick = 20.f;
             } Settings;
             ClientInstance(ClientState *const clientState, const Settings& settings)
@@ -36,6 +36,8 @@ namespace love_engine {
             ClientState *_nextClientState = nullptr;
             
             GraphicsInstance _graphicsInstance{_settings.applicationInfo, _settings.glfwErrorCallback};
+
+            static void _default_glfwErrorCallback(int error, const char* description);
     };
 
 }
