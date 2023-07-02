@@ -4,6 +4,10 @@
 
 namespace love_engine {
 
+    void ClientInstance::init() noexcept {
+        //
+    }
+
     void ClientInstance::run() noexcept {
         auto previousTime = std::chrono::high_resolution_clock::now();
         std::float128_t lag = 0.0f;

@@ -1,10 +1,12 @@
 #ifndef LOVE_CLIENT_INSTANCE_HPP
 #define LOVE_CLIENT_INSTANCE_HPP
 
+#include "graphics/graphics_instance.hpp"
 #include "client_state.hpp"
 
 #include <love/common/error/crash.hpp>
 
+#include <functional>
 #include <stdfloat>
 
 namespace love_engine {
@@ -12,14 +14,18 @@ namespace love_engine {
     class ClientInstance {
         public:
             typedef struct Settings_ {
+                GraphicsInstance::ApplicationInfo applicationInfo{};
+                std::function<void(int, const char*)> glfwErrorCallback;
                 std::float32_t msPerTick = 20.f;
             } Settings;
-            ClientInstance(ClientState *const clientState, const Settings settings)
+            ClientInstance(ClientState *const clientState, const Settings& settings)
             : _settings(settings), _clientState(clientState) {
                 if (clientState == nullptr) Crash::crash("clientState must not be NULL.");
+                init();
             }
             ~ClientInstance() = default;
 
+            static void init() noexcept;
             void run() noexcept;
 
             inline void set_ClientState(ClientState *clientState) noexcept { _nextClientState = clientState; }
@@ -28,6 +34,8 @@ namespace love_engine {
             Settings _settings;
             ClientState *_clientState = nullptr;
             ClientState *_nextClientState = nullptr;
+            
+            GraphicsInstance _graphicsInstance{_settings.applicationInfo, _settings.glfwErrorCallback};
     };
 
 }
