@@ -4,6 +4,8 @@
 #include <memory>
 #include <stdexcept>
 
+#include "../../error/stack_trace.hpp"
+
 namespace love_engine {
     std::string& String::reverse(std::string& str) {
         const size_t len = str.length();
@@ -24,7 +26,9 @@ namespace love_engine {
         const size_t len = str.length();
         // Input validation
         if (pos > len) {
-            throw std::length_error("Position to insert a character into a string is greater than the string's length.");
+            throw std::length_error(
+                StackTrace::append_Stacktrace("Position to insert a character into a string is greater than the string's length.")
+            );
         }
         
         str.resize(len + 1);
@@ -48,7 +52,9 @@ namespace love_engine {
         const size_t len = str.length();
         // Input validation
         if (pos > len) {
-            throw std::length_error("Position to insert characters into a string is greater than the string's length.");
+            throw std::length_error(
+                StackTrace::append_Stacktrace("Position to insert characters into a string is greater than the string's length.")
+            );
         }
         
         str.resize(len + count);
@@ -72,7 +78,9 @@ namespace love_engine {
         const size_t strLen = str.length();
         // Input validation
         if (pos > strLen) {
-            throw std::length_error("Position to insert a substring into a string is greater than the string's length.");
+            throw std::length_error(
+                StackTrace::append_Stacktrace("Position to insert a substring into a string is greater than the string's length.")
+            );
         }
         if (insertStr.empty()) return str;
 
