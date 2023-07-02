@@ -21,6 +21,7 @@
 #endif
 
 #include "../../error/crash.hpp"
+#include "../../error/stack_trace.hpp"
 
 namespace love_engine {
     std::mutex _fileMutex;
@@ -106,7 +107,7 @@ namespace love_engine {
     }
 
     void FileIO::validate_Path(std::string& path) {
-        if (path.empty()) throw std::invalid_argument("The file path passed is empty.");
+        if (path.empty()) throw std::invalid_argument(StackTrace::append_Stacktrace("The file path passed is empty."));
 
         path.assign(remove_Excess_Directory_Slashes(path));
         ensure_Parent_Directory_Exists(path);
@@ -122,13 +123,13 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
     }
 
@@ -141,7 +142,7 @@ namespace love_engine {
         if (std::remove(filePath.c_str())) {
             std::stringstream error;
             error << "Could not delete file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
     }
 
@@ -155,7 +156,7 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 
         std::fseek(file , 0 , SEEK_END);
@@ -167,13 +168,13 @@ namespace love_engine {
         if (std::fread(data.data(), 1, size, file) != size) {
             std::stringstream error;
             error << "Could not read from file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not save file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
         return data;
     }
@@ -188,7 +189,7 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 
         std::fseek(file , 0 , SEEK_END);
@@ -199,13 +200,13 @@ namespace love_engine {
         if (std::fread(data.data(), 1, size, file) != size) {
             std::stringstream error;
             error << "Could not read from file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
         return FileContent(data, size);
     }
@@ -220,19 +221,19 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 
         if (std::fwrite(data.data(), 1, data.length(), file) != data.length()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
         
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
     }
 
@@ -246,19 +247,19 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 
         if (std::fwrite(content.data(), 1, content.size(), file) != content.size()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
         
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
     }
     
@@ -272,19 +273,19 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 
         if (std::fwrite(data.data(), 1, data.length(), file) != data.length()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
         
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
     }
 }

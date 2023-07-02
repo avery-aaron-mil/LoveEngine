@@ -36,9 +36,10 @@ namespace love_engine {
         constexpr int MS_PER_TRY = 100;
         constexpr int MAX_TRIES = 5000 / MS_PER_TRY; // 5 seconds, 50 tries
         int tries = 0;
-        while ((_openThreads > 0) && (++tries <= MAX_TRIES)) {
+        do {
             std::this_thread::sleep_for(std::chrono::milliseconds(MS_PER_TRY));
         }
+        while ((_openThreads > 0) && (++tries <= MAX_TRIES));
     }
 
     void Thread::_add_To_Thread_Count() noexcept {

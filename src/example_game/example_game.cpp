@@ -17,8 +17,8 @@ int main(int argc, char** argv) {
     logger.log("System Info:\n" + SystemInfo::get_Consolidated_System_Info());
 
     ClientState_Loading loading_State;
-    ClientInstance client(&loading_State, 50.f);
-    //client.run();
+    ClientInstance client(&loading_State, ClientInstance::Settings{.msPerTick = 50.f});
+    client.run();
 
     LoveEngineInstance::cleanup();
     exit(EXIT_SUCCESS);

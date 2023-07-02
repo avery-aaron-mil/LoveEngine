@@ -1,5 +1,7 @@
 #include "file_compression.hpp"
 
+#include "../../error/stack_trace.hpp"
+
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
@@ -26,19 +28,27 @@ namespace love_engine {
         if (ret != LZMA_OK) {
             switch (ret) {
                 case LZMA_MEM_ERROR: {
-                    throw std::runtime_error(std::string("Ran out of memory while decompressing file: ") + filePath);
+                    std::stringstream error;
+                    error << "Ran out of memory while decompressing file: " << filePath;
+                    throw std::runtime_error(StackTrace::append_Stacktrace(error));
                 }
 
                 case LZMA_OPTIONS_ERROR: {
-                    throw std::runtime_error(std::string("Unsupported decompressor flags for file: ") + filePath);
+                    std::stringstream error;
+                    error << "Unsupported decompressor flags for file: " << filePath;
+                    throw std::runtime_error(StackTrace::append_Stacktrace(error));
                 }
                 
                 case LZMA_UNSUPPORTED_CHECK: {
-                    throw std::runtime_error(std::string("Unsupported integrity check for file: ") + filePath);
+                    std::stringstream error;
+                    error << "Unsupported integrity check for file: " << filePath;
+                    throw std::runtime_error(StackTrace::append_Stacktrace(error));
                 }
 
                 default: {
-                    throw std::runtime_error(std::string("Unknown error occurred while decompressing file: ") + filePath);
+                    std::stringstream error;
+                    error << "Unknown error occurred while decompressing file: " << filePath;
+                    throw std::runtime_error(StackTrace::append_Stacktrace(error));
                 }
             }
         }
@@ -66,15 +76,21 @@ namespace love_engine {
         if (ret != LZMA_OK) {
             switch (ret) {
                 case LZMA_MEM_ERROR: {
-                    throw std::runtime_error(std::string("Ran out of memory while decompressing file: ") + filePath);
+                    std::stringstream error;
+                    error << "Ran out of memory while decompressing file: " << filePath;
+                    throw std::runtime_error(StackTrace::append_Stacktrace(error));
                 }
 
                 case LZMA_OPTIONS_ERROR: {
-                    throw std::runtime_error(std::string("Unsupported decompressor flags for file: ") + filePath);
+                    std::stringstream error;
+                    error << "Unsupported decompressor flags for file: " << filePath;
+                    throw std::runtime_error(StackTrace::append_Stacktrace(error));
                 }
 
                 default: {
-                    throw std::runtime_error(std::string("Unknown error occurred while decompressing file: ") + filePath);
+                    std::stringstream error;
+                    error << "Unknown error occurred while decompressing file: " << filePath;
+                    throw std::runtime_error(StackTrace::append_Stacktrace(error));
                 }
             }
         }
@@ -88,7 +104,11 @@ namespace love_engine {
         // Open file
         std::lock_guard<std::mutex>(FileIO::get_Mutex());
         FILE* file = std::fopen(filePath, "wb");
-        if (!file) throw std::runtime_error(std::string("Error opening file: ") + filePath);
+        if (!file) {
+            std::stringstream error;
+            error << "Error opening file: " << filePath;
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+        }
 
         size_t head = 0, charsWritten = 0;
         uint8_t buf[BUFSIZ];
@@ -121,7 +141,7 @@ namespace love_engine {
                 if (std::fwrite(buf, 1, charsWritten, file) != charsWritten) {
                     std::stringstream error;
                     error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
-                    throw std::runtime_error(error.str());
+                    throw std::runtime_error(StackTrace::append_Stacktrace(error));
                 }
 
                 // Reset next_out and avail_out.
@@ -136,15 +156,21 @@ namespace love_engine {
 
                 switch (ret) {
                     case LZMA_MEM_ERROR: {
-                        throw std::runtime_error(std::string("Ran out of memory while compressing file: ") + filePath);
+                        std::stringstream error;
+                        error << "Ran out of memory while compressing file: " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
 
                     case LZMA_DATA_ERROR: {
-                        throw std::runtime_error(std::string("File size is greater than maximum (2^63 bytes): ") + filePath);
+                        std::stringstream error;
+                        error << "File size is greater than maximum (2^63 bytes): " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
 
                     default: {
-                        throw std::runtime_error(std::string("Unknown error occurred while compressing file: ") + filePath);
+                        std::stringstream error;
+                        error << "Unknown error occurred while compressing file: " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
                 }
             }
@@ -154,7 +180,7 @@ namespace love_engine {
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 	    lzma_end(&stream);
     }
@@ -175,7 +201,11 @@ namespace love_engine {
         // Open file
         std::lock_guard<std::mutex>(FileIO::get_Mutex());
         FILE* file = std::fopen(filePath, "rb");
-        if (!file) throw std::runtime_error(std::string("Error opening file: ") + filePath);
+        if (!file) {
+            std::stringstream error;
+            error << "Error opening file: " << filePath;
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+        }
         
         size_t head = 0, charsRead = 0;
         uint8_t inbuf[BUFSIZ], outbuf[BUFSIZ];
@@ -197,7 +227,7 @@ namespace love_engine {
                     else {
                         std::stringstream error;
                         error << "Could not read from file \"" << filePath << "\": " << std::strerror(errno);
-                        throw std::runtime_error(error.str());
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
                 }
 
@@ -228,27 +258,39 @@ namespace love_engine {
 
                 switch (ret) {
                     case LZMA_MEM_ERROR: {
-                        throw std::runtime_error(std::string("Ran out of memory while decompressing file: ") + filePath);
+                        std::stringstream error;
+                        error << "Ran out of memory while decompressing file: " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
 
                     case LZMA_DATA_ERROR: {
-                        throw std::runtime_error(std::string("Corrupted data encountered while decompressing file: ") + filePath);
+                        std::stringstream error;
+                        error << "Corrupted data encountered while decompressing file: " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
 
                     case LZMA_FORMAT_ERROR: {
-                        throw std::runtime_error(std::string("Input file for decompression is not in xz format: ") + filePath);
+                        std::stringstream error;
+                        error << "Input file for decompression is not in xz format: " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
 
                     case LZMA_OPTIONS_ERROR: {
-                        throw std::runtime_error(std::string("Unsupported compression options for file: ") + filePath);
+                        std::stringstream error;
+                        error << "Unsupported compression options for file: " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
 
                     case LZMA_BUF_ERROR: {
-                        throw std::runtime_error(std::string("Compressed file is truncated or otherwise corrupt: ") + filePath);
+                        std::stringstream error;
+                        error << "Compressed file is truncated or otherwise corrupt: " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
 
                     default: {
-                        throw std::runtime_error(std::string("Unknown error occurred while decompressing file: ") + filePath);
+                        std::stringstream error;
+                        error << "Unknown error occurred while decompressing file: " << filePath;
+                        throw std::runtime_error(StackTrace::append_Stacktrace(error));
                     }
                 }
             }
@@ -258,7 +300,7 @@ namespace love_engine {
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(error.str());
+            throw std::runtime_error(StackTrace::append_Stacktrace(error));
         }
 	    lzma_end(&stream);
 	    data.shrink_to_fit();

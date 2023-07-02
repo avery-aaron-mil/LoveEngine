@@ -4,6 +4,7 @@
 #include "../data/files/file_io.hpp"
 #include "../system/system_info.hpp"
 #include "../system/thread.hpp"
+#include "stack_trace.hpp"
 
 #include <cerrno>
 #include <cstdio>
@@ -12,7 +13,6 @@
 #include <ctime>
 #include <stdexcept>
 #include <sstream>
-#include <stacktrace>
 #include <sys/time.h>
 
 namespace love_engine {
@@ -61,25 +61,27 @@ namespace love_engine {
         "Work smarter, not harder.",
         "It's okay to ask for help, you know.",
         "Better luck next time!",
-        "I hope your day improves."
+        "I hope your day improves.",
+        "Shall we play a game?",
+        "Do you want to build a snowman?"
     };
 
-    void Crash::set_Crash_Function(std::function<void(const std::string&)> crashFunction) {
+    void Crash::set_Crash_Function(const std::function<void(const std::string&)>& crashFunction) noexcept {
         _crashFunction = crashFunction;
     }
 
-    void Crash::set_Crash_Directory(const std::string& directory) {
+    void Crash::set_Crash_Directory(const std::string& directory) noexcept {
         _crashDir.assign(directory);
     }
-    void Crash::set_Crash_Path(const std::string& filePath) {
+    void Crash::set_Crash_Path(const std::string& filePath) noexcept {
         _crashPath.assign(filePath);
     }
 
-    void Crash::set_Flavor_Texts(const std::vector<std::string>& flavorTexts) {
+    void Crash::set_Flavor_Texts(const std::vector<std::string>& flavorTexts) noexcept {
         _flavorTexts = flavorTexts;
     }
 
-    std::string _generate_Crash_Report(const std::string& message, std::tm*& now) {
+    std::string _generate_Crash_Report(const std::string& message, std::tm*& now) noexcept {
         // Get time
         char timeBuffer[] = "MM/DD/YYYY HH:mm XM (+SS.UUUUUUs)"; // 2/17/2008 7:35 AM (+20.276508s)
 
@@ -106,19 +108,12 @@ namespace love_engine {
             "Crashing Thread: " << Thread::get_Thread_Name(std::this_thread::get_id()) << "\n"
             "Description: " << message << "\n\n"
             "--- System Details ---\n" << SystemInfo::get_Consolidated_System_Info() << "\n\n"
-            "---- Stack Trace -----\n" <<
-#ifdef _GLIBCXX_HAS_STACKTRACE
-            // NOTE: Waiting for MSYS2 to implement libstdc++_libbacktrace.a, or GCC to implement <stacktrace> fully
-            std::to_string(std::stacktrace::current())
-#else
-            "G++ has not yet fully implemented stack traces defined in C++23. :)"
-#endif
-            << "\n"
+            "---- Stack Trace -----\n" << StackTrace::get_Stacktrace() << "\n"
         ;
         return outputMessageBuffer.str();
     }
 
-    std::string _get_Crash_Path(std::tm* now) {
+    std::string _get_Crash_Path(std::tm* now) noexcept {
         if (!_crashPath.empty()) return _crashPath;
         
         char crashFileBuffer[] = "crash-YYYY-MM-DD_HH.mm.SS.txt";
@@ -133,7 +128,7 @@ namespace love_engine {
         return crashPath.str();
     }
 
-    void _log_Crash_Report(const std::string& report, std::tm* now) {
+    void _log_Crash_Report(const std::string& report, std::tm* now) noexcept {
         std::string crashPath = _get_Crash_Path(now);
 
         std::fputs(report.c_str(), stderr);
@@ -144,7 +139,7 @@ namespace love_engine {
         }
     }
 
-    void _cleanup_and_Exit() {
+    void _cleanup_and_Exit() noexcept {
         LoveEngineInstance::cleanup();
         exit(EXIT_FAILURE);
     }
@@ -161,6 +156,6 @@ namespace love_engine {
             _crashFunction(message);
             _cleanup_and_Exit();
         }
-        throw std::logic_error(message);
+        throw std::logic_error(StackTrace::append_Stacktrace(message));
     }
 }
