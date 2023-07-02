@@ -11,7 +11,7 @@ namespace love_engine {
             static inline void init() noexcept { init(FileIO::get_Executable_Directory() + "crash-reports"); }
             static void init(const std::string& crashDirectory) noexcept;
             static void cleanup() noexcept;
-            static void add_Exit_Callback(std::function<void()> callback);
+            static void add_Exit_Callback(const std::function<void()>& callback) noexcept;
     };
 }
 

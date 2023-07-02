@@ -30,7 +30,7 @@ namespace love_engine {
         }
     }
 
-    void _set_Signal_Handler() {
+    void _set_Signal_Handler() noexcept {
         std::signal(SIGINT, _signal_Handler);
         std::signal(SIGILL, _signal_Handler);
         std::signal(SIGSEGV, _signal_Handler);
@@ -39,7 +39,7 @@ namespace love_engine {
         std::signal(SIGTERM, _signal_Handler);
     }
 
-    void LoveEngineInstance::init(const std::string& crashDirectory) {
+    void LoveEngineInstance::init(const std::string& crashDirectory) noexcept {
         _set_Signal_Handler();
         Thread::register_Thread(std::this_thread::get_id(), "Main");
         SystemInfo::get_Consolidated_System_Info();
@@ -47,7 +47,7 @@ namespace love_engine {
         Crash::set_Crash_Directory(crashDirectory);
     }
     
-    void LoveEngineInstance::cleanup() {
+    void LoveEngineInstance::cleanup() noexcept {
         Thread::wait_For_Threads();
         while (!_callbacks.empty()) {
             _callbacks.top()();
@@ -55,7 +55,7 @@ namespace love_engine {
         }
     }
     
-    void LoveEngineInstance::add_Exit_Callback(std::function<void()> callback) {
+    void LoveEngineInstance::add_Exit_Callback(const std::function<void()>& callback) noexcept {
         _callbacks.push(callback);
     }
 }
