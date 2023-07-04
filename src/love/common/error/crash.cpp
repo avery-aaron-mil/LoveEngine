@@ -63,7 +63,8 @@ namespace love_engine {
         "Better luck next time!",
         "I hope your day improves.",
         "Shall we play a game?",
-        "Do you want to build a snowman?"
+        "Do you want to build a snowman?",
+        "Would you like a hug?"
     };
 
     void Crash::set_Crash_Function(const std::function<void(const std::string&)>& crashFunction) noexcept {
@@ -85,10 +86,9 @@ namespace love_engine {
         // Get time
         char timeBuffer[] = "MM/DD/YYYY HH:mm XM (+SS.UUUUUUs)"; // 2/17/2008 7:35 AM (+20.276508s)
 
-        struct timeval tv;
+        struct timeval tv = {};
         if (!gettimeofday(&tv, nullptr)) {
             time_t time = static_cast<time_t>(tv.tv_sec);
-            std::srand(tv.tv_sec);
             now = std::localtime(&time);
             if (now != nullptr) {
                 std::snprintf(timeBuffer, sizeof(timeBuffer), "%d/%d/%d %d:%02d %s (+%2d.%6lds)",
@@ -101,6 +101,7 @@ namespace love_engine {
 
         // Set crash message
         // Who/what/when/where/why/how
+        std::srand(tv.tv_sec); // Used for flavor text
         std::stringstream outputMessageBuffer;
         outputMessageBuffer <<
             "---- Crash Report ----\n"
