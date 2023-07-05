@@ -3,6 +3,7 @@
 #include <love/common/system/system_info.hpp>
 
 #include <love/client/client_instance.hpp>
+#include <love/client/graphics/graphics_instance.hpp>
 
 #include "client/client_states/client_state_loading.hpp"
 
@@ -23,8 +24,20 @@ int main(int argc, char** argv) {
     logger = std::make_shared<Logger>(Logger(FileIO::get_Executable_Directory() + "../logs/latest.log", true));
     logger.get()->log("System Info:\n" + SystemInfo::get_Consolidated_System_Info());
 
+    GraphicsInstance::ApplicationInfo applicationInfo{
+        .name = "Example Game",
+        .versionMajor = 1,
+        .versionMinor = 0,
+        .versionPatch = 0,
+        .logger = logger
+    };
+
     ClientState_Loading loading_State;
-    ClientInstance client(&loading_State, ClientInstance::Settings{.glfwErrorCallback = glfwCallback, .msPerTick = 50.f});
+    ClientInstance client(&loading_State, ClientInstance::Settings{
+        .applicationInfo = applicationInfo,
+        .glfwErrorCallback = glfwCallback,
+        .msPerTick = 50.f
+    });
     client.run();
 
     LoveEngineInstance::cleanup();

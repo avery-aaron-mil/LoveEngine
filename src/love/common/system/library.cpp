@@ -33,6 +33,7 @@ namespace love_engine {
     }
 
     void Library::load_Library(const char*const library) noexcept {
+        if (_library) unload_Library();
 #ifdef _WIN32
             _library = LoadLibraryA(library);
 #elif defined(__unix__)

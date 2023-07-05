@@ -8,16 +8,25 @@
 #include "vulkan_functions.hpp"
 
 namespace love_engine {
-    void GraphicsInstance::_load_Global_Vulkan_Functions() noexcept {
+    void GraphicsInstance::_log(const std::string& message) const noexcept {
+        if (_applicationInfo.logger.get() != nullptr) {
+            _applicationInfo.logger.get()->log(message);
+        }
+    }
+
+    void GraphicsInstance::_load_Global_Vulkan_Functions() const noexcept {
+        _log("Loading global Vulkan functions...");
 #define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.load_Library_Function(#fun));
 #define VK_GLOBAL_LEVEL_FUNCTION(fun)\
         if(!(fun = (PFN_##fun) vkGetInstanceProcAddr(nullptr, #fun))) {\
             Crash::crash("Could not load global level function: " #fun);\
         }
 #include "vulkan_functions.inl"
+        _log("Loaded global Vulkan functions.");
     }
 
-    void GraphicsInstance::_create_Vulkan_Instance(const ApplicationInfo& applicationInfo) noexcept {
+    void GraphicsInstance::_create_Vulkan_Instance() noexcept {
+        _log("Creating Vulkan instance...");
         uint32_t apiVersion;
         if (vkEnumerateInstanceVersion(&apiVersion) != VK_SUCCESS) {
             Crash::crash("Failed to get Vulkan API version.");
@@ -29,12 +38,12 @@ namespace love_engine {
 
         VkApplicationInfo vulkanApplicationInfo = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-            .pApplicationName = applicationInfo.name.c_str(),
+            .pApplicationName = _applicationInfo.name.c_str(),
             .applicationVersion = VK_MAKE_API_VERSION(
                 1,
-                applicationInfo.versionMajor,
-                applicationInfo.versionMinor,
-                applicationInfo.versionPatch
+                _applicationInfo.versionMajor,
+                _applicationInfo.versionMinor,
+                _applicationInfo.versionPatch
             ),
             .pEngineName = "Love Engine",
             .engineVersion = VK_MAKE_API_VERSION(
@@ -56,12 +65,12 @@ namespace love_engine {
         if (vkCreateInstance(&instanceInfo, nullptr, &_vulkanInstance) != VK_SUCCESS) {
             Crash::crash("Failed to create Vulkan instance.");
         }
+
+        _log("Created Vulkan instance.");
     }
 
-    void GraphicsInstance::_initialize_GLFW(
-        const ApplicationInfo& applicationInfo,
-        const std::function<void(int, const char*)>& glfwErrorCallback
-    ) noexcept {
+    void GraphicsInstance::_initialize_GLFW(const std::function<void(int, const char*)>& glfwErrorCallback) const noexcept {
+        _log("Initializing GLFW...");
         if (!glfwInit()) {
             Crash::crash("Failed to initialize GLFW.");
         }
@@ -70,16 +79,21 @@ namespace love_engine {
         if (!glfwVulkanSupported()) {
             Crash::crash("Vulkan not supported.");
         }
+        
+        _log("Initialized GLFW.");
     }
 
     GraphicsInstance::GraphicsInstance(
         const ApplicationInfo& applicationInfo,
         const std::function<void(int, const char*)>& glfwErrorCallback
-    ) {
-        _vulkanLibrary.load_Library( "vulkan-1.dll" );
-        _initialize_GLFW(applicationInfo, glfwErrorCallback);
+    ) : _applicationInfo(applicationInfo) {
+        _log("Loading Vulkan library...");
+        _vulkanLibrary.load_Library("vulkan-1.dll");
+        _log("Loaded Vulkan library.");
+
+        _initialize_GLFW(glfwErrorCallback);
         _load_Global_Vulkan_Functions();
-        _create_Vulkan_Instance(applicationInfo);
+        _create_Vulkan_Instance();
     }
     
     GraphicsInstance::~GraphicsInstance() {
