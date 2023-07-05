@@ -5,10 +5,15 @@
 
 #include <GLFW/glfw3.h>
 
+#include "vulkan_functions.hpp"
+
 namespace love_engine {
     void GraphicsInstance::_load_Global_Vulkan_Functions() noexcept {
-#define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.load_Library_Function(#fun))
-#define VK_GLOBAL_LEVEL_FUNCTION(fun) (fun = (PFN_##fun) vkGetInstanceProcAddr(nullptr, #fun))
+#define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.load_Library_Function(#fun));
+#define VK_GLOBAL_LEVEL_FUNCTION(fun)\
+        if(!(fun = (PFN_##fun) vkGetInstanceProcAddr(nullptr, #fun))) {\
+            Crash::crash("Could not load global level function: " #fun);\
+        }
 #include "vulkan_functions.inl"
     }
 
