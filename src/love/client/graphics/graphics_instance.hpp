@@ -26,7 +26,8 @@ namespace love_engine {
             Library _vulkanLibrary;
             VkInstance _vulkanInstance;
 
-            void _initialize_Vulkan(const ApplicationInfo& applicationInfo, const char** extensions, uint32_t count) noexcept;
+            void _load_Global_Vulkan_Functions() noexcept;
+            void _create_Vulkan_Instance(const ApplicationInfo& applicationInfo) noexcept;
             void _initialize_GLFW(
                 const ApplicationInfo& applicationInfo,
                 const std::function<void(int, const char*)>& glfwErrorCallback

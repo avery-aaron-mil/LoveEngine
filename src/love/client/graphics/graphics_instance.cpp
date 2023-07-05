@@ -6,20 +6,21 @@
 #include <GLFW/glfw3.h>
 
 namespace love_engine {
-    void GraphicsInstance::_initialize_Vulkan(
-        const ApplicationInfo& applicationInfo,
-        const char** extensions, uint32_t count
-    ) noexcept {
-        PFN_vkEnumerateInstanceVersion pfnEnumerateInstanceVersion = (PFN_vkEnumerateInstanceVersion)
-            vkGetInstanceProcAddr(nullptr, "vkEnumerateInstanceVersion");
+    void GraphicsInstance::_load_Global_Vulkan_Functions() noexcept {
+#define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.load_Library_Function(#fun))
+#define VK_GLOBAL_LEVEL_FUNCTION(fun) (fun = (PFN_##fun) vkGetInstanceProcAddr(nullptr, #fun))
+#include "vulkan_functions.inl"
+    }
 
+    void GraphicsInstance::_create_Vulkan_Instance(const ApplicationInfo& applicationInfo) noexcept {
         uint32_t apiVersion;
-        if (pfnEnumerateInstanceVersion == nullptr) {
-            Crash::crash("Could not find vkEnumerateInstanceVersion().");
-        }
-        if (pfnEnumerateInstanceVersion(&apiVersion) != VK_SUCCESS) {
+        if (vkEnumerateInstanceVersion(&apiVersion) != VK_SUCCESS) {
             Crash::crash("Failed to get Vulkan API version.");
         }
+        
+        // GLFW Extensions
+        uint32_t count;
+        const char** extensions = glfwGetRequiredInstanceExtensions(&count);
 
         VkApplicationInfo vulkanApplicationInfo = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -39,6 +40,7 @@ namespace love_engine {
             ),
             .apiVersion = apiVersion
         };
+
         VkInstanceCreateInfo instanceInfo = {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pApplicationInfo = &vulkanApplicationInfo,
@@ -46,12 +48,7 @@ namespace love_engine {
             .ppEnabledExtensionNames = extensions
         };
 
-        PFN_vkCreateInstance pfnCreateInstance = (PFN_vkCreateInstance)
-            vkGetInstanceProcAddr(nullptr, "vkCreateInstance");
-        if (pfnCreateInstance == nullptr) {
-            Crash::crash("Could not find vkCreateInstance().");
-        }
-        if (pfnCreateInstance(&instanceInfo, nullptr, &_vulkanInstance) != VK_SUCCESS) {
+        if (vkCreateInstance(&instanceInfo, nullptr, &_vulkanInstance) != VK_SUCCESS) {
             Crash::crash("Failed to create Vulkan instance.");
         }
     }
@@ -68,9 +65,6 @@ namespace love_engine {
         if (!glfwVulkanSupported()) {
             Crash::crash("Vulkan not supported.");
         }
-        uint32_t count;
-        const char** extensions = glfwGetRequiredInstanceExtensions(&count);
-        _initialize_Vulkan(applicationInfo, extensions, count);
     }
 
     GraphicsInstance::GraphicsInstance(
@@ -79,9 +73,12 @@ namespace love_engine {
     ) {
         _vulkanLibrary.load_Library( "vulkan-1.dll" );
         _initialize_GLFW(applicationInfo, glfwErrorCallback);
+        _load_Global_Vulkan_Functions();
+        _create_Vulkan_Instance(applicationInfo);
     }
     
     GraphicsInstance::~GraphicsInstance() {
         glfwTerminate();
+        if (_vulkanInstance) vkDestroyInstance(_vulkanInstance, nullptr);
     }
 }
