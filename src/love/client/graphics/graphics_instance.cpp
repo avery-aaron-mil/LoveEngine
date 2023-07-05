@@ -13,6 +13,12 @@ namespace love_engine {
             _applicationInfo.logger.get()->log(message);
         }
     }
+    
+    void GraphicsInstance::_load_Vulkan_Library() noexcept {
+        _log("Loading Vulkan library...");
+        _vulkanLibrary.load_Library("vulkan-1.dll");
+        _log("Loaded Vulkan library.");
+    }
 
     void GraphicsInstance::_load_Global_Vulkan_Functions() const noexcept {
         _log("Loading global Vulkan functions...");
@@ -87,10 +93,7 @@ namespace love_engine {
         const ApplicationInfo& applicationInfo,
         const std::function<void(int, const char*)>& glfwErrorCallback
     ) : _applicationInfo(applicationInfo) {
-        _log("Loading Vulkan library...");
-        _vulkanLibrary.load_Library("vulkan-1.dll");
-        _log("Loaded Vulkan library.");
-
+        _load_Vulkan_Library();
         _initialize_GLFW(glfwErrorCallback);
         _load_Global_Vulkan_Functions();
         _create_Vulkan_Instance();
