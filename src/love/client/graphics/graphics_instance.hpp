@@ -33,6 +33,7 @@ namespace love_engine {
             void _log(const std::string& message) const noexcept;
             void _load_Vulkan_Library() noexcept;
             void _load_Global_Vulkan_Functions() const noexcept;
+            void _load_Instance_Vulkan_Functions() const noexcept;
             void _create_Vulkan_Instance() noexcept;
             void _initialize_GLFW(const std::function<void(int, const char*)>& glfwErrorCallback) const noexcept;
     };
