@@ -3,6 +3,8 @@
 #include <love/common/error/crash.hpp>
 #include <love/common/love_engine_instance.hpp>
 
+#include <GLFW/glfw3.h>
+
 namespace love_engine {
     void GraphicsInstance::_initialize_Vulkan(
         const ApplicationInfo& applicationInfo,
@@ -75,6 +77,7 @@ namespace love_engine {
         const ApplicationInfo& applicationInfo,
         const std::function<void(int, const char*)>& glfwErrorCallback
     ) {
+        _vulkanLibrary.load_Library( "vulkan-1.dll" );
         _initialize_GLFW(applicationInfo, glfwErrorCallback);
     }
     

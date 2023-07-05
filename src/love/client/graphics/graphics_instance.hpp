@@ -1,13 +1,13 @@
 #ifndef LOVE_GRAPHICS_INSTANCE_HPP
 #define LOVE_GRAPHICS_INSTANCE_HPP
 
-#ifndef GLFW_INCLUDE_VULKAN
-#define GLFW_INCLUDE_VULKAN
-#endif
-#include <GLFW/glfw3.h>
-
+#include <cstdint>
 #include <functional>
 #include <string>
+
+#include <love/common/system/library.hpp>
+
+#include <vulkan/vulkan.h> // Must be included before GLFW
 
 namespace love_engine {
     class GraphicsInstance {
@@ -23,7 +23,9 @@ namespace love_engine {
             ~GraphicsInstance();
 
         private:
+            Library _vulkanLibrary;
             VkInstance _vulkanInstance;
+
             void _initialize_Vulkan(const ApplicationInfo& applicationInfo, const char** extensions, uint32_t count) noexcept;
             void _initialize_GLFW(
                 const ApplicationInfo& applicationInfo,
