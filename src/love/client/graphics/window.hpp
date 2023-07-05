@@ -1,9 +1,6 @@
 #ifndef LOVE_WINDOW_HPP
 #define LOVE_WINDOW_HPP
 
-#ifndef GLFW_INCLUDE_VULKAN
-#define GLFW_INCLUDE_VULKAN
-#endif
 #include <GLFW/glfw3.h>
 
 namespace love_engine {
