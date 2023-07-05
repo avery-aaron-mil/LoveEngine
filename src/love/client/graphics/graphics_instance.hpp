@@ -25,9 +25,10 @@ namespace love_engine {
             GraphicsInstance(const ApplicationInfo& applicationInfo, const std::function<void(int, const char*)>& glfwErrorCallback);
             ~GraphicsInstance();
 
+            VkInstance instance() const noexcept { return _vulkanInstance; }
+
         private:
             Library _vulkanLibrary;
-            VkInstance _vulkanInstance;
             ApplicationInfo _applicationInfo;
 
             void _log(const std::string& message) const noexcept;

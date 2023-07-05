@@ -22,22 +22,22 @@ namespace love_engine {
 
     void GraphicsInstance::_load_Global_Vulkan_Functions() const noexcept {
         _log("Loading global Vulkan functions...");
-#define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.load_Library_Function(#fun));
-#define VK_GLOBAL_LEVEL_FUNCTION(fun)\
-        if(!(fun = (PFN_##fun) vkGetInstanceProcAddr(nullptr, #fun))) {\
+        #define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.load_Library_Function(#fun));
+        #define VK_GLOBAL_LEVEL_FUNCTION(fun)\
+        if (!(fun = (PFN_##fun) vkGetInstanceProcAddr(nullptr, #fun))) {\
             Crash::crash("Could not load global Vulkan function: " #fun);\
         }
-#include "vulkan_functions.inl"
+        #include "vulkan_functions.inl"
         _log("Loaded global Vulkan functions.");
     }
 
     void GraphicsInstance::_load_Instance_Vulkan_Functions() const noexcept {
         _log("Loading Vulkan instance functions...");
-#define VK_GLOBAL_LEVEL_FUNCTION(fun)\
-        if(!(fun = (PFN_##fun) vkGetInstanceProcAddr(_vulkanInstance, #fun))) {\
+        #define VK_GLOBAL_LEVEL_FUNCTION(fun)\
+        if (!(fun = (PFN_##fun) vkGetInstanceProcAddr(_vulkanInstance, #fun))) {\
             Crash::crash("Could not load Vulkan instance function: " #fun);\
         }
-#include "vulkan_functions.inl"
+        #include "vulkan_functions.inl"
         _log("Loaded Vulkan instance functions.");
     }
 
