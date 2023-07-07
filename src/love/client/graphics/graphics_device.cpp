@@ -247,11 +247,12 @@ namespace love_engine {
     void GraphicsDevice::_loadDeviceVulkanFunctions() const noexcept {
         _log("Loading Vulkan device functions...");
 
-        #define VK_GLOBAL_LEVEL_FUNCTION(fun)\
+        #define VK_DEVICE_LEVEL_FUNCTION(fun)\
         if (!(fun = (PFN_##fun) vkGetDeviceProcAddr(_device, #fun))) {\
             Crash::crash("Could not load Vulkan device function: " #fun);\
         }
         #include "vulkan_functions.inl"
+        #undef VK_DEVICE_LEVEL_FUNCTION
 
         _log("Loaded Vulkan device functions.");
     }

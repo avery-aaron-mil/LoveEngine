@@ -22,22 +22,28 @@ namespace love_engine {
 
     void GraphicsInstance::_loadGlobalVulkanFunctions() const noexcept {
         _log("Loading global Vulkan functions...");
+
         #define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.loadLibraryFunction(#fun));
         #define VK_GLOBAL_LEVEL_FUNCTION(fun)\
         if (!(fun = (PFN_##fun) vkGetInstanceProcAddr(nullptr, #fun))) {\
             Crash::crash("Could not load global Vulkan function: " #fun);\
         }
         #include "vulkan_functions.inl"
+        #undef VK_GLOBAL_LEVEL_FUNCTION
+
         _log("Loaded global Vulkan functions.");
     }
 
     void GraphicsInstance::_loadInstanceVulkanFunctions() const noexcept {
         _log("Loading Vulkan instance functions...");
-        #define VK_GLOBAL_LEVEL_FUNCTION(fun)\
+
+        #define VK_INSTANCE_LEVEL_FUNCTION(fun)\
         if (!(fun = (PFN_##fun) vkGetInstanceProcAddr(_vulkanInstance, #fun))) {\
             Crash::crash("Could not load Vulkan instance function: " #fun);\
         }
         #include "vulkan_functions.inl"
+        #undef VK_INSTANCE_LEVEL_FUNCTION
+
         _log("Loaded Vulkan instance functions.");
     }
 
