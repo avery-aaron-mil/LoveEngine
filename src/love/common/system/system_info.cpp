@@ -121,7 +121,7 @@ namespace love_engine {
         std::vector<std::wstring> registryKeys = WindowsRegistry::get_HKLM_Children(
             L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}"
         );
-        for (auto dir : registryKeys) {
+        for (const auto& dir : registryKeys) {
             if (dir.c_str()[0] == L'0') {
                 VideoCardInfo gpu;
                 gpu.name = WindowsRegistry::get_HKLM_Value_String(
@@ -214,7 +214,7 @@ namespace love_engine {
         if (get_Video_Cards().empty()) {
             buffer << "\n\tNo video cards found.";
         } else {
-            for (auto gpu : get_Video_Cards()) {
+            for (const auto& gpu : get_Video_Cards()) {
                 buffer << "\n\t" << gpu.name;
                 buffer << "\n\t\tDriver Version: " << gpu.driverVersion;
                 buffer << "\n\t\tMemory: " << gpu.memory;
