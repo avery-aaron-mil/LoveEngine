@@ -53,7 +53,7 @@ namespace love_engine {
         private:
             template<class F, class... Args>
             static void _handleThread(const std::string name, F&& f, Args&&... args) {
-                c(std::this_thread::get_id(), name);
+                registerThread(std::this_thread::get_id(), name);
                 f(args...);
                 unregisterThread(std::this_thread::get_id());
             }

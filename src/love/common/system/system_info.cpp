@@ -21,15 +21,15 @@
 #endif
 
 namespace love_engine {
-    std::string _consolidated_System_Info;
+    std::string _consolidatedSystemInfo;
     std::string _OS;
     std::string _systemName;
-    SystemInfo::CPU_Info _CPU;
-    std::vector<SystemInfo::VideoCardInfo> _video_Cards;
+    SystemInfo::CPUInfo _CPU;
+    std::vector<SystemInfo::VideoCardInfo> _videoCards;
     SystemInfo::BaseBoardInfo _baseBoard;
     std::string _physicalMemory;
 
-    void SystemInfo::_find_OS() noexcept {
+    void SystemInfo::_findOS() noexcept {
 #ifdef _WIN32
         const std::string version = WindowsRegistry::getHKLMValueString(
             L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
@@ -64,7 +64,7 @@ namespace love_engine {
     }
 
     
-    void SystemInfo::_find_System_Name() noexcept {
+    void SystemInfo::_findSystemName() noexcept {
 #ifdef _WIN32
         _systemName = WindowsRegistry::getHKLMValueString(
             L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\DataStore\\Machine\\0",
@@ -75,7 +75,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_CPU() noexcept {
+    void SystemInfo::_findCPU() noexcept {
 #ifdef _WIN32
         _CPU.name = WindowsRegistry::getHKLMValueString(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
@@ -116,7 +116,7 @@ namespace love_engine {
         _CPU.threads = std::to_string(std::thread::hardware_concurrency());
     }
     
-    void SystemInfo::_find_Video_Cards() noexcept {
+    void SystemInfo::_findVideoCards() noexcept {
 #ifdef _WIN32
         std::vector<std::wstring> registryKeys = WindowsRegistry::getHKLMChildren(
             L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}"
@@ -149,7 +149,7 @@ namespace love_engine {
                     gpu.memory = "Not found";
                 } else gpu.memory = std::to_string(memory / (1024 * 1024)) + "MB";
                 
-                _video_Cards.push_back(std::move(gpu));
+                _videoCards.push_back(std::move(gpu));
             }
         }
 #elif defined(__unix__)
@@ -157,7 +157,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_Base_Board() noexcept {
+    void SystemInfo::_findBaseBoard() noexcept {
 #ifdef _WIN32
         _baseBoard.name = WindowsRegistry::getHKLMValueString(
             L"HARDWARE\\DESCRIPTION\\System\\BIOS",
@@ -180,7 +180,7 @@ namespace love_engine {
 #endif
     }
     
-    void SystemInfo::_find_Physical_Memory() noexcept {
+    void SystemInfo::_findPhysicalMemory() noexcept {
 #ifdef _WIN32
         MEMORYSTATUSEX memory;
         memory.dwLength = sizeof(memory);
@@ -197,13 +197,13 @@ namespace love_engine {
     
     // TODO Get free space using statvfs (Linux) and GetDiskFreeSpaceA (Windows)
 
-    void SystemInfo::_set_Consolidated_System_Info() noexcept {
+    void SystemInfo::_setConsolidatedSystemInfo() noexcept {
         std::stringstream buffer;
-        buffer << "OS: " << get_OS();
-        buffer << "\nSystem Name: " << get_System_Name();
-        buffer << "\nPhysical Memory: " << get_Physical_Memory();
+        buffer << "OS: " << getOS();
+        buffer << "\nSystem Name: " << getSystemName();
+        buffer << "\nPhysical Memory: " << getPhysicalMemory();
 
-        get_CPU();
+        getCPU();
         buffer << "\nCPU:";
         buffer << "\n\tName: " << _CPU.name;
         buffer << "\n\tDescription: " << _CPU.description;
@@ -211,52 +211,52 @@ namespace love_engine {
         buffer << "\n\tMax Speed: " << _CPU.speed;
 
         buffer << "\nVideo Cards:";
-        if (get_Video_Cards().empty()) {
+        if (getVideoCards().empty()) {
             buffer << "\n\tNo video cards found.";
         } else {
-            for (const auto& gpu : get_Video_Cards()) {
+            for (const auto& gpu : getVideoCards()) {
                 buffer << "\n\t" << gpu.name;
                 buffer << "\n\t\tDriver Version: " << gpu.driverVersion;
                 buffer << "\n\t\tMemory: " << gpu.memory;
             }
         }
 
-        get_Base_Board();
+        getBaseBoard();
         buffer << "\nBase Board:";
         buffer << "\n\tName: " << _baseBoard.name;
         buffer << "\n\tBIOS Vendor: " << _baseBoard.biosVendor;
         buffer << "\n\tBIOS Version: " << _baseBoard.biosVersion;
         buffer << "\n\tSystem Product Name: " << _baseBoard.systemName;
 
-        _consolidated_System_Info.assign(buffer.str());
+        _consolidatedSystemInfo.assign(buffer.str());
     }
 
     std::string SystemInfo::getConsolidatedSystemInfo() noexcept {
-        if (_consolidated_System_Info.empty()) _set_Consolidated_System_Info();
-        return _consolidated_System_Info;
+        if (_consolidatedSystemInfo.empty()) _setConsolidatedSystemInfo();
+        return _consolidatedSystemInfo;
     }
-    std::string SystemInfo::get_OS() noexcept {
-        if (_OS.empty()) _find_OS();
+    std::string SystemInfo::getOS() noexcept {
+        if (_OS.empty()) _findOS();
         return _OS;
     }
-    std::string SystemInfo::get_System_Name() noexcept {
-        if (_systemName.empty()) _find_System_Name();
+    std::string SystemInfo::getSystemName() noexcept {
+        if (_systemName.empty()) _findSystemName();
         return _systemName;
     }
-    SystemInfo::CPU_Info SystemInfo::get_CPU() noexcept {
-        if (_CPU.name.empty()) _find_CPU();
+    SystemInfo::CPUInfo SystemInfo::getCPU() noexcept {
+        if (_CPU.name.empty()) _findCPU();
         return _CPU;
     }
-    std::vector<SystemInfo::VideoCardInfo> SystemInfo::get_Video_Cards() noexcept {
-        if (_video_Cards.empty()) _find_Video_Cards();
-        return _video_Cards;
+    std::vector<SystemInfo::VideoCardInfo> SystemInfo::getVideoCards() noexcept {
+        if (_videoCards.empty()) _findVideoCards();
+        return _videoCards;
     }
-    SystemInfo::BaseBoardInfo SystemInfo::get_Base_Board() noexcept {
-        if (_baseBoard.name.empty()) _find_Base_Board();
+    SystemInfo::BaseBoardInfo SystemInfo::getBaseBoard() noexcept {
+        if (_baseBoard.name.empty()) _findBaseBoard();
         return _baseBoard;
     }
-    std::string SystemInfo::get_Physical_Memory() noexcept {
-        if (_physicalMemory.empty()) _find_Physical_Memory();
+    std::string SystemInfo::getPhysicalMemory() noexcept {
+        if (_physicalMemory.empty()) _findPhysicalMemory();
         return _physicalMemory;
     }
 }

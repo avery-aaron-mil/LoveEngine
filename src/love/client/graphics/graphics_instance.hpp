@@ -30,6 +30,7 @@ namespace love_engine {
         private:
             Library _vulkanLibrary;
             ApplicationInfo _applicationInfo;
+            VkInstance _vulkanInstance;
 
             void _log(const std::string& message) const noexcept;
             void _loadVulkanLibrary() noexcept;

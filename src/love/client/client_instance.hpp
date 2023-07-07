@@ -13,11 +13,11 @@ namespace love_engine {
 
     class ClientInstance {
         public:
-            typedef struct Settings_ {
+            struct Settings {
                 GraphicsInstance::ApplicationInfo applicationInfo{};
                 std::function<void(int, const char*)> glfwErrorCallback = _defaultGLFWErrorCallback;
                 std::float32_t msPerTick = 20.f;
-            } Settings;
+            };
             ClientInstance(ClientState *const clientState, const Settings& settings)
             : _settings(settings), _clientState(clientState) {
                 if (clientState == nullptr) Crash::crash("clientState must not be NULL.");

@@ -102,7 +102,7 @@ namespace love_engine {
 	    lzma_action action = LZMA_RUN;
 
         // Open file
-        std::lock_guard<std::mutex>(FileIO::get_Mutex());
+        std::lock_guard<std::mutex>(FileIO::getMutex());
         FILE* file = std::fopen(filePath, "wb");
         if (!file) {
             std::stringstream error;
@@ -199,7 +199,7 @@ namespace love_engine {
 	    lzma_action action = LZMA_RUN;
 
         // Open file
-        std::lock_guard<std::mutex>(FileIO::get_Mutex());
+        std::lock_guard<std::mutex>(FileIO::getMutex());
         FILE* file = std::fopen(filePath, "rb");
         if (!file) {
             std::stringstream error;
