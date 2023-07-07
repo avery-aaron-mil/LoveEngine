@@ -106,7 +106,6 @@ set(SERVER_LIBS
 )
 set(CLIENT_LIBS
 	${SERVER_LIBS}
-	-Wl,-Bstatic -lvulkan-1
 	-Wl,-Bdynamic -lglfw3 -lsoft_oal -lsndfile -lserver
 )
 set(GAME_LIBS
