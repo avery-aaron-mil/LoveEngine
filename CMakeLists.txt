@@ -12,9 +12,9 @@ file(GLOB_RECURSE EXAMPLE_GAME_SERVER_FILES "src/example_game/server/*.cpp")
 file(GLOB RESOURCE_FILE "products/assets/resources.rc")
 
 # add the executable
-add_library(common SHARED "${COMMON_FILES}")
-add_library(server SHARED "${SERVER_FILES}")
-add_library(client SHARED "${CLIENT_FILES}")
+add_library(love_common SHARED "${COMMON_FILES}")
+add_library(love_server SHARED "${SERVER_FILES}")
+add_library(love_client SHARED "${CLIENT_FILES}")
 add_executable(game "src/example_game/example_game.cpp;${EXAMPLE_GAME_CLIENT_FILES}")
 add_executable(host "src/example_game/example_host.cpp;${EXAMPLE_GAME_SERVER_FILES}")
 add_executable(launcher "src/example_game/example_launcher.cpp")
@@ -65,12 +65,12 @@ endif()
 
 endif()
 
-target_compile_options(client PRIVATE ${CMAKE_CPP_FLAGS})
-target_link_options(client PRIVATE ${CMAKE_L_FLAGS})
-target_compile_options(server PRIVATE ${CMAKE_CPP_FLAGS})
-target_link_options(server PRIVATE ${CMAKE_L_FLAGS})
-target_compile_options(common PRIVATE ${CMAKE_CPP_FLAGS})
-target_link_options(common PRIVATE ${CMAKE_L_FLAGS})
+target_compile_options(love_client PRIVATE ${CMAKE_CPP_FLAGS})
+target_link_options(love_client PRIVATE ${CMAKE_L_FLAGS})
+target_compile_options(love_server PRIVATE ${CMAKE_CPP_FLAGS})
+target_link_options(love_server PRIVATE ${CMAKE_L_FLAGS})
+target_compile_options(love_common PRIVATE ${CMAKE_CPP_FLAGS})
+target_link_options(love_common PRIVATE ${CMAKE_L_FLAGS})
 
 target_compile_options(game PRIVATE ${CMAKE_CPP_FLAGS})
 target_link_options(game PRIVATE ${CMAKE_L_FLAGS})
@@ -82,11 +82,12 @@ target_link_options(launcher PRIVATE ${CMAKE_L_FLAGS})
 # set include paths
 include_directories("lib/include/" "src/")
 link_directories("lib/")
-target_link_directories(client PRIVATE "lib/" "build/")
-target_include_directories(server PRIVATE "lib/include/" "src/")
-target_link_directories(server PRIVATE "lib/" "build/")
-target_include_directories(common PRIVATE "lib/include/" "src/")
-target_link_directories(common PRIVATE "lib/" "build/")
+target_include_directories(love_client PRIVATE "lib/include/" "src/")
+target_link_directories(love_client PRIVATE "lib/" "build/")
+target_include_directories(love_server PRIVATE "lib/include/" "src/")
+target_link_directories(love_server PRIVATE "lib/" "build/")
+target_include_directories(love_common PRIVATE "lib/include/" "src/")
+target_link_directories(love_common PRIVATE "lib/" "build/")
 
 target_include_directories(game PRIVATE "lib/include/" "src/")
 target_link_directories(game PRIVATE "lib/" "build/")
@@ -102,24 +103,24 @@ set(COMMON_LIBS
 )
 set(SERVER_LIBS
 	${COMMON_LIBS}
-	-Wl,-Bdynamic -lcommon
+	-Wl,-Bdynamic -llove_common
 )
 set(CLIENT_LIBS
 	${SERVER_LIBS}
-	-Wl,-Bdynamic -lglfw3 -lsoft_oal -lsndfile -lserver
+	-Wl,-Bdynamic -lglfw3 -lsoft_oal -lsndfile -llove_server
 )
 set(GAME_LIBS
 	${CLIENT_LIBS}
-	-Wl,-Bdynamic -lclient
+	-Wl,-Bdynamic -llove_client
 )
 set(HOST_LIBS
 	${SERVER_LIBS}
-	-Wl,-Bdynamic -lserver
+	-Wl,-Bdynamic -llove_server
 )
 
-target_link_libraries(common PRIVATE ${COMMON_LIBS})
-target_link_libraries(server PRIVATE ${SERVER_LIBS})
-target_link_libraries(client PRIVATE ${CLIENT_LIBS})
+target_link_libraries(love_common PRIVATE ${COMMON_LIBS})
+target_link_libraries(love_server PRIVATE ${SERVER_LIBS})
+target_link_libraries(love_client PRIVATE ${CLIENT_LIBS})
 target_link_libraries(game PRIVATE ${GAME_LIBS})
 target_link_libraries(host PRIVATE ${HOST_LIBS})
 target_link_libraries(launcher PRIVATE ${COMMON_LIBS})
