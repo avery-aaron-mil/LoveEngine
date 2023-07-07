@@ -27,7 +27,7 @@ namespace love_engine {
 
         uint32_t deviceCount = 0;
         if (vkEnumeratePhysicalDevices(_vulkanInstance, &deviceCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Failed to enumerate physical devices.");
+            Crash::crash("Failed to enumerate physical graphics devices.");
         }
         if (deviceCount == 0) {
             Crash::crash("Found no physical graphics devices.");
@@ -35,7 +35,7 @@ namespace love_engine {
 
         _physicalDevices.resize(deviceCount);
         if (vkEnumeratePhysicalDevices(_vulkanInstance, &deviceCount, _physicalDevices.data()) != VK_SUCCESS) {
-            Crash::crash("Failed to enumerate physical devices.");
+            Crash::crash("Failed to enumerate physical graphics devices.");
         }
 
         for (size_t i = 0; i < deviceCount; i++) {
@@ -45,7 +45,7 @@ namespace love_engine {
         }
 
         std::stringstream buffer;
-        buffer << "Got " << deviceCount << " physical devices.";
+        buffer << "Got " << deviceCount << " physical graphics devices.";
         _log(buffer.str());
     }
 
@@ -67,7 +67,9 @@ namespace love_engine {
 
                 // Check if queue can be used for presenting
                 VkBool32 presentSupport = false;
-                vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
+                if (vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport) != VK_SUCCESS) {
+                    Crash::crash("Could not get surface support of physical graphics device.");
+                }
                 if (presentSupport) {
                     queueIndices.hasPresentQueue = true;
                     queueIndices.presentQueue = i;
@@ -82,15 +84,18 @@ namespace love_engine {
     
     bool GraphicsDevice::_checkDeviceHasEnabledExtensions(const VkPhysicalDevice& device) noexcept {
         uint32_t extensionCount;
-        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+        if (vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr) != VK_SUCCESS) {
+            Crash::crash("Could not enumerate device extension properites for physical graphics device");
+        }
 
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-        vkEnumerateDeviceExtensionProperties(
-            device,
-            nullptr,
-            &extensionCount,
-            availableExtensions.data()
-        );
+        if (vkEnumerateDeviceExtensionProperties(
+                device,
+                nullptr,
+                &extensionCount,
+                availableExtensions.data()
+            ) != VK_SUCCESS
+        ) Crash::crash("Could not enumerate device extension properites for physical graphics device");
 
         std::unordered_set<std::string> remainingExtensions(_enabledExtensions.begin(), _enabledExtensions.end());
         for (const auto &extension : remainingExtensions) {
@@ -102,27 +107,36 @@ namespace love_engine {
     
     GraphicsDevice::SwapChainSupportDetails GraphicsDevice::_querySwapChainSupport(const VkPhysicalDevice& device) const noexcept {
         SwapChainSupportDetails details;
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface, &details.capabilities);
+        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface, &details.capabilities) != VK_SUCCESS) {
+            Crash::crash("Could not get surface capabilities for physical graphics device.");
+        }
 
         uint32_t formatCount;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, nullptr);
+        if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, nullptr) != VK_SUCCESS) {
+            Crash::crash("Could not get surface formats for physical graphics device.");
+        }
 
         if (formatCount > 0) {
             details.formats.resize(formatCount);
-            vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.formats.data());
+            if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.formats.data()) != VK_SUCCESS) {
+                Crash::crash("Could not get surface formats for physical graphics device.");
+            }
         }
 
         uint32_t presentModeCount;
-        vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, nullptr);
+        if (vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, nullptr) != VK_SUCCESS) {
+            Crash::crash("Could not get surface present modes for physical graphics device.");
+        }
 
         if (presentModeCount > 0) {
             details.presentModes.resize(presentModeCount);
-            vkGetPhysicalDeviceSurfacePresentModesKHR(
-                device,
-                _surface,
-                &presentModeCount,
-                details.presentModes.data()
-            );
+            if (vkGetPhysicalDeviceSurfacePresentModesKHR(
+                    device,
+                    _surface,
+                    &presentModeCount,
+                    details.presentModes.data()
+                ) != VK_SUCCESS
+            ) Crash::crash("Could not get surface present modes for physical graphics device.");
         }
 
         return details;
@@ -202,7 +216,7 @@ namespace love_engine {
         std::string excuse = _getDeviceUnsuitabilityReason(physicalDevice);
         if (!excuse.empty()) {
             std::stringstream buffer;
-            buffer << "Could not create logical device because the physical device does not meet requirements: " << excuse;
+            buffer << "Could not create logical device because the physical graphics device does not meet requirements: " << excuse;
             Crash::crash(buffer.str());
         }
 
@@ -236,9 +250,7 @@ namespace love_engine {
         VkDevice device;
         if ((vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device) != VK_SUCCESS) ||
             (device == nullptr)
-        ) {
-            Crash::crash("Failed to create Vulkan device.");
-        }
+        ) Crash::crash("Failed to create Vulkan device.");
 
         _log("Created Vulkan device.");
         return device;
@@ -289,10 +301,7 @@ namespace love_engine {
 
     void GraphicsDevice::usePhysicalDevice(const VkPhysicalDevice& device) noexcept {
         // Input validation
-        if (device == nullptr) {
-            Crash::crash("Null was passed to usePhysicalDevice().");
-        }
-
+        if (device == nullptr) Crash::crash("Null was passed to usePhysicalDevice().");
         
         VkPhysicalDeviceFeatures deviceFeatures = {
             .samplerAnisotropy = VK_TRUE
