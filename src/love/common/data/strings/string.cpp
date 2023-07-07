@@ -27,7 +27,7 @@ namespace love_engine {
         // Input validation
         if (pos > len) {
             throw std::length_error(
-                StackTrace::append_Stacktrace("Position to insert a character into a string is greater than the string's length.")
+                StackTrace::appendStacktrace("Position to insert a character into a string is greater than the string's length.")
             );
         }
         
@@ -53,7 +53,7 @@ namespace love_engine {
         // Input validation
         if (pos > len) {
             throw std::length_error(
-                StackTrace::append_Stacktrace("Position to insert characters into a string is greater than the string's length.")
+                StackTrace::appendStacktrace("Position to insert characters into a string is greater than the string's length.")
             );
         }
         
@@ -79,7 +79,7 @@ namespace love_engine {
         // Input validation
         if (pos > strLen) {
             throw std::length_error(
-                StackTrace::append_Stacktrace("Position to insert a substring into a string is greater than the string's length.")
+                StackTrace::appendStacktrace("Position to insert a substring into a string is greater than the string's length.")
             );
         }
         if (insertStr.empty()) return str;
@@ -102,7 +102,7 @@ namespace love_engine {
         return str;
     }
     
-    bool String::is_ASCII(const std::string& str) noexcept {
+    bool String::isASCII(const std::string& str) noexcept {
         const size_t len = str.length();
         const char *const data = str.data();
 
@@ -115,7 +115,7 @@ namespace love_engine {
         return true;
     }
 
-    char String::translate_Escape_Character(const char c) noexcept {
+    char String::translateEscapeCharacter(const char c) noexcept {
         switch (c) {
             case '\"': return '\"';
             case '\'': return '\'';

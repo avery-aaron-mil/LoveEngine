@@ -11,7 +11,7 @@
 #include <sys/time.h>
 
 namespace love_engine {
-    std::string Logger::_generate_Log_Message(const Log_Status status, const std::string& message) noexcept {
+    std::string Logger::_generateLogMessage(const Log_Status status, const std::string& message) noexcept {
         // Get time
         struct timeval tv;
         if (gettimeofday(&tv, nullptr)) {
@@ -36,7 +36,7 @@ namespace love_engine {
         std::stringstream outputMessageBuffer;
         outputMessageBuffer <<
             timeBuffer <<
-            " [" << Thread::get_Thread_Name(std::this_thread::get_id()) << "/" <<
+            " [" << Thread::getThreadName(std::this_thread::get_id()) << "/" <<
             LOG_TYPE_STRINGS[static_cast<int>(status)] << "]: " <<
             message << "\n"
         ;
@@ -44,19 +44,19 @@ namespace love_engine {
     }
 
     void Logger::log(const Log_Status status, const std::string& message) const noexcept {
-        std::string outputMessage = _generate_Log_Message(status, message);
+        std::string outputMessage = _generateLogMessage(status, message);
 
         std::puts(outputMessage.c_str());
         if (!_logPath.empty()) {
             try {
                 Thread asyncLogThread(
                     "ASYNC_LOG_OUTPUT",
-                    FileIO::append_File,
+                    FileIO::appendFile,
                     _logPath.c_str(), outputMessage
                 );
             } catch (std::exception& e) {
                 std::stringstream error;
-                error << "FileIO::append_File() failed. Error:\n\t" << e.what();
+                error << "FileIO::appendFile() failed. Error:\n\t" << e.what();
                 Crash::crash(error.str());
             }
         }

@@ -33,7 +33,7 @@ namespace love_engine {
         }
     }
 
-    void ClientInstance::_default_glfwErrorCallback(int error, const char* description) {
+    void ClientInstance::_defaultGLFWErrorCallback(int error, const char* description) {
         Crash::crash(std::string("Caught GLFW error with no callback: ") + description);
     }
 }

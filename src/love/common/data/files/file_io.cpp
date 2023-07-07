@@ -27,11 +27,11 @@ namespace love_engine {
     std::mutex _fileMutex;
     std::string _executable_Directory;
 
-    std::mutex& FileIO::get_Mutex() noexcept {
+    std::mutex& FileIO::getMutex() noexcept {
         return _fileMutex;
     }
 
-    std::string FileIO::get_Executable_Directory() noexcept {
+    std::string FileIO::getExecutableDirectory() noexcept {
         if (_executable_Directory.empty()) {
             unsigned int bufferSize = 1024;
             std::vector<char> buffer(bufferSize + 1);
@@ -68,7 +68,7 @@ namespace love_engine {
         }
 
         try {
-            validate_Path(_executable_Directory);
+            validatePath(_executable_Directory);
         } catch (std::invalid_argument& e) {
             Crash::crash(std::string("Failed to validate executable path: ") + e.what());
         }
@@ -76,7 +76,7 @@ namespace love_engine {
         return _executable_Directory;        
     }
 
-    [[nodiscard]] std::string FileIO::remove_Excess_Directory_Slashes(std::string path) noexcept {
+    [[nodiscard]] std::string FileIO::removeExcessDirectorySlashes(std::string path) noexcept {
         std::string buffer;
         buffer.resize(path.length());
         const char *in = path.data();
@@ -99,23 +99,23 @@ namespace love_engine {
         return buffer;
     }
 
-    void FileIO::ensure_Parent_Directory_Exists(const std::string& path) noexcept {
+    void FileIO::ensureParentDirectoryExists(const std::string& path) noexcept {
         if (!std::filesystem::exists(path.c_str())) {
             std::filesystem::path p = path;
             std::filesystem::create_directories(p.parent_path());
         }
     }
 
-    void FileIO::validate_Path(std::string& path) {
-        if (path.empty()) throw std::invalid_argument(StackTrace::append_Stacktrace("The file path passed is empty."));
+    void FileIO::validatePath(std::string& path) {
+        if (path.empty()) throw std::invalid_argument(StackTrace::appendStacktrace("The file path passed is empty."));
 
-        path.assign(remove_Excess_Directory_Slashes(path));
-        ensure_Parent_Directory_Exists(path);
+        path.assign(removeExcessDirectorySlashes(path));
+        ensureParentDirectoryExists(path);
     }
 
-    void FileIO::clear_File(std::string filePath) {
+    void FileIO::clearFile(std::string filePath) {
         try {
-            validate_Path(filePath);
+            validatePath(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
         std::lock_guard<std::mutex> lock(_fileMutex);
@@ -123,32 +123,32 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
 
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
     }
 
-    void FileIO::delete_File(std::string filePath) {
+    void FileIO::deleteFile(std::string filePath) {
         try {
-            validate_Path(filePath);
+            validatePath(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
         std::lock_guard<std::mutex> lock(_fileMutex);
         if (std::remove(filePath.c_str())) {
             std::stringstream error;
             error << "Could not delete file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
     }
 
-    std::string FileIO::read_File(std::string filePath) {
+    std::string FileIO::readFile(std::string filePath) {
         try {
-            validate_Path(filePath);
+            validatePath(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
         std::lock_guard<std::mutex> lock(_fileMutex);
@@ -156,7 +156,7 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
 
         std::fseek(file , 0 , SEEK_END);
@@ -168,20 +168,20 @@ namespace love_engine {
         if (std::fread(data.data(), 1, size, file) != size) {
             std::stringstream error;
             error << "Could not read from file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
 
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not save file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
         return data;
     }
     
-    FileIO::FileContent FileIO::read_File_Content(std::string filePath) {
+    FileIO::FileContent FileIO::readFileContent(std::string filePath) {
         try {
-            validate_Path(filePath);
+            validatePath(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
         std::lock_guard<std::mutex> lock(_fileMutex);
@@ -189,7 +189,7 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
 
         std::fseek(file , 0 , SEEK_END);
@@ -200,20 +200,20 @@ namespace love_engine {
         if (std::fread(data.data(), 1, size, file) != size) {
             std::stringstream error;
             error << "Could not read from file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
 
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
         return FileContent(data, size);
     }
     
-    void FileIO::write_File(std::string filePath, const std::string& data) {
+    void FileIO::writeFile(std::string filePath, const std::string& data) {
         try {
-            validate_Path(filePath);
+            validatePath(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
         std::lock_guard<std::mutex> lock(_fileMutex);
@@ -221,25 +221,25 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
 
         if (std::fwrite(data.data(), 1, data.length(), file) != data.length()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
         
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
     }
 
-    void FileIO::write_File(std::string filePath, FileIO::FileContent& content) {
+    void FileIO::writeFile(std::string filePath, FileIO::FileContent& content) {
         try {
-            validate_Path(filePath);
+            validatePath(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
         std::lock_guard<std::mutex> lock(_fileMutex);
@@ -247,25 +247,25 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
 
         if (std::fwrite(content.data(), 1, content.size(), file) != content.size()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
         
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
     }
     
-    void FileIO::append_File(std::string filePath, const std::string& data) {
+    void FileIO::appendFile(std::string filePath, const std::string& data) {
         try {
-            validate_Path(filePath);
+            validatePath(filePath);
         } catch (std::invalid_argument& e) { throw e; }
 
         std::lock_guard<std::mutex> lock(_fileMutex);
@@ -273,19 +273,19 @@ namespace love_engine {
         if (!file) {
             std::stringstream error;
             error << "Could not open file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
 
         if (std::fwrite(data.data(), 1, data.length(), file) != data.length()) {
             std::stringstream error;
             error << "Could not write to file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
         
         if (std::fclose(file)) {
             std::stringstream error;
             error << "Could not close file \"" << filePath << "\": " << std::strerror(errno);
-            throw std::runtime_error(StackTrace::append_Stacktrace(error));
+            throw std::runtime_error(StackTrace::appendStacktrace(error));
         }
     }
 }

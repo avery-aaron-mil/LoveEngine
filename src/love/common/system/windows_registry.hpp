@@ -9,10 +9,10 @@
 namespace love_engine {
     class WindowsRegistry {
         public:
-            static std::vector<std::wstring> get_HKLM_Children(const std::wstring& registryKey) noexcept;
-            static std::string get_HKLM_Value_String(const std::wstring& registryKey, const std::wstring& registryValue) noexcept;
-            static int64_t get_HKLM_Value_I64(const std::wstring& registryKey, const std::wstring& registryValue) noexcept;
-            static int32_t get_HKLM_Value_I32(const std::wstring& registryKey, const std::wstring& registryValue) noexcept;
+            static std::vector<std::wstring> getHKLMChildren(const std::wstring& registryKey) noexcept;
+            static std::string getHKLMValueString(const std::wstring& registryKey, const std::wstring& registryValue) noexcept;
+            static int64_t getHKLMValueI64(const std::wstring& registryKey, const std::wstring& registryValue) noexcept;
+            static int32_t getHKLMValueI32(const std::wstring& registryKey, const std::wstring& registryValue) noexcept;
     };
 }
 

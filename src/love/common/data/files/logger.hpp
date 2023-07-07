@@ -39,11 +39,11 @@ namespace love_engine {
             inline void log(const std::string& message) const noexcept { log(Log_Status::INFO, message); }
             virtual void log(const Log_Status status, const std::string& message) const noexcept;
 
-            void set_Log_Path(const std::string& filePath) noexcept { _logPath.assign(filePath); }
-            void clear() { FileIO::clear_File(_logPath.c_str()); }
+            void setLogPath(const std::string& filePath) noexcept { _logPath.assign(filePath); }
+            void clear() { FileIO::clearFile(_logPath.c_str()); }
 
         private:
-            static std::string _generate_Log_Message(const Log_Status status, const std::string& message) noexcept;
+            static std::string _generateLogMessage(const Log_Status status, const std::string& message) noexcept;
 
             std::string _logPath;
    };

@@ -9,9 +9,9 @@ namespace love_engine {
             Window();
             ~Window();
 
-            bool should_Close() const noexcept { return glfwWindowShouldClose(_window); }
+            bool shouldClose() const noexcept { return glfwWindowShouldClose(_window); }
 
-            const GLFWwindow* get_GLFW_Window() const noexcept { return _window; }
+            const GLFWwindow* getGLFWWindow() const noexcept { return _window; }
 
         private:
             GLFWwindow* _window = nullptr;

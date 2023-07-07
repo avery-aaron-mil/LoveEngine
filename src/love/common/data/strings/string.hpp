@@ -20,9 +20,9 @@ namespace love_engine {
                 return insert(str, 0, prependStr);
             }
 
-            static bool is_ASCII(const std::string& str) noexcept;
+            static bool isASCII(const std::string& str) noexcept;
 
-            static char translate_Escape_Character(const char c) noexcept;
+            static char translateEscapeCharacter(const char c) noexcept;
     };
 }
 

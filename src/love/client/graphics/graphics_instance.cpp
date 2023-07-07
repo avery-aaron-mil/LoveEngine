@@ -14,15 +14,15 @@ namespace love_engine {
         }
     }
     
-    void GraphicsInstance::_load_Vulkan_Library() noexcept {
+    void GraphicsInstance::_loadVulkanLibrary() noexcept {
         _log("Loading Vulkan library...");
-        _vulkanLibrary.load_Library("vulkan-1.dll");
+        _vulkanLibrary.loadLibrary("vulkan-1.dll");
         _log("Loaded Vulkan library.");
     }
 
-    void GraphicsInstance::_load_Global_Vulkan_Functions() const noexcept {
+    void GraphicsInstance::_loadGlobalVulkanFunctions() const noexcept {
         _log("Loading global Vulkan functions...");
-        #define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.load_Library_Function(#fun));
+        #define VK_EXPORTED_FUNCTION(fun) (fun = (PFN_##fun) _vulkanLibrary.loadLibraryFunction(#fun));
         #define VK_GLOBAL_LEVEL_FUNCTION(fun)\
         if (!(fun = (PFN_##fun) vkGetInstanceProcAddr(nullptr, #fun))) {\
             Crash::crash("Could not load global Vulkan function: " #fun);\
@@ -31,7 +31,7 @@ namespace love_engine {
         _log("Loaded global Vulkan functions.");
     }
 
-    void GraphicsInstance::_load_Instance_Vulkan_Functions() const noexcept {
+    void GraphicsInstance::_loadInstanceVulkanFunctions() const noexcept {
         _log("Loading Vulkan instance functions...");
         #define VK_GLOBAL_LEVEL_FUNCTION(fun)\
         if (!(fun = (PFN_##fun) vkGetInstanceProcAddr(_vulkanInstance, #fun))) {\
@@ -41,7 +41,7 @@ namespace love_engine {
         _log("Loaded Vulkan instance functions.");
     }
 
-    void GraphicsInstance::_create_Vulkan_Instance() noexcept {
+    void GraphicsInstance::_createVulkanInstance() noexcept {
         _log("Creating Vulkan instance...");
         uint32_t apiVersion;
         if (vkEnumerateInstanceVersion(&apiVersion) != VK_SUCCESS) {
@@ -85,7 +85,7 @@ namespace love_engine {
         _log("Created Vulkan instance.");
     }
 
-    void GraphicsInstance::_initialize_GLFW(const std::function<void(int, const char*)>& glfwErrorCallback) const noexcept {
+    void GraphicsInstance::_initializeGLFW(const std::function<void(int, const char*)>& glfwErrorCallback) const noexcept {
         _log("Initializing GLFW...");
         if (!glfwInit()) {
             Crash::crash("Failed to initialize GLFW.");
@@ -103,11 +103,11 @@ namespace love_engine {
         const ApplicationInfo& applicationInfo,
         const std::function<void(int, const char*)>& glfwErrorCallback
     ) : _applicationInfo(applicationInfo) {
-        _load_Vulkan_Library();
-        _initialize_GLFW(glfwErrorCallback);
-        _load_Global_Vulkan_Functions();
-        _create_Vulkan_Instance();
-        _load_Instance_Vulkan_Functions();
+        _loadVulkanLibrary();
+        _initializeGLFW(glfwErrorCallback);
+        _loadGlobalVulkanFunctions();
+        _createVulkanInstance();
+        _loadInstanceVulkanFunctions();
     }
     
     GraphicsInstance::~GraphicsInstance() {

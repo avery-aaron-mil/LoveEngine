@@ -17,15 +17,15 @@ namespace love_engine {
         public:
             Library() = default;
             Library(const char*const library) {
-                load_Library(library);
+                loadLibrary(library);
             }
             ~Library() {
-                unload_Library();
+                unloadLibrary();
             }
 
-            void load_Library(const char*const library) noexcept;
-            void unload_Library() noexcept;
-            function_t load_Library_Function(const char*const function) const noexcept;
+            void loadLibrary(const char*const library) noexcept;
+            void unloadLibrary() noexcept;
+            function_t loadLibraryFunction(const char*const function) const noexcept;
             // TODO Consider loading all libraries this way to have runtime checks
 
         private:

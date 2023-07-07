@@ -8,8 +8,8 @@ using namespace love_engine;
 
 int main(int argc, char** argv) {
     LoveEngineInstance::init();
-    Logger logger(FileIO::get_Executable_Directory() + "../logs/latest.log", true);
-    logger.log("System Info:\n" + SystemInfo::get_Consolidated_System_Info());
+    Logger logger(FileIO::getExecutableDirectory() + "../logs/latest.log", true);
+    logger.log("System Info:\n" + SystemInfo::getConsolidatedSystemInfo());
 
     LoveEngineInstance::cleanup();
     exit(EXIT_SUCCESS);

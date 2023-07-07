@@ -31,22 +31,22 @@ namespace love_engine {
 
     void SystemInfo::_find_OS() noexcept {
 #ifdef _WIN32
-        const std::string version = WindowsRegistry::get_HKLM_Value_String(
+        const std::string version = WindowsRegistry::getHKLMValueString(
             L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
             L"ProductName"
         );
         if (version != "Not found") {
             std::stringstream buffer;
-            buffer << version << " (" << WindowsRegistry::get_HKLM_Value_String(
+            buffer << version << " (" << WindowsRegistry::getHKLMValueString(
                 L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
                 L"DisplayVersion"
-            ) << ") v" << WindowsRegistry::get_HKLM_Value_I32(
+            ) << ") v" << WindowsRegistry::getHKLMValueI32(
                 L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
                 L"CurrentMajorVersionNumber"
-            ) << "." << WindowsRegistry::get_HKLM_Value_I32(
+            ) << "." << WindowsRegistry::getHKLMValueI32(
                 L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
                 L"CurrentMinorVersionNumber"
-            ) << "." << WindowsRegistry::get_HKLM_Value_String(
+            ) << "." << WindowsRegistry::getHKLMValueString(
                 L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
                 L"CurrentBuildNumber"
             );
@@ -66,7 +66,7 @@ namespace love_engine {
     
     void SystemInfo::_find_System_Name() noexcept {
 #ifdef _WIN32
-        _systemName = WindowsRegistry::get_HKLM_Value_String(
+        _systemName = WindowsRegistry::getHKLMValueString(
             L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\DataStore\\Machine\\0",
             L"szName"
         );
@@ -77,23 +77,23 @@ namespace love_engine {
     
     void SystemInfo::_find_CPU() noexcept {
 #ifdef _WIN32
-        _CPU.name = WindowsRegistry::get_HKLM_Value_String(
+        _CPU.name = WindowsRegistry::getHKLMValueString(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
             L"ProcessorNameString"
         );
-        const std::string description = WindowsRegistry::get_HKLM_Value_String(
+        const std::string description = WindowsRegistry::getHKLMValueString(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
             L"Identifier"
         );
         if (description != "Not found") {
             std::stringstream buffer;
-            buffer << description << " " << WindowsRegistry::get_HKLM_Value_String(
+            buffer << description << " " << WindowsRegistry::getHKLMValueString(
                 L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
                 L"VendorIdentifier"
             );
             _CPU.description = buffer.str();
         }
-        _CPU.speed = std::to_string(WindowsRegistry::get_HKLM_Value_I32(
+        _CPU.speed = std::to_string(WindowsRegistry::getHKLMValueI32(
             L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
             L"~MHz"
         )) + "MHz";
@@ -118,28 +118,28 @@ namespace love_engine {
     
     void SystemInfo::_find_Video_Cards() noexcept {
 #ifdef _WIN32
-        std::vector<std::wstring> registryKeys = WindowsRegistry::get_HKLM_Children(
+        std::vector<std::wstring> registryKeys = WindowsRegistry::getHKLMChildren(
             L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}"
         );
         for (const auto& dir : registryKeys) {
             if (dir.c_str()[0] == L'0') {
                 VideoCardInfo gpu;
-                gpu.name = WindowsRegistry::get_HKLM_Value_String(
+                gpu.name = WindowsRegistry::getHKLMValueString(
                     L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\" + dir,
                     L"HardwareInformation.AdapterString"
                 );
-                gpu.driverVersion = WindowsRegistry::get_HKLM_Value_String(
+                gpu.driverVersion = WindowsRegistry::getHKLMValueString(
                     L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\" + dir,
                     L"DriverVersion"
                 );
                 
-                int64_t memory = WindowsRegistry::get_HKLM_Value_I64(
+                int64_t memory = WindowsRegistry::getHKLMValueI64(
                     L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\" + dir,
                     L"HardwareInformation.qwMemorySize"
                 );
                 if (memory < 0) {
                     memory = static_cast<int64_t>(
-                        WindowsRegistry::get_HKLM_Value_I32(
+                        WindowsRegistry::getHKLMValueI32(
                             L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\" + dir,
                             L"HardwareInformation.MemorySize"
                         )
@@ -159,19 +159,19 @@ namespace love_engine {
     
     void SystemInfo::_find_Base_Board() noexcept {
 #ifdef _WIN32
-        _baseBoard.name = WindowsRegistry::get_HKLM_Value_String(
+        _baseBoard.name = WindowsRegistry::getHKLMValueString(
             L"HARDWARE\\DESCRIPTION\\System\\BIOS",
             L"BaseBoardProduct"
         );
-        _baseBoard.biosVendor = WindowsRegistry::get_HKLM_Value_String(
+        _baseBoard.biosVendor = WindowsRegistry::getHKLMValueString(
             L"HARDWARE\\DESCRIPTION\\System\\BIOS",
             L"BIOSVendor"
         );
-        _baseBoard.biosVersion = WindowsRegistry::get_HKLM_Value_String(
+        _baseBoard.biosVersion = WindowsRegistry::getHKLMValueString(
             L"HARDWARE\\DESCRIPTION\\System\\BIOS",
             L"BIOSVersion"
         );
-        _baseBoard.systemName = WindowsRegistry::get_HKLM_Value_String(
+        _baseBoard.systemName = WindowsRegistry::getHKLMValueString(
             L"HARDWARE\\DESCRIPTION\\System\\BIOS",
             L"SystemProductName"
         );
@@ -231,7 +231,7 @@ namespace love_engine {
         _consolidated_System_Info.assign(buffer.str());
     }
 
-    std::string SystemInfo::get_Consolidated_System_Info() noexcept {
+    std::string SystemInfo::getConsolidatedSystemInfo() noexcept {
         if (_consolidated_System_Info.empty()) _set_Consolidated_System_Info();
         return _consolidated_System_Info;
     }

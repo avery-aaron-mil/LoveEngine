@@ -10,10 +10,10 @@ namespace love_engine {
         public:
             template<class F, class... Args>
             Thread(const std::string& name, F&& f, Args&&... args) {
-                _add_To_Thread_Count(); // NOTE: Must be done asynchronously to avoid race conditions.
+                _addToThreadCount(); // NOTE: Must be done asynchronously to avoid race conditions.
                 _thread = std::thread(
                     [](auto&&... fwd){
-                        _handle_Thread(std::forward<decltype(fwd)>(fwd)...);
+                        _handleThread(std::forward<decltype(fwd)>(fwd)...);
                     },
                     name,
                     std::forward<F>(f),
@@ -27,38 +27,38 @@ namespace love_engine {
                 _thread.detach();
             }
 
-            std::thread::id get_id() const noexcept { return _thread.get_id(); }
+            std::thread::id getID() const noexcept { return _thread.get_id(); }
             void join() noexcept { if (_thread.joinable()) _thread.join(); }
 
-            std::string get_Thread_Name() const noexcept {
-                return get_Thread_Name(get_id());
+            std::string getThreadName() const noexcept {
+                return getThreadName(getID());
             }
-            static std::string get_Thread_Name(const std::thread::id& id) noexcept;
+            static std::string getThreadName(const std::thread::id& id) noexcept;
 
-            void rename_Thread(const std::string& name) noexcept {
-                register_Thread(get_id(), name);
+            void renameThread(const std::string& name) noexcept {
+                registerThread(getID(), name);
             }
-            static void rename_Thread(const std::thread::id& id, const std::string& name) {
-                register_Thread(id, name);
+            static void renameThread(const std::thread::id& id, const std::string& name) {
+                registerThread(id, name);
             }
 
             // NOTE: Recommended to not use this functions unless native threads are absolutely necessary.
-            static void register_Thread(const std::thread::id& id, const std::string& name) noexcept;
+            static void registerThread(const std::thread::id& id, const std::string& name) noexcept;
             // NOTE: Recommended to not use this functions unless native threads are absolutely necessary.
-            static void unregister_Thread(const std::thread::id& id) noexcept;
+            static void unregisterThread(const std::thread::id& id) noexcept;
 
             // NOTE: Should only be called by main thread.
-            static void wait_For_Threads() noexcept;
+            static void waitForThreads() noexcept;
 
         private:
             template<class F, class... Args>
-            static void _handle_Thread(const std::string name, F&& f, Args&&... args) {
-                register_Thread(std::this_thread::get_id(), name);
+            static void _handleThread(const std::string name, F&& f, Args&&... args) {
+                c(std::this_thread::get_id(), name);
                 f(args...);
-                unregister_Thread(std::this_thread::get_id());
+                unregisterThread(std::this_thread::get_id());
             }
 
-            static void _add_To_Thread_Count() noexcept;
+            static void _addToThreadCount() noexcept;
 
             std::thread _thread;
     };

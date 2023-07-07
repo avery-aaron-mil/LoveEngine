@@ -11,7 +11,7 @@
 namespace love_engine {
     std::stack<std::function<void()>> _callbacks;
 
-    [[noreturn]] void _signal_Handler(int signum) {
+    [[noreturn]] void _signalHandler(int signum) {
         switch (signum) {
             case SIGINT:
                 Crash::crash("(SIGINT) Received interrupt signal.");
@@ -30,32 +30,32 @@ namespace love_engine {
         }
     }
 
-    void _set_Signal_Handler() noexcept {
-        std::signal(SIGINT, _signal_Handler);
-        std::signal(SIGILL, _signal_Handler);
-        std::signal(SIGSEGV, _signal_Handler);
-        std::signal(SIGFPE, _signal_Handler);
-        std::signal(SIGABRT, _signal_Handler);
-        std::signal(SIGTERM, _signal_Handler);
+    void _setSignalHandler() noexcept {
+        std::signal(SIGINT, _signalHandler);
+        std::signal(SIGILL, _signalHandler);
+        std::signal(SIGSEGV, _signalHandler);
+        std::signal(SIGFPE, _signalHandler);
+        std::signal(SIGABRT, _signalHandler);
+        std::signal(SIGTERM, _signalHandler);
     }
 
     void LoveEngineInstance::init(const std::string& crashDirectory) noexcept {
-        _set_Signal_Handler();
-        Thread::register_Thread(std::this_thread::get_id(), "Main");
-        SystemInfo::get_Consolidated_System_Info();
-        FileIO::get_Executable_Directory();
-        Crash::set_Crash_Directory(crashDirectory);
+        _setSignalHandler();
+        Thread::registerThread(std::this_thread::get_id(), "Main");
+        SystemInfo::getConsolidatedSystemInfo();
+        FileIO::getExecutableDirectory();
+        Crash::setCrashDirectory(crashDirectory);
     }
     
     void LoveEngineInstance::cleanup() noexcept {
-        Thread::wait_For_Threads();
+        Thread::waitForThreads();
         while (!_callbacks.empty()) {
             _callbacks.top()();
             _callbacks.pop();
         }
     }
     
-    void LoveEngineInstance::add_Exit_Callback(const std::function<void()>& callback) noexcept {
+    void LoveEngineInstance::addExitCallback(const std::function<void()>& callback) noexcept {
         _callbacks.push(callback);
     }
 }

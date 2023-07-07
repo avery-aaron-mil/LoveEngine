@@ -16,13 +16,13 @@ using namespace example_game;
 std::shared_ptr<Logger> logger;
 
 void glfwCallback(int e, const char*desc) {
-    logger.get()->log("System Info:\n" + SystemInfo::get_Consolidated_System_Info());
+    logger.get()->log("System Info:\n" + SystemInfo::getConsolidatedSystemInfo());
 }
 
 int main(int argc, char** argv) {
-    LoveEngineInstance::init(FileIO::get_Executable_Directory() + "../crash-reports");
-    logger = std::make_shared<Logger>(Logger(FileIO::get_Executable_Directory() + "../logs/latest.log", true));
-    logger.get()->log("System Info:\n" + SystemInfo::get_Consolidated_System_Info());
+    LoveEngineInstance::init(FileIO::getExecutableDirectory() + "../crash-reports");
+    logger = std::make_shared<Logger>(Logger(FileIO::getExecutableDirectory() + "../logs/latest.log", true));
+    logger.get()->log("System Info:\n" + SystemInfo::getConsolidatedSystemInfo());
 
     GraphicsInstance::ApplicationInfo applicationInfo{
         .name = "Example Game",

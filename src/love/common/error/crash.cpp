@@ -67,18 +67,18 @@ namespace love_engine {
         "Would you like a hug?"
     };
 
-    void Crash::set_Crash_Function(const std::function<void(const std::string&)>& crashFunction) noexcept {
+    void Crash::setCrashFunction(const std::function<void(const std::string&)>& crashFunction) noexcept {
         _crashFunction = crashFunction;
     }
 
-    void Crash::set_Crash_Directory(const std::string& directory) noexcept {
+    void Crash::setCrashDirectory(const std::string& directory) noexcept {
         _crashDir.assign(directory);
     }
-    void Crash::set_Crash_Path(const std::string& filePath) noexcept {
+    void Crash::setCrashPath(const std::string& filePath) noexcept {
         _crashPath.assign(filePath);
     }
 
-    void Crash::set_Flavor_Texts(const std::vector<std::string>& flavorTexts) noexcept {
+    void Crash::setFlavorTexts(const std::vector<std::string>& flavorTexts) noexcept {
         _flavorTexts = flavorTexts;
     }
 
@@ -107,10 +107,10 @@ namespace love_engine {
             "---- Crash Report ----\n"
             "// " << _flavorTexts[std::rand() % _flavorTexts.size()] << "\n\n"
             "Time: " << timeBuffer << "\n"
-            "Crashing Thread: " << Thread::get_Thread_Name(std::this_thread::get_id()) << "\n"
+            "Crashing Thread: " << Thread::getThreadName(std::this_thread::get_id()) << "\n"
             "Description: " << message << "\n\n"
-            "--- System Details ---\n" << SystemInfo::get_Consolidated_System_Info() << "\n\n"
-            "---- Stack Trace -----\n" << StackTrace::get_Stacktrace() << "\n"
+            "--- System Details ---\n" << SystemInfo::getConsolidatedSystemInfo() << "\n\n"
+            "---- Stack Trace -----\n" << StackTrace::getStacktrace() << "\n"
         ;
         return outputMessageBuffer.str();
     }
@@ -135,7 +135,7 @@ namespace love_engine {
 
         std::fputs(report.c_str(), stderr);
         try {
-            FileIO::write_File(crashPath.c_str(), report);
+            FileIO::writeFile(crashPath.c_str(), report);
         } catch (std::exception& e) {
             std::fputs(e.what(), stderr);
         }
@@ -158,6 +158,6 @@ namespace love_engine {
             _crashFunction(message);
             _cleanup_and_Exit();
         }
-        throw std::logic_error(StackTrace::append_Stacktrace(message));
+        throw std::logic_error(StackTrace::appendStacktrace(message));
     }
 }

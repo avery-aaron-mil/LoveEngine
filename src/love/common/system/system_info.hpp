@@ -26,7 +26,7 @@ namespace love_engine {
                 std::string systemName;
             } BaseBoardInfo;
 
-            static std::string get_Consolidated_System_Info() noexcept;
+            static std::string getConsolidatedSystemInfo() noexcept;
             static std::string get_OS() noexcept;
             static std::string get_System_Name() noexcept;
             static CPU_Info get_CPU() noexcept;

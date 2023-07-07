@@ -32,8 +32,8 @@ namespace love_engine {
         return errorString;
     }
 
-    void Library::load_Library(const char*const library) noexcept {
-        if (_library) unload_Library();
+    void Library::loadLibrary(const char*const library) noexcept {
+        if (_library) unloadLibrary();
 #ifdef _WIN32
             _library = LoadLibraryA(library);
 #elif defined(__unix__)
@@ -46,7 +46,7 @@ namespace love_engine {
         }
     }
 
-    void Library::unload_Library() noexcept {
+    void Library::unloadLibrary() noexcept {
         if (_library) {
 #ifdef _WIN32
             FreeLibrary(_library);
@@ -57,7 +57,7 @@ namespace love_engine {
         }
     }
 
-    Library::function_t Library::load_Library_Function(const char*const function) const noexcept {
+    Library::function_t Library::loadLibraryFunction(const char*const function) const noexcept {
         if (_library == nullptr) {
             std::stringstream buffer;
             buffer << "Cannot load library functions before loading library: " << function;

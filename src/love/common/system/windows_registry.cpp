@@ -27,7 +27,7 @@ namespace love_engine {
         return systemMessage;
     }
 
-    std::vector<std::wstring> WindowsRegistry::get_HKLM_Children(const std::wstring& registryKey) noexcept {
+    std::vector<std::wstring> WindowsRegistry::getHKLMChildren(const std::wstring& registryKey) noexcept {
         std::vector<std::wstring> children;
         HKEY parentKey;
         auto rc = RegOpenKeyExW(
@@ -91,7 +91,7 @@ namespace love_engine {
         return children;
     }
 
-    std::string WindowsRegistry::get_HKLM_Value_String(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
+    std::string WindowsRegistry::getHKLMValueString(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
         std::wstring valueBuf;
         size_t bufferSize = BUFSIZ;
         valueBuf.resize(bufferSize);
@@ -135,7 +135,7 @@ namespace love_engine {
         }
     }
     
-    int64_t WindowsRegistry::get_HKLM_Value_I64(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
+    int64_t WindowsRegistry::getHKLMValueI64(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
         int64_t value = 0;
         DWORD cbData = static_cast<DWORD>(sizeof(int64_t));
         auto rc = RegGetValueW(
@@ -156,7 +156,7 @@ namespace love_engine {
         }
     }
 
-    int32_t WindowsRegistry::get_HKLM_Value_I32(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
+    int32_t WindowsRegistry::getHKLMValueI32(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
         int32_t value = 0;
         DWORD cbData = static_cast<DWORD>(sizeof(int32_t));
         auto rc = RegGetValueW(

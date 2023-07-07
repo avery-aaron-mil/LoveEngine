@@ -2,14 +2,14 @@
 
 
 namespace love_engine {
-    std::string StackTrace::append_Stacktrace(const std::string& message) noexcept {
+    std::string StackTrace::appendStacktrace(const std::string& message) noexcept {
         std::stringstream buffer;
-        buffer << message << "\n\nThrowing stack:\n" << get_Stacktrace();
+        buffer << message << "\n\nThrowing stack:\n" << getStacktrace();
         return buffer.str();
     }
     
-    std::string StackTrace::append_Stacktrace(std::stringstream& buffer) noexcept {
-        buffer << "\n\nThrowing stack:\n" << get_Stacktrace();
+    std::string StackTrace::appendStacktrace(std::stringstream& buffer) noexcept {
+        buffer << "\n\nThrowing stack:\n" << getStacktrace();
         return buffer.str();
     }
 }
