@@ -305,8 +305,7 @@ namespace love_engine {
 
         {
             VkPhysicalDeviceProperties properties;
-            vkGetPhysicalDeviceProperties(_physicalDevices[i], &properties);
-            _physicalDevicesNameToIndex[properties.deviceName] = i;
+            vkGetPhysicalDeviceProperties(device, &properties);
             std::stringstream buffer;
             buffer << "Using physical device: " << properties.deviceName;
             _log(buffer.str());
