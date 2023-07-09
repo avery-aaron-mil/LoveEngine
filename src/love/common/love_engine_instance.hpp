@@ -2,20 +2,25 @@
 #define LOVE_LOVE_ENGINE_INSTANCE_HPP
 
 #include "data/files/file_io.hpp"
+#include "system/library.hpp"
 
 #include <functional>
 
 namespace love_engine {
     class LoveEngineInstance {
         public:
-            static inline void init() noexcept { init(FileIO::getExecutableDirectory() + "crash-reports"); }
-            static void init(const std::string& crashDirectory) noexcept;
-            static void cleanup() noexcept;
+            LoveEngineInstance();
+            LoveEngineInstance(const std::string& crashDirectory);
+            ~LoveEngineInstance();
+
             static void addExitCallback(const std::function<void()>& callback) noexcept;
 
             static constexpr uint8_t LOVE_ENGINE_VERSION_MAJOR = 1;
             static constexpr uint8_t LOVE_ENGINE_VERSION_MINOR = 0;
             static constexpr uint8_t LOVE_ENGINE_VERSION_PATCH = 0;
+        
+        private:
+            static void _init(const std::string& crashDirectory) noexcept;
     };
 }
 
