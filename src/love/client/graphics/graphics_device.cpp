@@ -49,7 +49,7 @@ namespace love_engine {
         _log(buffer.str());
     }
 
-    GraphicsDevice::QueueFamilyIndices GraphicsDevice::_getDeviceQueueFamilies(const VkPhysicalDevice& device) const noexcept {
+    GraphicsDevice::QueueFamilyIndices GraphicsDevice::_getDeviceQueueFamilyIndices(const VkPhysicalDevice& device) const noexcept {
         QueueFamilyIndices queueIndices;
         uint32_t queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
@@ -159,7 +159,7 @@ namespace love_engine {
         if (!features.shaderFloat64) return std::string("64-bit floats not supported.");
 
         // Check queue families
-        QueueFamilyIndices queueIndices = _getDeviceQueueFamilies(device);
+        QueueFamilyIndices queueIndices = _getDeviceQueueFamilyIndices(device);
         if (!queueIndices.hasAllQueues()) return std::string("No queues family with required queues found.");
 
         // Check extension support
@@ -221,7 +221,7 @@ namespace love_engine {
         }
 
         // Create queue create infos
-        QueueFamilyIndices indices = _getDeviceQueueFamilies(physicalDevice);
+        QueueFamilyIndices indices = _getDeviceQueueFamilyIndices(physicalDevice);
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         std::unordered_set<uint32_t> uniqueQueueFamilies = {indices.graphicsQueue, indices.presentQueue};
 
@@ -302,12 +302,24 @@ namespace love_engine {
     void GraphicsDevice::usePhysicalDevice(const VkPhysicalDevice& device) noexcept {
         // Input validation
         if (device == nullptr) Crash::crash("Null was passed to usePhysicalDevice().");
+
+        {
+            VkPhysicalDeviceProperties properties;
+            vkGetPhysicalDeviceProperties(_physicalDevices[i], &properties);
+            _physicalDevicesNameToIndex[properties.deviceName] = i;
+            std::stringstream buffer;
+            buffer << "Using physical device: " << properties.deviceName;
+            _log(buffer.str());
+        }
         
         VkPhysicalDeviceFeatures deviceFeatures = {
             .samplerAnisotropy = VK_TRUE
         };
+        _queueFamilyIndices = _getDeviceQueueFamilyIndices(device);
         _device = _createLogicalDevice(device, deviceFeatures);
         _loadDeviceVulkanFunctions();
+        vkGetDeviceQueue(_device, _queueFamilyIndices.graphicsQueue, 0, &_graphicsQueue);
+        vkGetDeviceQueue(_device, _queueFamilyIndices.presentQueue, 0, &_presentQueue);
     }
 
     void GraphicsDevice::_initGraphicsDevice(const std::string& deviceName) noexcept {

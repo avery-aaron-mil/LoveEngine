@@ -51,10 +51,13 @@ namespace love_engine {
             VkSurfaceKHR _surface;
             std::vector<VkPhysicalDevice> _physicalDevices;
             std::unordered_map<std::string, size_t> _physicalDevicesNameToIndex;
+            QueueFamilyIndices _queueFamilyIndices;
+            VkQueue _graphicsQueue;
+            VkQueue _presentQueue;
 
             void _log(const std::string& message) const noexcept;
             void _getPhysicalDevices() noexcept;
-            QueueFamilyIndices _getDeviceQueueFamilies(const VkPhysicalDevice& device) const noexcept;
+            QueueFamilyIndices _getDeviceQueueFamilyIndices(const VkPhysicalDevice& device) const noexcept;
             static bool _checkDeviceHasEnabledExtensions(const VkPhysicalDevice& device) noexcept;
             SwapChainSupportDetails _querySwapChainSupport(const VkPhysicalDevice& device) const noexcept;
             std::string _getDeviceUnsuitabilityReason(const VkPhysicalDevice& device) const noexcept;
