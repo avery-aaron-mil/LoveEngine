@@ -11,7 +11,7 @@
 #include <sys/time.h>
 
 namespace love_engine {
-    std::string Logger::_generateLogMessage(const Log_Status status, const std::string& message) noexcept {
+    std::string Logger::_generateLogMessage(const LogStatus status, const std::string& message) noexcept {
         // Get time
         struct timeval tv;
         if (gettimeofday(&tv, nullptr)) {
@@ -43,7 +43,7 @@ namespace love_engine {
         return outputMessageBuffer.str();
     }
 
-    void Logger::log(const Log_Status status, const std::string& message) const noexcept {
+    void Logger::log(const LogStatus status, const std::string& message) const noexcept {
         std::string outputMessage = _generateLogMessage(status, message);
 
         std::puts(outputMessage.c_str());

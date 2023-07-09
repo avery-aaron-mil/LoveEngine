@@ -20,7 +20,7 @@ void glfwCallback(int e, const char*desc) {
 }
 
 int main(int argc, char** argv) {
-    LoveEngineInstance loveEngine(FileIO::getExecutableDirectory() + "../crash-reports");
+    LoveEngineInstance loveEngine{FileIO::getExecutableDirectory() + "../crash-reports"};
     logger = std::make_shared<Logger>(Logger(FileIO::getExecutableDirectory() + "../logs/latest.log", true));
     logger.get()->log("System Info:\n" + SystemInfo::getConsolidatedSystemInfo());
 

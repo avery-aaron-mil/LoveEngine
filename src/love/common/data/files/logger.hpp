@@ -8,14 +8,14 @@
 
 namespace love_engine {
 
-    enum class Log_Status {
+    enum class LogStatus {
         IGNORED,
         STATUS,
         UPDATE,
         MESSAGE,
         INFO,
         WARNING,
-        ERROR,
+        ERROR_,
         FATAL,
     };
 
@@ -36,14 +36,14 @@ namespace love_engine {
             Logger(const std::string& filePath, const bool clearFile) : _logPath(filePath) { if (clearFile) clear(); }
             ~Logger() = default;
            
-            inline void log(const std::string& message) const noexcept { log(Log_Status::INFO, message); }
-            virtual void log(const Log_Status status, const std::string& message) const noexcept;
+            inline void log(const std::string& message) const noexcept { log(LogStatus::INFO, message); }
+            virtual void log(const LogStatus status, const std::string& message) const noexcept;
 
             void setLogPath(const std::string& filePath) noexcept { _logPath.assign(filePath); }
             void clear() { FileIO::clearFile(_logPath.c_str()); }
 
         private:
-            static std::string _generateLogMessage(const Log_Status status, const std::string& message) noexcept;
+            static std::string _generateLogMessage(const LogStatus status, const std::string& message) noexcept;
 
             std::string _logPath;
    };
