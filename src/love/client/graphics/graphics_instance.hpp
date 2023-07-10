@@ -19,15 +19,19 @@ namespace love_engine {
                 uint8_t versionMajor = 0;
                 uint8_t versionMinor = 0;
                 uint8_t versionPatch = 0;
-                std::shared_ptr<Logger> logger;
             } ApplicationInfo;
 
-            GraphicsInstance(const ApplicationInfo& applicationInfo, const std::function<void(int, const char*)>& glfwErrorCallback);
+            GraphicsInstance(
+                const ApplicationInfo& applicationInfo,
+                const std::function<void(int, const char*)>& glfwErrorCallback,
+                std::shared_ptr<Logger> logger
+            );
             ~GraphicsInstance();
 
             VkInstance instance() const noexcept { return _vulkanInstance; }
 
         private:
+            std::shared_ptr<Logger> _logger;
             Library _vulkanLibrary;
             ApplicationInfo _applicationInfo;
             VkInstance _vulkanInstance;

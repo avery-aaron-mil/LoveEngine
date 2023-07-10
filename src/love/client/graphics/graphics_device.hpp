@@ -30,12 +30,12 @@ namespace love_engine {
                 std::vector<VkPresentModeKHR> presentModes;
             };
 
-            GraphicsDevice(std::shared_ptr<Logger> logger, VkInstance vulkanInstance, VkSurfaceKHR surface);
+            GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, std::shared_ptr<Logger> logger);
             GraphicsDevice(
-                std::shared_ptr<Logger> logger,
                 VkInstance vulkanInstance,
                 VkSurfaceKHR surface,
-                const std::string& deviceName
+                const std::string& deviceName,
+                std::shared_ptr<Logger> logger
             );
             ~GraphicsDevice();
 
@@ -43,6 +43,8 @@ namespace love_engine {
             VkPhysicalDevice getBestDevice() const;
             VkPhysicalDevice getPhysicalDeviceFromName(const std::string& name) const;
             void usePhysicalDevice(const VkPhysicalDevice& device) noexcept;
+
+            inline VkDevice device() const noexcept { return _device; }
 
         private:
             std::shared_ptr<Logger> _logger;

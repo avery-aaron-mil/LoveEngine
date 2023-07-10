@@ -9,7 +9,8 @@
 
 namespace love_engine {
     std::vector<const char*> _enabledExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_KHR_SURFACE_EXTENSION_NAME
     };
 
     void GraphicsDevice::_log(const std::string &message) const noexcept {
@@ -329,7 +330,7 @@ namespace love_engine {
         } catch (std::invalid_argument& e) { Crash::crash(e.what()); }
     }
 
-    GraphicsDevice::GraphicsDevice(std::shared_ptr<Logger> logger, VkInstance vulkanInstance, VkSurfaceKHR surface)
+    GraphicsDevice::GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, std::shared_ptr<Logger> logger)
         : _logger(logger), _vulkanInstance(vulkanInstance), _surface(surface)
     {
         // Input validation
@@ -339,10 +340,10 @@ namespace love_engine {
         _initGraphicsDevice("");
     }
     GraphicsDevice::GraphicsDevice(
-        std::shared_ptr<Logger> logger,
         VkInstance vulkanInstance,
         VkSurfaceKHR surface,
-        const std::string& deviceName
+        const std::string& deviceName,
+        std::shared_ptr<Logger> logger
     )
         : _logger(logger), _vulkanInstance(vulkanInstance), _surface(surface)
     {

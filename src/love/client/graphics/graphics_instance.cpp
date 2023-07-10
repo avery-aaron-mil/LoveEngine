@@ -9,8 +9,8 @@
 
 namespace love_engine {
     void GraphicsInstance::_log(const std::string& message) const noexcept {
-        if (_applicationInfo.logger.get() != nullptr) {
-            _applicationInfo.logger.get()->log(message);
+        if (_logger.get() != nullptr) {
+            _logger.get()->log(message);
         }
     }
     
@@ -107,8 +107,9 @@ namespace love_engine {
 
     GraphicsInstance::GraphicsInstance(
         const ApplicationInfo& applicationInfo,
-        const std::function<void(int, const char*)>& glfwErrorCallback
-    ) : _applicationInfo(applicationInfo) {
+        const std::function<void(int, const char*)>& glfwErrorCallback,
+        std::shared_ptr<Logger> logger
+    ) : _logger(logger), _applicationInfo(applicationInfo) {
         _loadVulkanLibrary();
         _initializeGLFW(glfwErrorCallback);
         _loadGlobalVulkanFunctions();

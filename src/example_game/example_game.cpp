@@ -28,8 +28,7 @@ int main(int argc, char** argv) {
         .name = "Example Game",
         .versionMajor = 1,
         .versionMinor = 0,
-        .versionPatch = 0,
-        .logger = logger
+        .versionPatch = 0
     };
 
     ClientState_Loading loading_State;
@@ -37,7 +36,7 @@ int main(int argc, char** argv) {
         .applicationInfo = applicationInfo,
         .glfwErrorCallback = glfwCallback,
         .msPerTick = 50.f
-    });
+    }, logger);
     client.run();
 
     exit(EXIT_SUCCESS);
