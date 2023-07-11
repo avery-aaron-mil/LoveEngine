@@ -115,7 +115,7 @@ namespace love_engine {
             << "\n\tHeight: " << videoMode->height
             << "\n\tRefresh rate: " << videoMode->refreshRate << "Hz"
             << "\n\tRGB bit depth: " << (videoMode->redBits + videoMode->blueBits + videoMode->greenBits)
-                << " (" << videoMode->redBits << "+" << videoMode->greenBits << "+" << videoMode->blueBits << ")"
+                << " (R" << videoMode->redBits << "+G" << videoMode->greenBits << "+B" << videoMode->blueBits << ")"
         ;
         _log(buffer.str());
     }
