@@ -64,7 +64,8 @@ namespace love_engine {
             << "\n\tWidth: " << videoMode->width
             << "\n\tHeight: " << videoMode->height
             << "\n\tRefresh rate: " << videoMode->refreshRate << "Hz"
-            << "\n\tColor bit depth: R" << videoMode->redBits << ", G" << videoMode->greenBits << ", B" << videoMode->blueBits
+            << "\n\tRGB bit depth: " << (videoMode->redBits + videoMode->blueBits + videoMode->greenBits)
+                << " (" << videoMode->redBits << "+" << videoMode->greenBits << "+" << videoMode->blueBits << ")"
         ;
         _log(buffer.str());
     }
@@ -118,8 +119,6 @@ namespace love_engine {
         glfwSetWindowUserPointer(_window, this);
         if (!_properties.iconPath.empty()) _setWindowIcon();
         _createWindowSurface();
-
-        focusWindow();
 
         _log("Created window.");
     }
