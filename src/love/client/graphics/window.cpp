@@ -29,7 +29,6 @@ namespace love_engine {
     
     void Window::focusWindow() const noexcept {
         glfwShowWindow(_window);
-        glfwFocusWindow(_window);
     }
     
     void Window::_createWindowSurface() noexcept {
@@ -68,6 +67,40 @@ namespace love_engine {
                 << " (" << videoMode->redBits << "+" << videoMode->greenBits << "+" << videoMode->blueBits << ")"
         ;
         _log(buffer.str());
+    }
+
+    GLFWmonitor* Window::_getCurrentMonitor() const noexcept {
+        // Thanks to Shmo for this algorithm
+        // https://stackoverflow.com/questions/21421074
+
+        // Get window position
+        int windowX, windowY, windowWidth, windowHeight;
+        glfwGetWindowPos(_window, &windowX, &windowY);
+        glfwGetWindowSize(_window, &windowWidth, &windowHeight);
+
+        // Check all monitors for greatest overlap
+        int monitorCount;
+        GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+        const GLFWvidmode* mode;
+        GLFWmonitor* bestMonitor = nullptr;
+        int monitorX, monitorY;
+        int overlap, bestOverlap = 0;
+        for (int i = 0; i < monitorCount; ++i) {
+            mode = glfwGetVideoMode(monitors[i]);
+            glfwGetMonitorPos(monitors[i], &monitorX, &monitorY);
+
+            overlap = std::max(0,
+                (std::min(windowX + windowWidth, monitorX + mode->width) - std::max(windowX, monitorX))
+                * std::max(0, std::min(windowY + windowHeight, monitorY + mode->height) - std::max(windowY, monitorY))
+            );
+
+            if (overlap > bestOverlap) {
+                bestOverlap = overlap;
+                bestMonitor = monitors[i];
+            }
+        }
+
+        return bestMonitor;
     }
 
     void Window::setIcon(const std::string& iconPath) noexcept {
@@ -111,15 +144,65 @@ namespace love_engine {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+        glfwWindowHint(GLFW_FOCUS_ON_SHOW, GL_TRUE);
+        glfwWindowHint(GLFW_RED_BITS, videoMode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, videoMode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, videoMode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, videoMode->refreshRate);
 
         // Create window
-        _window = glfwCreateWindow(_properties.width, _properties.height, _properties.title.c_str(), nullptr, nullptr);
+        switch (_properties.windowType) {
+            default:
+            case WindowType::WINDOWED: {
+                _window = glfwCreateWindow(_properties.width, _properties.height, _properties.title.c_str(), nullptr, nullptr);
+            } break;
+            case WindowType::WINDOWED_BORDERLESS: {
+                glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+                _window = glfwCreateWindow(_properties.width, _properties.height, _properties.title.c_str(), nullptr, nullptr);
+            } break;
+            case WindowType::FULLSCREEN_BORDERLESS: {
+                glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+                _window = glfwCreateWindow(videoMode->width, videoMode->height, _properties.title.c_str(), nullptr, nullptr);
+            } break;
+            case WindowType::FULLSCREEN_MONITOR: {
+                _window = glfwCreateWindow(videoMode->width, videoMode->height, _properties.title.c_str(), monitor, nullptr);
+            } break;
+        }
         if (_window == nullptr) Crash::crash("GLFW failed to create window.");
         glfwSetWindowPos(_window, _properties.x, _properties.y);
         glfwSetWindowUserPointer(_window, this);
         if (!_properties.iconPath.empty()) _setWindowIcon();
         _createWindowSurface();
 
+        // Set window callbacks
+        glfwSetFramebufferSizeCallback(_window, _framebufferResizeCallback);
+        glfwSetWindowPosCallback(_window, _positionCallback);
+        glfwSetWindowFocusCallback(_window, _focusCallback);
+
         _log("Created window.");
+    }
+
+    void Window::_framebufferResizeCallback(GLFWwindow* glfwWindow, int width, int height) noexcept {
+        Window* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        window->_properties._resized = true;
+        window->_properties.width = width;
+        window->_properties.height = height;
+
+        if (window->_userResizeCallback != nullptr) window->_userResizeCallback(glfwWindow, width, height);
+    }
+
+    void Window::_positionCallback(GLFWwindow* glfwWindow, int x, int y) noexcept {
+        Window* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        window->_properties.x = x;
+        window->_properties.y = y;
+        
+        if (window->_userPositionCallback != nullptr) window->_userResizeCallback(glfwWindow, x, y);
+    }
+
+    void Window::_focusCallback(GLFWwindow* glfwWindow, int focused) noexcept {
+        Window* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        window->_properties._focused = focused;
+        
+        if (window->_userFocusCallback != nullptr) window->_userFocusCallback(glfwWindow, focused);
     }
 }

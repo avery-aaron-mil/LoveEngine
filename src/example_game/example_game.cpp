@@ -33,9 +33,8 @@ int main(int argc, char** argv) {
         .versionPatch = 0,
         .debugLogger = logger
     };
-    Window::WindowProperties windowProperties{
-        .title = "Game"
-    };
+    Window::WindowProperties windowProperties;
+    windowProperties.title = "Game";
 
     // Start client
     ClientState_Loading loading_State;
