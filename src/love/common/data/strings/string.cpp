@@ -13,7 +13,7 @@ namespace love_engine {
 
         char temp;
         // Replace working outside of string to the middle
-        for (size_t i = 0; i < len / 2; i++) {
+        for (size_t i = 0; i < len / 2; ++i) {
             temp = dst[i];
             dst[i] = dst[len - i - 1];
             dst[len - i - 1] = temp;
