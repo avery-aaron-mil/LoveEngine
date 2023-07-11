@@ -13,6 +13,24 @@
 namespace love_engine {
     std::shared_ptr<Logger> _debugLogger;
 
+    GraphicsInstance::GraphicsInstance(
+        const ApplicationInfo& applicationInfo,
+        const std::function<void(int, const char*)>& glfwErrorCallback,
+        std::shared_ptr<Logger> logger
+    ) : _logger(logger), _applicationInfo(applicationInfo) {
+        _debugLogger = applicationInfo.debugLogger;
+        _loadVulkanLibrary();
+        _initializeGLFW(glfwErrorCallback);
+        _loadGlobalVulkanFunctions();
+        _createVulkanInstance();
+        _loadInstanceVulkanFunctions();
+    }
+    
+    GraphicsInstance::~GraphicsInstance() {
+        glfwTerminate();
+        if (_vulkanInstance) vkDestroyInstance(_vulkanInstance, nullptr);
+    }
+
     void GraphicsInstance::_log(const std::string& message) const noexcept {
         if (_logger.get() != nullptr) {
             _logger.get()->log(message);
@@ -86,9 +104,11 @@ namespace love_engine {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
+        // Get available layers
         std::vector<VkLayerProperties> availableLayers(layerCount);
         vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
         
+        // Search for layers
         for (const auto& layer : layers) {
             bool layerFound = false;
 
@@ -119,6 +139,7 @@ namespace love_engine {
         uint32_t count;
         const char** extensions = glfwGetRequiredInstanceExtensions(&count);
 
+        // Create info
         VkApplicationInfo vulkanApplicationInfo = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
             .pApplicationName = _applicationInfo.name.c_str(),
@@ -137,14 +158,14 @@ namespace love_engine {
             ),
             .apiVersion = apiVersion
         };
-
         VkInstanceCreateInfo instanceCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pApplicationInfo = &vulkanApplicationInfo,
             .enabledExtensionCount = count,
             .ppEnabledExtensionNames = extensions
         };
-        
+
+        // Validation layers
         std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
         _checkValidationLayerSupport(validationLayers);
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
@@ -178,23 +199,5 @@ namespace love_engine {
         }
         
         _log("Initialized GLFW.");
-    }
-
-    GraphicsInstance::GraphicsInstance(
-        const ApplicationInfo& applicationInfo,
-        const std::function<void(int, const char*)>& glfwErrorCallback,
-        std::shared_ptr<Logger> logger
-    ) : _logger(logger), _applicationInfo(applicationInfo) {
-        _debugLogger = applicationInfo.debugLogger;
-        _loadVulkanLibrary();
-        _initializeGLFW(glfwErrorCallback);
-        _loadGlobalVulkanFunctions();
-        _createVulkanInstance();
-        _loadInstanceVulkanFunctions();
-    }
-    
-    GraphicsInstance::~GraphicsInstance() {
-        glfwTerminate();
-        if (_vulkanInstance) vkDestroyInstance(_vulkanInstance, nullptr);
     }
 }

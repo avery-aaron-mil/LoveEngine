@@ -15,6 +15,42 @@ namespace love_engine {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
+    GraphicsDevice::GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, std::shared_ptr<Logger> logger)
+        : _logger(logger), _vulkanInstance(vulkanInstance), _surface(surface)
+    {
+        // Input validation
+        if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics Device was null.");
+        if (_surface == nullptr) Crash::crash("Surface passed to Graphics Device was null.");
+
+        _initGraphicsDevice("");
+    }
+    GraphicsDevice::GraphicsDevice(
+        VkInstance vulkanInstance,
+        VkSurfaceKHR surface,
+        const std::string& deviceName,
+        std::shared_ptr<Logger> logger
+    )
+        : _logger(logger), _vulkanInstance(vulkanInstance), _surface(surface)
+    {
+        // Input validation
+        if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics Device was null.");
+        if (_surface == nullptr) Crash::crash("Surface passed to Graphics Device was null.");
+
+        _initGraphicsDevice(deviceName);
+    }
+
+    GraphicsDevice::~GraphicsDevice() {
+        if (_device) vkDestroyDevice(_device, nullptr);
+    }
+
+    void GraphicsDevice::_initGraphicsDevice(const std::string& deviceName) noexcept {
+        _getPhysicalDevices();
+        try {
+            VkPhysicalDevice device = deviceName.empty() ? getBestDevice() : getPhysicalDeviceFromName(deviceName);
+            usePhysicalDevice(device);
+        } catch (std::invalid_argument& e) { Crash::crash(e.what()); }
+    }
+
     void GraphicsDevice::_log(const std::string &message) const noexcept {
         if (_logger.get() != nullptr) {
             _logger.get()->log(message);
@@ -91,6 +127,7 @@ namespace love_engine {
             Crash::crash("Could not enumerate device extension properites for physical graphics device.");
         }
 
+        // Get available extensions
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
         if (vkEnumerateDeviceExtensionProperties(
                 device,
@@ -100,6 +137,7 @@ namespace love_engine {
             ) != VK_SUCCESS
         ) Crash::crash("Could not enumerate device extension properites for physical graphics device.");
 
+        // Search extensions
         for (const auto& extension : _enabledExtensions) {
             bool extensionFound = false;
 
@@ -345,41 +383,5 @@ namespace love_engine {
         _loadDeviceVulkanFunctions();
         vkGetDeviceQueue(_device, _queueFamilyIndices.graphicsQueue, 0, &_graphicsQueue);
         vkGetDeviceQueue(_device, _queueFamilyIndices.presentQueue, 0, &_presentQueue);
-    }
-
-    void GraphicsDevice::_initGraphicsDevice(const std::string& deviceName) noexcept {
-        _getPhysicalDevices();
-        try {
-            VkPhysicalDevice device = deviceName.empty() ? getBestDevice() : getPhysicalDeviceFromName(deviceName);
-            usePhysicalDevice(device);
-        } catch (std::invalid_argument& e) { Crash::crash(e.what()); }
-    }
-
-    GraphicsDevice::GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, std::shared_ptr<Logger> logger)
-        : _logger(logger), _vulkanInstance(vulkanInstance), _surface(surface)
-    {
-        // Input validation
-        if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics Device was null.");
-        if (_surface == nullptr) Crash::crash("Surface passed to Graphics Device was null.");
-
-        _initGraphicsDevice("");
-    }
-    GraphicsDevice::GraphicsDevice(
-        VkInstance vulkanInstance,
-        VkSurfaceKHR surface,
-        const std::string& deviceName,
-        std::shared_ptr<Logger> logger
-    )
-        : _logger(logger), _vulkanInstance(vulkanInstance), _surface(surface)
-    {
-        // Input validation
-        if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics Device was null.");
-        if (_surface == nullptr) Crash::crash("Surface passed to Graphics Device was null.");
-
-        _initGraphicsDevice(deviceName);
-    }
-
-    GraphicsDevice::~GraphicsDevice() {
-        if (_device) vkDestroyDevice(_device, nullptr);
     }
 }

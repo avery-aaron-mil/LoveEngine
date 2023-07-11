@@ -26,7 +26,6 @@ namespace love_engine {
             void loadLibrary(const char*const library) noexcept;
             void unloadLibrary() noexcept;
             function_t loadLibraryFunction(const char*const function) const noexcept;
-            // TODO Consider loading all libraries this way to have runtime checks
 
         private:
             library_t _library = nullptr;
