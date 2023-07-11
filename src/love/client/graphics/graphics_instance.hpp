@@ -42,6 +42,7 @@ namespace love_engine {
             void _loadGlobalVulkanFunctions() const noexcept;
             void _loadInstanceVulkanFunctions() const noexcept;
             static void _checkValidationLayerSupport(const std::vector<const char*>& layers) noexcept;
+            void _validateEnabledExtensions() noexcept;
             void _createVulkanInstance() noexcept;
             void _initializeGLFW(const std::function<void(int, const char*)>& glfwErrorCallback) const noexcept;
     };

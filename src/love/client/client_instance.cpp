@@ -3,7 +3,6 @@
 #include <chrono>
 
 namespace love_engine {
-
     ClientInstance::ClientInstance(ClientState *const clientState, const Settings& settings, std::shared_ptr<Logger> logger)
     : _logger(logger), _settings(settings), _clientState(clientState) {
         if (clientState == nullptr) Crash::crash("clientState must not be NULL.");

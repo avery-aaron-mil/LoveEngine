@@ -11,7 +11,10 @@
 #include "vulkan_functions.hpp"
 
 namespace love_engine {
-    std::shared_ptr<Logger> _debugLogger;
+    static std::shared_ptr<Logger> _debugLogger;
+    static std::vector<const char*> _enabledExtensions = {
+        VK_KHR_SURFACE_EXTENSION_NAME
+    };
 
     GraphicsInstance::GraphicsInstance(
         const ApplicationInfo& applicationInfo,
@@ -115,7 +118,6 @@ namespace love_engine {
             for (size_t i = 0; i < availableLayers.size(); i++) {
                 if (std::strcmp(layer, availableLayers[i].layerName) == 0) {
                     layerFound = true;
-                    availableLayers.erase(availableLayers.begin() + i, availableLayers.end());
                     break;
                 }
             }
@@ -128,6 +130,37 @@ namespace love_engine {
         }
     }
 
+    void GraphicsInstance::_validateEnabledExtensions() noexcept {
+        uint32_t extensionCount;
+        if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr) != VK_SUCCESS) {
+            Crash::crash("Could not enumerate Vulkan instance extension properites.");
+        }
+
+        // Get available extensions
+        std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+        if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data()) != VK_SUCCESS) {
+            Crash::crash("Could not enumerate Vulkan instance extension properites.");
+        }
+
+        // Search extensions
+        for (const auto& extension : _enabledExtensions) {
+            bool extensionFound = false;
+
+            for (size_t i = 0; i < availableExtensions.size(); i++) {
+                if (std::strcmp(extension, availableExtensions[i].extensionName) == 0) {
+                    extensionFound = true;
+                    break;
+                }
+            }
+
+            if (!extensionFound) {
+                std::stringstream buffer;
+                buffer << "Could not find extension \"" << extension << "\" for Vulkan instance.";
+                Crash::crash(buffer.str());
+            }
+        }
+    }
+
     void GraphicsInstance::_createVulkanInstance() noexcept {
         _log("Creating Vulkan instance...");
         uint32_t apiVersion;
@@ -135,9 +168,13 @@ namespace love_engine {
             Crash::crash("Failed to get Vulkan API version.");
         }
         
-        // GLFW Extensions
-        uint32_t count;
-        const char** extensions = glfwGetRequiredInstanceExtensions(&count);
+        // Extensions
+        uint32_t glfwExtensionCount;
+        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+        for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
+            _enabledExtensions.emplace_back(glfwExtensions[i]);
+        }
+        _validateEnabledExtensions();
 
         // Create info
         VkApplicationInfo vulkanApplicationInfo = {
@@ -161,12 +198,12 @@ namespace love_engine {
         VkInstanceCreateInfo instanceCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pApplicationInfo = &vulkanApplicationInfo,
-            .enabledExtensionCount = count,
-            .ppEnabledExtensionNames = extensions
+            .enabledExtensionCount = static_cast<uint32_t>(_enabledExtensions.size()),
+            .ppEnabledExtensionNames = _enabledExtensions.data()
         };
 
         // Validation layers
-        std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
+        std::vector<const char *> validationLayers = { "VK_LAYER_KHRONOS_validation" };
         _checkValidationLayerSupport(validationLayers);
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
         if (_debugLogger.get() != nullptr) {

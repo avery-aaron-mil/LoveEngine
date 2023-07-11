@@ -21,13 +21,13 @@
 #endif
 
 namespace love_engine {
-    std::string _consolidatedSystemInfo;
-    std::string _OS;
-    std::string _systemName;
-    SystemInfo::CPUInfo _CPU;
-    std::vector<SystemInfo::VideoCardInfo> _videoCards;
-    SystemInfo::BaseBoardInfo _baseBoard;
-    std::string _physicalMemory;
+    static std::string _consolidatedSystemInfo;
+    static std::string _OS;
+    static std::string _systemName;
+    static SystemInfo::CPUInfo _CPU;
+    static std::vector<SystemInfo::VideoCardInfo> _videoCards;
+    static SystemInfo::BaseBoardInfo _baseBoard;
+    static std::string _physicalMemory;
 
     void SystemInfo::_findOS() noexcept {
 #ifdef _WIN32

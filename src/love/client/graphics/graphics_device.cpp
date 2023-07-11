@@ -11,7 +11,7 @@
 #include "vulkan_functions.hpp"
 
 namespace love_engine {
-    std::vector<const char*> _enabledExtensions = {
+    static std::vector<const char*> _enabledExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
@@ -144,7 +144,6 @@ namespace love_engine {
             for (size_t i = 0; i < availableExtensions.size(); i++) {
                 if (std::strcmp(extension, availableExtensions[i].extensionName) == 0) {
                     extensionFound = true;
-                    availableExtensions.erase(availableExtensions.begin() + i, availableExtensions.end());
                     break;
                 }
             }

@@ -16,12 +16,12 @@
 #include <sys/time.h>
 
 namespace love_engine {
-    volatile bool _crashed = false;
-    std::string _crashDir(".");
-    std::string _crashPath;
-    void _default_Crash_Function(const std::string& message);
-    std::function<void(const std::string&)> _crashFunction = _default_Crash_Function;
-    std::vector<std::string> _flavorTexts = {
+    static volatile bool _crashed = false;
+    static std::string _crashDir(".");
+    static std::string _crashPath;
+    static void _default_Crash_Function(const std::string& message);
+    static std::function<void(const std::string&)> _crashFunction = _default_Crash_Function;
+    static std::vector<std::string> _flavorTexts = {
         "Everything's going to plan. No, really, that was supposed to happen.",
         "Sorry :(",
         "On the bright side, I bought you a teddy bear!",

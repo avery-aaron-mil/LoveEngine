@@ -6,9 +6,9 @@
 #include <unordered_map>
 
 namespace love_engine {
-    std::mutex _threadsMutex;
-    volatile size_t _openThreads = 1; // NOTE: Setting to "1" accounts for main thread.
-    std::unordered_map<std::thread::id, std::string> _threadNames;
+    static std::mutex _threadsMutex;
+    static volatile size_t _openThreads = 1; // NOTE: Setting to "1" accounts for main thread.
+    static std::unordered_map<std::thread::id, std::string> _threadNames;
 
     std::string Thread::getThreadName(const std::thread::id& id) noexcept {
         _threadsMutex.lock();

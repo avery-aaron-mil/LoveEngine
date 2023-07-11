@@ -24,15 +24,15 @@
 #include "../../error/stack_trace.hpp"
 
 namespace love_engine {
-    std::mutex _fileMutex;
-    std::string _executable_Directory;
+    static std::mutex _fileMutex;
+    static std::string _executableDirectory;
 
     std::mutex& FileIO::getMutex() noexcept {
         return _fileMutex;
     }
 
     std::string FileIO::getExecutableDirectory() noexcept {
-        if (_executable_Directory.empty()) {
+        if (_executableDirectory.empty()) {
             unsigned int bufferSize = 1024;
             std::vector<char> buffer(bufferSize + 1);
 #ifdef _WIN32
@@ -61,19 +61,19 @@ namespace love_engine {
             std::string path = &buffer[0];
             std::filesystem::path p = path;
 #ifdef __WIN32__
-            _executable_Directory.assign(p.parent_path().string() + "\\");
+            _executableDirectory.assign(p.parent_path().string() + "\\");
 #else
-            _executable_Directory.assign(p.parent_path().string() + "/");
+            _executableDirectory.assign(p.parent_path().string() + "/");
 #endif
         }
 
         try {
-            validatePath(_executable_Directory);
+            validatePath(_executableDirectory);
         } catch (std::invalid_argument& e) {
             Crash::crash(std::string("Failed to validate executable path: ") + e.what());
         }
         
-        return _executable_Directory;        
+        return _executableDirectory;        
     }
 
     [[nodiscard]] std::string FileIO::removeExcessDirectorySlashes(std::string path) noexcept {

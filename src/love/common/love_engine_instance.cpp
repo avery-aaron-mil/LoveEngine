@@ -9,7 +9,7 @@
 #include "system/thread.hpp"
 
 namespace love_engine {
-    std::stack<std::function<void()>> _callbacks;
+    static std::stack<std::function<void()>> _callbacks;
 
     [[noreturn]] void _signalHandler(int signum) {
         switch (signum) {
