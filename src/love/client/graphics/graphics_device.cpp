@@ -1,9 +1,12 @@
 #include "graphics_device.hpp"
 
+#include <cstring>
 #include <sstream>
 #include <unordered_set>
 
 #include <love/common/error/crash.hpp>
+
+#include <GLFW/glfw3.h>
 
 #include "vulkan_functions.hpp"
 
@@ -39,7 +42,7 @@ namespace love_engine {
             Crash::crash("Failed to enumerate physical graphics devices.");
         }
 
-        for (size_t i = 0; i < deviceCount; i++) {
+        for (size_t i = 0; i < deviceCount; ++i) {
             VkPhysicalDeviceProperties properties;
             vkGetPhysicalDeviceProperties(_physicalDevices[i], &properties);
             _physicalDevicesNameToIndex[properties.deviceName] = i;
@@ -98,12 +101,21 @@ namespace love_engine {
             ) != VK_SUCCESS
         ) Crash::crash("Could not enumerate device extension properites for physical graphics device");
 
-        std::unordered_set<std::string> remainingExtensions(_enabledExtensions.begin(), _enabledExtensions.end());
-        for (const auto &extension : remainingExtensions) {
-            remainingExtensions.erase(extension);
+        for (const auto& extension : _enabledExtensions) {
+            bool extensionFound = false;
+
+            for (size_t i = 0; i < availableExtensions.size(); i++) {
+                if (std::strcmp(extension, availableExtensions[i].extensionName) == 0) {
+                    extensionFound = true;
+                    availableExtensions.erase(availableExtensions.begin() + i, availableExtensions.end());
+                    break;
+                }
+            }
+
+            if (!extensionFound) return false;
         }
 
-        return remainingExtensions.empty();
+        return true;
     }
     
     GraphicsDevice::SwapChainSupportDetails GraphicsDevice::_querySwapChainSupport(const VkPhysicalDevice& device) const noexcept {
@@ -289,7 +301,7 @@ namespace love_engine {
         int64_t bestScore = -1;
         size_t bestDeviceIndex = 0;
         int64_t deviceScore;
-        for (size_t i = 0; i < _physicalDevices.size(); i++) {
+        for (size_t i = 0; i < _physicalDevices.size(); ++i) {
             deviceScore = _rateDevice(_physicalDevices[i]);
             if (deviceScore > bestScore) {
                 bestScore = deviceScore;
@@ -316,6 +328,9 @@ namespace love_engine {
             .samplerAnisotropy = VK_TRUE
         };
         _queueFamilyIndices = _getDeviceQueueFamilyIndices(device);
+        if (!glfwGetPhysicalDevicePresentationSupport(_vulkanInstance, device, _queueFamilyIndices.presentQueue)) {
+            Crash::crash("No presentation support for GLFW.");
+        }
         _device = _createLogicalDevice(device, deviceFeatures);
         _loadDeviceVulkanFunctions();
         vkGetDeviceQueue(_device, _queueFamilyIndices.graphicsQueue, 0, &_graphicsQueue);

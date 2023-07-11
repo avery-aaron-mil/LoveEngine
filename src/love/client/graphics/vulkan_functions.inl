@@ -17,6 +17,7 @@ VK_EXPORTED_FUNCTION(vkGetInstanceProcAddr)
 VK_GLOBAL_LEVEL_FUNCTION(vkCreateInstance)
 VK_GLOBAL_LEVEL_FUNCTION(vkEnumerateInstanceVersion)
 VK_GLOBAL_LEVEL_FUNCTION(vkEnumerateInstanceExtensionProperties)
+VK_GLOBAL_LEVEL_FUNCTION(vkEnumerateInstanceLayerProperties)
 
 #undef VK_GLOBAL_LEVEL_FUNCTION
 

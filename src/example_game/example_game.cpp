@@ -28,7 +28,8 @@ int main(int argc, char** argv) {
         .name = "Example Game",
         .versionMajor = 1,
         .versionMinor = 0,
-        .versionPatch = 0
+        .versionPatch = 0,
+        .debugLogger = logger
     };
 
     ClientState_Loading loading_State;
