@@ -12,8 +12,7 @@
 
 namespace love_engine {
     std::vector<const char*> _enabledExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-        VK_KHR_SURFACE_EXTENSION_NAME
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
     void GraphicsDevice::_log(const std::string &message) const noexcept {
@@ -86,10 +85,10 @@ namespace love_engine {
         return queueIndices;
     }
     
-    bool GraphicsDevice::_checkDeviceHasEnabledExtensions(const VkPhysicalDevice& device) noexcept {
+    bool GraphicsDevice::_checkDeviceHasEnabledExtensions(const VkPhysicalDevice& device) const noexcept {
         uint32_t extensionCount;
         if (vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Could not enumerate device extension properites for physical graphics device");
+            Crash::crash("Could not enumerate device extension properites for physical graphics device.");
         }
 
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
@@ -99,7 +98,7 @@ namespace love_engine {
                 &extensionCount,
                 availableExtensions.data()
             ) != VK_SUCCESS
-        ) Crash::crash("Could not enumerate device extension properites for physical graphics device");
+        ) Crash::crash("Could not enumerate device extension properites for physical graphics device.");
 
         for (const auto& extension : _enabledExtensions) {
             bool extensionFound = false;
@@ -112,7 +111,14 @@ namespace love_engine {
                 }
             }
 
-            if (!extensionFound) return false;
+            if (!extensionFound) {
+                VkPhysicalDeviceProperties properties;
+                vkGetPhysicalDeviceProperties(device, &properties);
+                std::stringstream buffer;
+                buffer << "Could not find extension \"" << extension << "\" for device \"" << properties.deviceName << "\".";
+                _log(buffer.str());
+                return false;
+            }
         }
 
         return true;
@@ -228,8 +234,12 @@ namespace love_engine {
         // Input validation
         std::string excuse = _getDeviceUnsuitabilityReason(physicalDevice);
         if (!excuse.empty()) {
+            VkPhysicalDeviceProperties properties;
+            vkGetPhysicalDeviceProperties(physicalDevice, &properties);
             std::stringstream buffer;
-            buffer << "Could not create logical device because the physical graphics device does not meet requirements: " << excuse;
+            buffer << "Could not create logical device because the physical graphics device \"" << properties.deviceName
+                << "\" does not meet requirements: " << excuse
+            ;
             Crash::crash(buffer.str());
         }
 

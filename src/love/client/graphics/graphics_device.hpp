@@ -60,7 +60,7 @@ namespace love_engine {
             void _log(const std::string& message) const noexcept;
             void _getPhysicalDevices() noexcept;
             QueueFamilyIndices _getDeviceQueueFamilyIndices(const VkPhysicalDevice& device) const noexcept;
-            static bool _checkDeviceHasEnabledExtensions(const VkPhysicalDevice& device) noexcept;
+            bool _checkDeviceHasEnabledExtensions(const VkPhysicalDevice& device) const noexcept;
             SwapChainSupportDetails _querySwapChainSupport(const VkPhysicalDevice& device) const noexcept;
             std::string _getDeviceUnsuitabilityReason(const VkPhysicalDevice& device) const noexcept;
             int64_t _rateDevice(const VkPhysicalDevice& device) const noexcept;
