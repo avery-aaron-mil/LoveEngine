@@ -34,12 +34,16 @@ namespace love_engine {
                 friend class Window;
                 bool _resized = false;
                 bool _focused = false;
+                bool _fullscreen = false;
+                int _windowedWidth = 0;
+                int _windowedHeight = 0;
             };
 
             Window(VkInstance vulkanInstance, const WindowProperties& properties, std::shared_ptr<Logger> logger);
             ~Window();
 
             void setIcon(const std::string& iconPath) noexcept;
+            void setWindowType(const WindowType& windowType) noexcept;
             void focusWindow() const noexcept;
             bool shouldClose() const noexcept { return glfwWindowShouldClose(_window); }
 

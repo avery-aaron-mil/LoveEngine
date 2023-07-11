@@ -27,6 +27,53 @@ namespace love_engine {
         }
     }
     
+    void Window::setWindowType(const WindowType& windowType) noexcept {
+        switch (windowType) {
+            default:
+            case WindowType::WINDOWED: {
+                glfwSetWindowAttrib(_window, GLFW_DECORATED, GLFW_TRUE);
+                if (_properties._fullscreen) {
+                    _properties.width = _properties._windowedWidth;
+                    _properties.height = _properties._windowedHeight;
+                    glfwSetWindowMonitor(_window, nullptr, _properties.x, _properties.y, _properties.width, _properties.height, 0);
+                    _properties._fullscreen = false;
+                    _properties._resized = true;
+                }
+            } break;
+            case WindowType::WINDOWED_BORDERLESS: {
+                glfwSetWindowAttrib(_window, GLFW_DECORATED, GLFW_FALSE);
+                if (_properties._fullscreen) {
+                    _properties.width = _properties._windowedWidth;
+                    _properties.height = _properties._windowedHeight;
+                    glfwSetWindowMonitor(_window, nullptr, _properties.x, _properties.y, _properties.width, _properties.height, 0);
+                    _properties._fullscreen = false;
+                    _properties._resized = true;
+                }
+            } break;
+            case WindowType::FULLSCREEN_BORDERLESS: {
+                const GLFWvidmode* videoMode = glfwGetVideoMode(_getCurrentMonitor());
+                glfwSetWindowAttrib(_window, GLFW_DECORATED, GLFW_FALSE);
+                glfwSetWindowMonitor(_window, nullptr, 0, 0, videoMode->width, videoMode->height, videoMode->refreshRate);
+                if (!_properties._fullscreen) {
+                    _properties.width = videoMode->width;
+                    _properties.height = videoMode->height;
+                    _properties._fullscreen = true;
+                }
+            } break;
+            case WindowType::FULLSCREEN_MONITOR: {
+                GLFWmonitor* monitor = _getCurrentMonitor();
+                const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
+                glfwSetWindowAttrib(_window, GLFW_DECORATED, GLFW_FALSE);
+                glfwSetWindowMonitor(_window, monitor, 0, 0, videoMode->width, videoMode->height, videoMode->refreshRate);
+                if (!_properties._fullscreen) {
+                    _properties.width = videoMode->width;
+                    _properties.height = videoMode->height;
+                    _properties._fullscreen = true;
+                }
+            } break;
+        }
+    }
+    
     void Window::focusWindow() const noexcept {
         glfwShowWindow(_window);
     }
@@ -163,12 +210,24 @@ namespace love_engine {
             case WindowType::FULLSCREEN_BORDERLESS: {
                 glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
                 _window = glfwCreateWindow(videoMode->width, videoMode->height, _properties.title.c_str(), nullptr, nullptr);
+                _properties._fullscreen = true;
             } break;
             case WindowType::FULLSCREEN_MONITOR: {
                 _window = glfwCreateWindow(videoMode->width, videoMode->height, _properties.title.c_str(), monitor, nullptr);
+                _properties._fullscreen = true;
             } break;
         }
         if (_window == nullptr) Crash::crash("GLFW failed to create window.");
+
+        // Set windowed width
+        _properties._windowedWidth = _properties.width;
+        _properties._windowedHeight = _properties.height;
+        if (_properties._fullscreen) {
+            _properties.width = videoMode->width;
+            _properties.height = videoMode->height;
+        }
+
+        // Design windoww
         glfwSetWindowPos(_window, _properties.x, _properties.y);
         glfwSetWindowUserPointer(_window, this);
         if (!_properties.iconPath.empty()) _setWindowIcon();
