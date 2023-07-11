@@ -45,5 +45,7 @@ int main(int argc, char** argv) {
     }, logger);
     client.run();
 
+    logger.get()->log("Client exited. Closing.");
+    loveEngine.cleanup();
     exit(EXIT_SUCCESS);
 }

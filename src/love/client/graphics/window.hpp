@@ -44,8 +44,9 @@ namespace love_engine {
 
             void setIcon(const std::string& iconPath) noexcept;
             void setWindowType(const WindowType& windowType) noexcept;
-            void focusWindow() const noexcept;
-            bool shouldClose() const noexcept { return glfwWindowShouldClose(_window); }
+            void show() const noexcept;
+            void focus() const noexcept;
+            inline bool shouldClose() const noexcept { return glfwWindowShouldClose(_window); }
 
             inline const GLFWwindow* window() const noexcept { return _window; }
             inline VkSurfaceKHR surface() const noexcept { return _surface; }

@@ -15,7 +15,7 @@ namespace love_engine {
             // @param lag Percentage of the way to next tick; "ms since last tick"/"ms per tick"
             virtual void render(std::float128_t lag) noexcept = 0;
             // Exits ClientInstance if true.
-            bool should_Exit() const noexcept { return _shouldExit; }
+            bool shouldExit() const noexcept { return _shouldExit; }
 
         protected:
             bool _shouldExit = false;

@@ -13,6 +13,7 @@ namespace love_engine {
             LoveEngineInstance(const std::string& crashDirectory);
             ~LoveEngineInstance();
 
+            static void cleanup() noexcept;
             static void addExitCallback(const std::function<void()>& callback) noexcept;
 
             static constexpr uint8_t LOVE_ENGINE_VERSION_MAJOR = 1;

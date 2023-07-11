@@ -11,5 +11,6 @@ int main(int argc, char** argv) {
     Logger logger(FileIO::getExecutableDirectory() + "../logs/latest.log", true);
     logger.log("System Info:\n" + SystemInfo::getConsolidatedSystemInfo());
 
+    loveEngine.cleanup();
     exit(EXIT_SUCCESS);
 }

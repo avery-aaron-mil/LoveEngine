@@ -142,6 +142,7 @@ namespace love_engine {
     }
 
     void _cleanup_and_Exit() noexcept {
+        LoveEngineInstance::cleanup();
         exit(EXIT_FAILURE);
     }
 

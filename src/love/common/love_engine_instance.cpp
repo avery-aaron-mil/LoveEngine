@@ -46,6 +46,14 @@ namespace love_engine {
         FileIO::getExecutableDirectory();
         Crash::setCrashDirectory(crashDirectory);
     }
+
+    void LoveEngineInstance::cleanup() noexcept {
+        Thread::waitForThreads();
+        while (!_callbacks.empty()) {
+            _callbacks.top()();
+            _callbacks.pop();
+        }
+    }
     
     void LoveEngineInstance::addExitCallback(const std::function<void()>& callback) noexcept {
         _callbacks.push(callback);
@@ -54,11 +62,5 @@ namespace love_engine {
     
     LoveEngineInstance::LoveEngineInstance() { _init(FileIO::getExecutableDirectory() + "crash-reports"); }
     LoveEngineInstance::LoveEngineInstance(const std::string& crashDirectory) { _init(crashDirectory); }
-    LoveEngineInstance::~LoveEngineInstance() {
-        Thread::waitForThreads();
-        while (!_callbacks.empty()) {
-            _callbacks.top()();
-            _callbacks.pop();
-        }
-    }
+    LoveEngineInstance::~LoveEngineInstance() { cleanup(); }
 }

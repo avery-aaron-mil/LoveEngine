@@ -20,13 +20,13 @@ namespace love_engine {
         if (_window) glfwDestroyWindow(_window);
         if (_surface) vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
     }
-    
+
     void Window::_log(const std::string& message) const noexcept {
         if (_logger.get() != nullptr) {
             _logger.get()->log(message);
         }
     }
-    
+
     void Window::setWindowType(const WindowType& windowType) noexcept {
         switch (windowType) {
             default:
@@ -73,9 +73,13 @@ namespace love_engine {
             } break;
         }
     }
-    
-    void Window::focusWindow() const noexcept {
+
+    void Window::show() const noexcept {
         glfwShowWindow(_window);
+    }
+    
+    void Window::focus() const noexcept {
+        glfwFocusWindow(_window);
     }
     
     void Window::_createWindowSurface() noexcept {
