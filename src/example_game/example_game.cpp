@@ -20,10 +20,12 @@ void glfwCallback(int e, const char*desc) {
 }
 
 int main(int argc, char** argv) {
+    // Initialize
     LoveEngineInstance loveEngine{FileIO::getExecutableDirectory() + "../crash-reports"};
     logger = std::make_shared<Logger>(Logger(FileIO::getExecutableDirectory() + "../logs/latest.log", true));
     logger.get()->log("System Info:\n" + SystemInfo::getConsolidatedSystemInfo());
 
+    // Set properties
     GraphicsInstance::ApplicationInfo applicationInfo{
         .name = "Example Game",
         .versionMajor = 1,
@@ -31,7 +33,11 @@ int main(int argc, char** argv) {
         .versionPatch = 0,
         .debugLogger = logger
     };
+    Window::WindowProperties windowProperties{
+        .title = "Game"
+    };
 
+    // Start client
     ClientState_Loading loading_State;
     ClientInstance client(&loading_State, ClientInstance::Settings{
         .applicationInfo = applicationInfo,
