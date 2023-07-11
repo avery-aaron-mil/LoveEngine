@@ -20,6 +20,7 @@ namespace love_engine {
                 uint8_t versionMinor = 0;
                 uint8_t versionPatch = 0;
                 std::shared_ptr<Logger> debugLogger;
+                bool verbose = false;
             } ApplicationInfo;
 
             GraphicsInstance(
