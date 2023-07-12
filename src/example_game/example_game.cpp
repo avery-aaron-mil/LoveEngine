@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
     ClientState_Loading loading_State;
     ClientInstance client(&loading_State, ClientInstance::Settings{
         .applicationInfo = applicationInfo,
+        .windowProperties = windowProperties,
         .glfwErrorCallback = glfwCallback,
         .msPerTick = 50.f
     }, logger);

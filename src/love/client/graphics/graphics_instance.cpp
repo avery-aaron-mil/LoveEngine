@@ -162,12 +162,13 @@ namespace love_engine {
     }
 
     void GraphicsInstance::_createVulkanInstance() noexcept {
-        _log("Creating Vulkan instance...");
+        _log("Creating Vulkan instance..."); // TODO Fix time-hog function
+
         uint32_t apiVersion;
         if (vkEnumerateInstanceVersion(&apiVersion) != VK_SUCCESS) {
             Crash::crash("Failed to get Vulkan API version.");
         }
-        
+
         // Extensions
         uint32_t glfwExtensionCount;
         const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -244,10 +245,12 @@ namespace love_engine {
         }
         glfwSetErrorCallback(*(glfwErrorCallback.target<void(*)(int, const char*)>()));
 
+        // TODO Fix time-hog function
+        //Likely hogs by loading library and/or functions; so does creating Vulkan instance when glfwVulkanSupported() is removed.
         if (!glfwVulkanSupported()) {
             Crash::crash("Vulkan not supported.");
         }
-        
+
         _log("Initialized GLFW.");
     }
 }

@@ -205,18 +205,22 @@ namespace love_engine {
         switch (_properties.windowType) {
             default:
             case WindowType::WINDOWED: {
+                _log("Opening window in windowed mode.");
                 _window = glfwCreateWindow(_properties.width, _properties.height, _properties.title.c_str(), nullptr, nullptr);
             } break;
             case WindowType::WINDOWED_BORDERLESS: {
+                _log("Opening window in borderless windowed mode.");
                 glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
                 _window = glfwCreateWindow(_properties.width, _properties.height, _properties.title.c_str(), nullptr, nullptr);
             } break;
             case WindowType::FULLSCREEN_BORDERLESS: {
+                _log("Opening window in borderless fullscreen mode.");
                 glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
                 _window = glfwCreateWindow(videoMode->width, videoMode->height, _properties.title.c_str(), nullptr, nullptr);
                 _properties._fullscreen = true;
             } break;
             case WindowType::FULLSCREEN_MONITOR: {
+                _log("Opening window in fullscreen monitor mode.");
                 _window = glfwCreateWindow(videoMode->width, videoMode->height, _properties.title.c_str(), monitor, nullptr);
                 _properties._fullscreen = true;
             } break;
@@ -229,10 +233,11 @@ namespace love_engine {
         if (_properties._fullscreen) {
             _properties.width = videoMode->width;
             _properties.height = videoMode->height;
+        } else {
+            glfwSetWindowPos(_window, _properties.x, _properties.y);
         }
 
         // Design windoww
-        glfwSetWindowPos(_window, _properties.x, _properties.y);
         glfwSetWindowUserPointer(_window, this);
         if (!_properties.iconPath.empty()) _setWindowIcon();
         _createWindowSurface();
