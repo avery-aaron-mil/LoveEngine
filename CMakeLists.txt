@@ -59,7 +59,11 @@ if(WIN32)
 set(CMAKE_L_FLAGS
     ${CMAKE_L_FLAGS}
 	-mwindows
-)	
+)
+
+else()
+
+# TODO Check for XLIB or XCB and define VK_USE_PLATFORM_XLIB_KHR or VK_USE_PLATFORM_XCB_KHR
 
 endif()
 

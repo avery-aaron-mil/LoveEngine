@@ -13,7 +13,16 @@
 namespace love_engine {
     static std::shared_ptr<Logger> _debugLogger;
     static std::vector<const char*> _enabledExtensions = {
-        VK_KHR_SURFACE_EXTENSION_NAME
+        VK_KHR_SURFACE_EXTENSION_NAME,
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+#elif defined(VK_USE_PLATFORM_XCB_KHR)
+        VK_KHR_XCB_SURFACE_EXTENSION_NAME,
+#elif defined(VK_USE_PLATFORM_XLIB_KHR)
+        VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
+#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
+        VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
+#endif
     };
 
     GraphicsInstance::GraphicsInstance(
@@ -104,6 +113,8 @@ namespace love_engine {
     }
 
     void GraphicsInstance::_checkValidationLayerSupport(const std::vector<const char*>& layers) noexcept {
+        _log("Checking validation layer support...");
+
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -128,9 +139,13 @@ namespace love_engine {
                 Crash::crash(buffer.str());
             }
         }
+
+        _log("Checked validation layer support.");
     }
 
     void GraphicsInstance::_validateEnabledExtensions() noexcept {
+        _log("Validating extensions...");
+
         uint32_t extensionCount;
         if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr) != VK_SUCCESS) {
             Crash::crash("Could not enumerate Vulkan instance extension properites.");
@@ -159,11 +174,13 @@ namespace love_engine {
                 Crash::crash(buffer.str());
             }
         }
+
+        _log("Validated extensions.");
     }
 
     void GraphicsInstance::_createVulkanInstance() noexcept {
-        _log("Creating Vulkan instance..."); // TODO Fix time-hog function
-
+        _log("Creating Vulkan instance...");
+        
         uint32_t apiVersion;
         if (vkEnumerateInstanceVersion(&apiVersion) != VK_SUCCESS) {
             Crash::crash("Failed to get Vulkan API version.");
@@ -174,6 +191,7 @@ namespace love_engine {
         const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
         for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
             _enabledExtensions.emplace_back(glfwExtensions[i]);
+            _log(std::string(glfwExtensions[i]));
         }
         _validateEnabledExtensions();
 
@@ -245,8 +263,6 @@ namespace love_engine {
         }
         glfwSetErrorCallback(*(glfwErrorCallback.target<void(*)(int, const char*)>()));
 
-        // TODO Fix time-hog function
-        //Likely hogs by loading library and/or functions; so does creating Vulkan instance when glfwVulkanSupported() is removed.
         if (!glfwVulkanSupported()) {
             Crash::crash("Vulkan not supported.");
         }
