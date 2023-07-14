@@ -9,7 +9,9 @@ Love Engine is a small game engine written in C++ designed to be simple, expanda
 ## License
 
 Love Engine is under the MIT license, and is free to be used or expanded upon by anyone.
+
 Please consider contributing with any improvements, especially regarding speed or algorithm improvements, or bug fixes.
+
 New ideas are always welcome.
 
 ---
