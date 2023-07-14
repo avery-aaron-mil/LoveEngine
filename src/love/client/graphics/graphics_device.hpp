@@ -18,7 +18,6 @@ namespace love_engine {
         public:
             struct Settings {
                 std::string deviceName = "";
-                VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
             };
 
             struct QueueFamilyIndices {
@@ -28,11 +27,6 @@ namespace love_engine {
                 uint32_t presentQueue;
 
                 inline bool hasAllQueues() const noexcept { return hasGraphicsQueue && hasPresentQueue; }
-            };
-            struct SwapChainSupportDetails {
-                VkSurfaceCapabilitiesKHR capabilities;
-                std::vector<VkSurfaceFormatKHR> surfaceFormats;
-                std::vector<VkPresentModeKHR> presentModes;
             };
 
             GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, const Settings& settings, std::shared_ptr<Logger> logger);
@@ -44,29 +38,27 @@ namespace love_engine {
             void usePhysicalDevice(const VkPhysicalDevice& device) noexcept;
 
             inline VkDevice device() const noexcept { return _device; }
+            inline VkPhysicalDevice physicalDevice() const noexcept { return _physicalDevice; }
+            inline const QueueFamilyIndices& queueFamilyIndices() const noexcept { return _queueFamilyIndices; }
             inline std::string getDeviceName() const noexcept { return _settings.deviceName; }
 
         private:
             std::shared_ptr<Logger> _logger;
             Settings _settings;
             VkInstance _vulkanInstance;
-            VkDevice _device;
             VkSurfaceKHR _surface;
+            VkPhysicalDevice _physicalDevice;
+            VkDevice _device;
 
             std::vector<VkPhysicalDevice> _physicalDevices;
             std::unordered_map<std::string, size_t> _physicalDevicesNameToIndex;
             QueueFamilyIndices _queueFamilyIndices;
-            SwapChainSupportDetails _swapChainSupport;
             std::vector<const char*> _enabledExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-
-            VkQueue _graphicsQueue;
-            VkQueue _presentQueue;
 
             void _log(const std::string& message) const noexcept;
             void _getPhysicalDevices() noexcept;
             QueueFamilyIndices _getDeviceQueueFamilyIndices(const VkPhysicalDevice& device) const noexcept;
             bool _checkDeviceHasEnabledExtensions(const VkPhysicalDevice& device) const noexcept;
-            SwapChainSupportDetails _querySwapChainSupport(const VkPhysicalDevice& device) const noexcept;
             std::string _getDeviceUnsuitabilityReason(const VkPhysicalDevice& device) const noexcept;
             int64_t _rateDevice(const VkPhysicalDevice& device) const noexcept;
             VkDevice _createLogicalDevice(

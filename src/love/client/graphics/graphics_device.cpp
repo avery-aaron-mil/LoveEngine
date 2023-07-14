@@ -8,6 +8,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "swap_chain.hpp"
 #include "vulkan_functions.hpp"
 
 namespace love_engine {
@@ -147,43 +148,6 @@ namespace love_engine {
 
         return true;
     }
-    
-    GraphicsDevice::SwapChainSupportDetails GraphicsDevice::_querySwapChainSupport(const VkPhysicalDevice& device) const noexcept {
-        SwapChainSupportDetails details;
-        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface, &details.capabilities) != VK_SUCCESS) {
-            Crash::crash("Could not get surface capabilities for physical graphics device.");
-        }
-
-        uint32_t formatCount;
-        if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Could not get surface formats for physical graphics device.");
-        }
-
-        if (formatCount > 0) {
-            details.surfaceFormats.resize(formatCount);
-            if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.surfaceFormats.data()) != VK_SUCCESS) {
-                Crash::crash("Could not get surface formats for physical graphics device.");
-            }
-        }
-
-        uint32_t presentModeCount;
-        if (vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Could not get surface present modes for physical graphics device.");
-        }
-
-        if (presentModeCount > 0) {
-            details.presentModes.resize(presentModeCount);
-            if (vkGetPhysicalDeviceSurfacePresentModesKHR(
-                    device,
-                    _surface,
-                    &presentModeCount,
-                    details.presentModes.data()
-                ) != VK_SUCCESS
-            ) Crash::crash("Could not get surface present modes for physical graphics device.");
-        }
-
-        return details;
-    }
 
     std::string GraphicsDevice::_getDeviceUnsuitabilityReason(const VkPhysicalDevice& device) const noexcept {
         // Check limits
@@ -209,7 +173,7 @@ namespace love_engine {
         if (!_checkDeviceHasEnabledExtensions(device)) return std::string("Extensions not supported.");
 
         // Check swap chain support
-        SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(device);
+        auto swapChainSupport = SwapChain::querySwapChainSupport(device, _surface);
         if (swapChainSupport.surfaceFormats.empty()) return std::string("No swap chain formats supported.");
         if (swapChainSupport.presentModes.empty()) return std::string("No swap chain present modes supported.");
 
@@ -348,7 +312,7 @@ namespace love_engine {
 
     void GraphicsDevice::usePhysicalDevice(const VkPhysicalDevice& device) noexcept {
         // Input validation
-        if (device == nullptr) Crash::crash("Null was passed to usePhysicalDevice().");
+        if (device == nullptr) Crash::crash("Device passed to usePhysicalDevice() was null.");
 
         // Log
         VkPhysicalDeviceProperties properties;
@@ -357,11 +321,13 @@ namespace love_engine {
         std::stringstream buffer;
         buffer << "Using physical device: " << properties.deviceName;
         _log(buffer.str());
+        _physicalDevice = device;
 
         // Create logical device
         VkPhysicalDeviceFeatures deviceFeatures = {
             .samplerAnisotropy = VK_TRUE
         };
+        if (_device) vkDestroyDevice(_device, nullptr);
         _device = _createLogicalDevice(device, deviceFeatures);
         _loadDeviceVulkanFunctions();
 
@@ -370,8 +336,5 @@ namespace love_engine {
         if (!glfwGetPhysicalDevicePresentationSupport(_vulkanInstance, device, _queueFamilyIndices.presentQueue)) {
             Crash::crash("No presentation support for GLFW.");
         }
-        _swapChainSupport = _querySwapChainSupport(device);
-        vkGetDeviceQueue(_device, _queueFamilyIndices.graphicsQueue, 0, &_graphicsQueue);
-        vkGetDeviceQueue(_device, _queueFamilyIndices.presentQueue, 0, &_presentQueue);
     }
 }

@@ -1,23 +1,51 @@
 #ifndef LOVE_SWAP_CHAIN_HPP
 #define LOVE_SWAP_CHAIN_HPP
 
-#include "graphics_device.hpp"
-
+#include <memory>
 #include <vector>
 
 #include <vulkan/vulkan.h>
 
+#include "graphics_device.hpp"
+#include "window.hpp"
+
 namespace love_engine {
     class SwapChain {
         public:
-            SwapChain(const GraphicsDevice::SwapChainSupportDetails& swapChainSupport, const GraphicsDevice::Settings& settings);
+            struct Settings {
+                VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+            };
+
+            struct SwapChainSupportDetails {
+                VkSurfaceCapabilitiesKHR capabilities;
+                std::vector<VkSurfaceFormatKHR> surfaceFormats;
+                std::vector<VkPresentModeKHR> presentModes;
+            };
+
+            SwapChain(
+                const GraphicsDevice& graphicsDevice,
+                const Window& window,
+                const Settings& settings,
+                std::shared_ptr<Logger> logger
+            );
             ~SwapChain();
 
+            static SwapChainSupportDetails querySwapChainSupport(
+                const VkPhysicalDevice& device,
+                const VkSurfaceKHR& surface
+            ) noexcept;
+
         private:
-            GraphicsDevice::Settings _settings;
+            std::shared_ptr<Logger> _logger;
+            Settings _settings;
+            Window _window;
             VkSurfaceFormatKHR _surfaceFormat;
             VkPresentModeKHR _presentMode;
+            VkQueue _graphicsQueue;
+            VkQueue _presentQueue;
 
+            void _log(const std::string& message) const noexcept;
+            void _initSwapChain(const GraphicsDevice& graphicsDevice) noexcept;
             static VkSurfaceFormatKHR _chooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR>& formats) noexcept;
             VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& presentModes) const noexcept;
     };
