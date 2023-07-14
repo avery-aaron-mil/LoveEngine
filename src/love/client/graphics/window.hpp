@@ -50,6 +50,7 @@ namespace love_engine {
 
             inline const GLFWwindow* window() const noexcept { return _window; }
             inline VkSurfaceKHR surface() const noexcept { return _surface; }
+            inline VkExtent2D extent() const noexcept { return _extent; }
 
             inline void setResizeCallback(const std::function<void(GLFWwindow*, int, int)>& callback) noexcept {
                 _userResizeCallback = callback;
@@ -67,8 +68,10 @@ namespace love_engine {
             GLFWwindow* _window = nullptr;
             VkInstance _vulkanInstance;
             VkSurfaceKHR _surface;
+            VkExtent2D _extent;
 
             void _log(const std::string& message) const noexcept;
+            static void _updateWindowSize(Window* window) noexcept;
             void _createWindowSurface() noexcept;
             void _getMonitor(const int monitorID, GLFWmonitor*& monitor, const GLFWvidmode*& videoMode) const noexcept;
             GLFWmonitor* _getCurrentMonitor() const noexcept;

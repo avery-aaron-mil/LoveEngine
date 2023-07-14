@@ -27,6 +27,16 @@ namespace love_engine {
         }
     }
 
+    void Window::_updateWindowSize(Window* window) noexcept {
+        if (window == nullptr) Crash::crash("Window passed to _updateWindowSize() was null.");
+
+        int width, height;
+        glfwGetFramebufferSize(window->_window, &width, &height);
+        window->_extent.width = static_cast<uint32_t>(width);
+        window->_extent.height = static_cast<uint32_t>(height);
+        window->_properties._resized = true;
+    }
+
     void Window::setWindowType(const WindowType& windowType) noexcept {
         switch (windowType) {
             default:
@@ -36,8 +46,8 @@ namespace love_engine {
                     _properties.width = _properties._windowedWidth;
                     _properties.height = _properties._windowedHeight;
                     glfwSetWindowMonitor(_window, nullptr, _properties.x, _properties.y, _properties.width, _properties.height, 0);
+                    _updateWindowSize(this);
                     _properties._fullscreen = false;
-                    _properties._resized = true;
                 }
             } break;
             case WindowType::WINDOWED_BORDERLESS: {
@@ -46,8 +56,8 @@ namespace love_engine {
                     _properties.width = _properties._windowedWidth;
                     _properties.height = _properties._windowedHeight;
                     glfwSetWindowMonitor(_window, nullptr, _properties.x, _properties.y, _properties.width, _properties.height, 0);
+                    _updateWindowSize(this);
                     _properties._fullscreen = false;
-                    _properties._resized = true;
                 }
             } break;
             case WindowType::FULLSCREEN_BORDERLESS: {
@@ -57,6 +67,7 @@ namespace love_engine {
                 if (!_properties._fullscreen) {
                     _properties.width = videoMode->width;
                     _properties.height = videoMode->height;
+                    _updateWindowSize(this);
                     _properties._fullscreen = true;
                 }
             } break;
@@ -68,6 +79,7 @@ namespace love_engine {
                 if (!_properties._fullscreen) {
                     _properties.width = videoMode->width;
                     _properties.height = videoMode->height;
+                    _updateWindowSize(this);
                     _properties._fullscreen = true;
                 }
             } break;
@@ -236,6 +248,10 @@ namespace love_engine {
         } else {
             glfwSetWindowPos(_window, _properties.x, _properties.y);
         }
+        int width, height;
+        glfwGetFramebufferSize(_window, &width, &height);
+        _extent.width = static_cast<uint32_t>(width);
+        _extent.height = static_cast<uint32_t>(height);
 
         // Design windoww
         glfwSetWindowUserPointer(_window, this);
@@ -252,7 +268,7 @@ namespace love_engine {
 
     void Window::_framebufferResizeCallback(GLFWwindow* glfwWindow, int width, int height) noexcept {
         Window* window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-        window->_properties._resized = true;
+        _updateWindowSize(window);
         window->_properties.width = width;
         window->_properties.height = height;
 
