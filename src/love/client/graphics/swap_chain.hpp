@@ -37,17 +37,19 @@ namespace love_engine {
 
         private:
             std::shared_ptr<Logger> _logger;
-            Settings _settings;
+            GraphicsDevice _graphicsDevice;
             Window _window;
-            VkSurfaceFormatKHR _surfaceFormat;
-            VkPresentModeKHR _presentMode;
+            Settings _settings;
+            VkSwapchainKHR _swapChain;
             VkQueue _graphicsQueue;
             VkQueue _presentQueue;
 
             void _log(const std::string& message) const noexcept;
             void _initSwapChain(const GraphicsDevice& graphicsDevice) noexcept;
+            void _createSwapChain() noexcept;
             static VkSurfaceFormatKHR _chooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR>& formats) noexcept;
             VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& presentModes) const noexcept;
+            VkExtent2D _chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const noexcept;
     };
 }
 
