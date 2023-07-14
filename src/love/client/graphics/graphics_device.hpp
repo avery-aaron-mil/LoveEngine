@@ -45,10 +45,10 @@ namespace love_engine {
         private:
             std::shared_ptr<Logger> _logger;
             Settings _settings;
-            VkInstance _vulkanInstance;
-            VkSurfaceKHR _surface;
-            VkPhysicalDevice _physicalDevice;
-            VkDevice _device;
+            VkInstance _vulkanInstance = nullptr;
+            VkSurfaceKHR _surface = nullptr;
+            VkPhysicalDevice _physicalDevice = nullptr;
+            VkDevice _device = nullptr;
 
             std::vector<VkPhysicalDevice> _physicalDevices;
             std::unordered_map<std::string, size_t> _physicalDevicesNameToIndex;

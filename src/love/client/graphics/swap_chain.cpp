@@ -26,7 +26,7 @@ namespace love_engine {
     }
 
     void SwapChain::_createSwapChain() noexcept {
-        _log("Creating image swap chain...");
+        _log("Creating swap chain...");
 
         // Get data for create info
         SwapChainSupportDetails swapChainSupport = querySwapChainSupport(_graphicsDevice.physicalDevice(), _window.surface());
@@ -74,7 +74,7 @@ namespace love_engine {
             Crash::crash("Failed to create swap chain.");
         }
 
-        _log("Created image swap chain.");
+        _log("Created swap chain.");
     }
 
     SwapChain::SwapChainSupportDetails SwapChain::querySwapChainSupport(

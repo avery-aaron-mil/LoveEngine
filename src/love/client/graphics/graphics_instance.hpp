@@ -60,7 +60,7 @@ namespace love_engine {
             std::shared_ptr<Logger> _logger;
             Library _vulkanLibrary;
             ApplicationInfo _applicationInfo;
-            VkInstance _vulkanInstance;
+            VkInstance _vulkanInstance = nullptr;
             std::vector<const char*> _enabledExtensions = {
                 VK_KHR_SURFACE_EXTENSION_NAME,
 #ifdef VK_USE_PLATFORM_WIN32_KHR

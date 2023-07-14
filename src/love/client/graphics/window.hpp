@@ -66,8 +66,8 @@ namespace love_engine {
             std::shared_ptr<Logger> _logger;
             WindowProperties _properties;
             GLFWwindow* _window = nullptr;
-            VkInstance _vulkanInstance;
-            VkSurfaceKHR _surface;
+            VkInstance _vulkanInstance = nullptr;
+            VkSurfaceKHR _surface = nullptr;
             VkExtent2D _extent;
 
             void _log(const std::string& message) const noexcept;
