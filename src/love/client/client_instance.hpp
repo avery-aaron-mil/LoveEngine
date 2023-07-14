@@ -19,6 +19,7 @@ namespace love_engine {
             struct Settings {
                 GraphicsInstance::ApplicationInfo applicationInfo{};
                 Window::WindowProperties windowProperties{};
+                GraphicsDevice::Settings graphicsDeviceSettings{};
                 std::function<void(int, const char*)> glfwErrorCallback = _defaultGLFWErrorCallback;
                 std::float32_t msPerTick = 20.f;
             };
@@ -39,7 +40,7 @@ namespace love_engine {
             
             GraphicsInstance _graphicsInstance{_settings.applicationInfo, _settings.glfwErrorCallback, _logger};
             Window _window{_graphicsInstance.instance(), _settings.windowProperties, _logger};
-            GraphicsDevice _graphicsDevice{_graphicsInstance.instance(), _window.surface(), _logger};
+            GraphicsDevice _graphicsDevice{_graphicsInstance.instance(), _window.surface(), _settings.graphicsDeviceSettings, _logger};
 
             void _log(const std::string& message) const noexcept;
             static void _defaultGLFWErrorCallback(int error, const char* description);

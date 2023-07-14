@@ -38,14 +38,14 @@
 namespace love_engine {
     class GraphicsInstance {
         public:
-            typedef struct ApplicationInfo_ {
+            struct ApplicationInfo {
                 std::string name;
                 uint8_t versionMajor = 0;
                 uint8_t versionMinor = 0;
                 uint8_t versionPatch = 0;
                 std::shared_ptr<Logger> debugLogger;
                 bool verbose = false;
-            } ApplicationInfo;
+            };
 
             GraphicsInstance(
                 const ApplicationInfo& applicationInfo,
@@ -61,12 +61,24 @@ namespace love_engine {
             Library _vulkanLibrary;
             ApplicationInfo _applicationInfo;
             VkInstance _vulkanInstance;
+            std::vector<const char*> _enabledExtensions = {
+                VK_KHR_SURFACE_EXTENSION_NAME,
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+                VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+#elif defined(VK_USE_PLATFORM_XCB_KHR)
+                VK_KHR_XCB_SURFACE_EXTENSION_NAME,
+#elif defined(VK_USE_PLATFORM_XLIB_KHR)
+                VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
+#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
+                VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
+#endif
+            };
 
             void _log(const std::string& message) const noexcept;
             void _loadVulkanLibrary() noexcept;
             void _loadGlobalVulkanFunctions() const noexcept;
             void _loadInstanceVulkanFunctions() const noexcept;
-            static void _checkValidationLayerSupport(const std::vector<const char*>& layers) noexcept;
+            void _checkValidationLayerSupport(const std::vector<const char*>& layers) const noexcept;
             void _validateEnabledExtensions() noexcept;
             void _createVulkanInstance() noexcept;
             void _initializeGLFW(const std::function<void(int, const char*)>& glfwErrorCallback) const noexcept;

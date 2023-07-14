@@ -11,32 +11,19 @@
 #include "vulkan_functions.hpp"
 
 namespace love_engine {
-    static std::vector<const char*> _enabledExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
-    };
-
-    GraphicsDevice::GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, std::shared_ptr<Logger> logger)
-        : _logger(logger), _vulkanInstance(vulkanInstance), _surface(surface)
-    {
-        // Input validation
-        if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics Device was null.");
-        if (_surface == nullptr) Crash::crash("Surface passed to Graphics Device was null.");
-
-        _initGraphicsDevice("");
-    }
     GraphicsDevice::GraphicsDevice(
         VkInstance vulkanInstance,
         VkSurfaceKHR surface,
-        const std::string& deviceName,
+        const Settings& settings,
         std::shared_ptr<Logger> logger
     )
-        : _logger(logger), _vulkanInstance(vulkanInstance), _surface(surface)
+        : _logger(logger), _settings(settings), _vulkanInstance(vulkanInstance), _surface(surface)
     {
         // Input validation
         if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics Device was null.");
         if (_surface == nullptr) Crash::crash("Surface passed to Graphics Device was null.");
 
-        _initGraphicsDevice(deviceName);
+        _initGraphicsDevice(_settings.deviceName);
     }
 
     GraphicsDevice::~GraphicsDevice() {
@@ -57,7 +44,7 @@ namespace love_engine {
         }
     }
 
-    void GraphicsDevice::addEnabledExtension(const char* extension) const noexcept {
+    void GraphicsDevice::addEnabledExtension(const char* extension) noexcept {
         _enabledExtensions.push_back(extension);
     }
 
@@ -173,8 +160,8 @@ namespace love_engine {
         }
 
         if (formatCount > 0) {
-            details.formats.resize(formatCount);
-            if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.formats.data()) != VK_SUCCESS) {
+            details.surfaceFormats.resize(formatCount);
+            if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.surfaceFormats.data()) != VK_SUCCESS) {
                 Crash::crash("Could not get surface formats for physical graphics device.");
             }
         }
@@ -223,7 +210,7 @@ namespace love_engine {
 
         // Check swap chain support
         SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(device);
-        if (swapChainSupport.formats.empty()) return std::string("No swap chain formats supported.");
+        if (swapChainSupport.surfaceFormats.empty()) return std::string("No swap chain formats supported.");
         if (swapChainSupport.presentModes.empty()) return std::string("No swap chain present modes supported.");
 
         // Device suitable; no reason to report
@@ -363,13 +350,12 @@ namespace love_engine {
         // Input validation
         if (device == nullptr) Crash::crash("Null was passed to usePhysicalDevice().");
 
-        {
-            VkPhysicalDeviceProperties properties;
-            vkGetPhysicalDeviceProperties(device, &properties);
-            std::stringstream buffer;
-            buffer << "Using physical device: " << properties.deviceName;
-            _log(buffer.str());
-        }
+        VkPhysicalDeviceProperties properties;
+        vkGetPhysicalDeviceProperties(device, &properties);
+        _settings.deviceName = properties.deviceName;
+        std::stringstream buffer;
+        buffer << "Using physical device: " << properties.deviceName;
+        _log(buffer.str());
         
         VkPhysicalDeviceFeatures deviceFeatures = {
             .samplerAnisotropy = VK_TRUE
@@ -378,6 +364,8 @@ namespace love_engine {
         if (!glfwGetPhysicalDevicePresentationSupport(_vulkanInstance, device, _queueFamilyIndices.presentQueue)) {
             Crash::crash("No presentation support for GLFW.");
         }
+        _swapChainSupport = _querySwapChainSupport(device);
+
         _device = _createLogicalDevice(device, deviceFeatures);
         _loadDeviceVulkanFunctions();
         vkGetDeviceQueue(_device, _queueFamilyIndices.graphicsQueue, 0, &_graphicsQueue);

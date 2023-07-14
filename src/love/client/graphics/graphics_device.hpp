@@ -9,13 +9,18 @@
 
 #include <love/common/data/files/logger.hpp>
 
-#include <vulkan/vulkan.h> // Must be included before GLFW
+#include <vulkan/vulkan.h>
 
 #include "graphics_instance.hpp"
 
 namespace love_engine {
     class GraphicsDevice {
         public:
+            struct Settings {
+                std::string deviceName = "";
+                VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+            };
+
             struct QueueFamilyIndices {
                 bool hasGraphicsQueue = false;
                 bool hasPresentQueue = false;
@@ -26,34 +31,34 @@ namespace love_engine {
             };
             struct SwapChainSupportDetails {
                 VkSurfaceCapabilitiesKHR capabilities;
-                std::vector<VkSurfaceFormatKHR> formats;
+                std::vector<VkSurfaceFormatKHR> surfaceFormats;
                 std::vector<VkPresentModeKHR> presentModes;
             };
 
-            GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, std::shared_ptr<Logger> logger);
-            GraphicsDevice(
-                VkInstance vulkanInstance,
-                VkSurfaceKHR surface,
-                const std::string& deviceName,
-                std::shared_ptr<Logger> logger
-            );
+            GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, const Settings& settings, std::shared_ptr<Logger> logger);
             ~GraphicsDevice();
 
-            void addEnabledExtension(const char* extension) const noexcept;
+            void addEnabledExtension(const char* extension) noexcept;
             VkPhysicalDevice getBestDevice() const;
             VkPhysicalDevice getPhysicalDeviceFromName(const std::string& name) const;
             void usePhysicalDevice(const VkPhysicalDevice& device) noexcept;
 
             inline VkDevice device() const noexcept { return _device; }
+            inline std::string getDeviceName() const noexcept { return _settings.deviceName; }
 
         private:
             std::shared_ptr<Logger> _logger;
+            Settings _settings;
             VkInstance _vulkanInstance;
             VkDevice _device;
             VkSurfaceKHR _surface;
+
             std::vector<VkPhysicalDevice> _physicalDevices;
             std::unordered_map<std::string, size_t> _physicalDevicesNameToIndex;
             QueueFamilyIndices _queueFamilyIndices;
+            SwapChainSupportDetails _swapChainSupport;
+            std::vector<const char*> _enabledExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
             VkQueue _graphicsQueue;
             VkQueue _presentQueue;
 

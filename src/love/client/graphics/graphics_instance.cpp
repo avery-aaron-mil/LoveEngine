@@ -12,18 +12,6 @@
 
 namespace love_engine {
     static std::shared_ptr<Logger> _debugLogger;
-    static std::vector<const char*> _enabledExtensions = {
-        VK_KHR_SURFACE_EXTENSION_NAME,
-#ifdef VK_USE_PLATFORM_WIN32_KHR
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-#elif defined(VK_USE_PLATFORM_XCB_KHR)
-        VK_KHR_XCB_SURFACE_EXTENSION_NAME,
-#elif defined(VK_USE_PLATFORM_XLIB_KHR)
-        VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
-#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
-        VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
-#endif
-    };
 
     GraphicsInstance::GraphicsInstance(
         const ApplicationInfo& applicationInfo,
@@ -112,7 +100,7 @@ namespace love_engine {
         _log("Loaded Vulkan instance functions.");
     }
 
-    void GraphicsInstance::_checkValidationLayerSupport(const std::vector<const char*>& layers) noexcept {
+    void GraphicsInstance::_checkValidationLayerSupport(const std::vector<const char*>& layers) const noexcept {
         _log("Checking validation layer support...");
 
         uint32_t layerCount;
