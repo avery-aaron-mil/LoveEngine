@@ -350,24 +350,27 @@ namespace love_engine {
         // Input validation
         if (device == nullptr) Crash::crash("Null was passed to usePhysicalDevice().");
 
+        // Log
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(device, &properties);
-        _settings.deviceName = properties.deviceName;
+        _settings.deviceName = properties.deviceName; // Don't forget to set used device name for users!
         std::stringstream buffer;
         buffer << "Using physical device: " << properties.deviceName;
         _log(buffer.str());
-        
+
+        // Create logical device
         VkPhysicalDeviceFeatures deviceFeatures = {
             .samplerAnisotropy = VK_TRUE
         };
+        _device = _createLogicalDevice(device, deviceFeatures);
+        _loadDeviceVulkanFunctions();
+
+        // Prepare SwapChain
         _queueFamilyIndices = _getDeviceQueueFamilyIndices(device);
         if (!glfwGetPhysicalDevicePresentationSupport(_vulkanInstance, device, _queueFamilyIndices.presentQueue)) {
             Crash::crash("No presentation support for GLFW.");
         }
         _swapChainSupport = _querySwapChainSupport(device);
-
-        _device = _createLogicalDevice(device, deviceFeatures);
-        _loadDeviceVulkanFunctions();
         vkGetDeviceQueue(_device, _queueFamilyIndices.graphicsQueue, 0, &_graphicsQueue);
         vkGetDeviceQueue(_device, _queueFamilyIndices.presentQueue, 0, &_presentQueue);
     }
