@@ -40,9 +40,9 @@ namespace love_engine {
             GraphicsDevice _graphicsDevice;
             Window _window;
             Settings _settings;
-            VkSwapchainKHR _swapChain;
-            VkQueue _graphicsQueue;
-            VkQueue _presentQueue;
+            VkSwapchainKHR _swapChain = nullptr;
+            VkQueue _graphicsQueue = nullptr;
+            VkQueue _presentQueue = nullptr;
 
             void _log(const std::string& message) const noexcept;
             void _initSwapChain(const GraphicsDevice& graphicsDevice) noexcept;
