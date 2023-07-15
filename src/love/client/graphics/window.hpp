@@ -45,6 +45,7 @@ namespace love_engine {
             void setIcon(const std::string& iconPath) noexcept;
             void setWindowType(const WindowType& windowType) noexcept;
             void show() const noexcept;
+            void hide() const noexcept;
             void focus() const noexcept;
             inline bool shouldClose() const noexcept { return glfwWindowShouldClose(_window); }
 

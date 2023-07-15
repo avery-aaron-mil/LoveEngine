@@ -90,6 +90,10 @@ namespace love_engine {
         glfwShowWindow(_window);
     }
     
+    void Window::hide() const noexcept {
+        glfwHideWindow(_window);
+    }
+    
     void Window::focus() const noexcept {
         glfwFocusWindow(_window);
     }

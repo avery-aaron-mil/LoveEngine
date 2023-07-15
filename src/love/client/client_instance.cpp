@@ -47,6 +47,7 @@ namespace love_engine {
             glfwPollEvents();
         }
 
+        _window.hide();
         if (_window.shouldClose()) _log("Window closed by user.");
         else if (_clientState->shouldExit()) _log("Client state exited program.");
     }
