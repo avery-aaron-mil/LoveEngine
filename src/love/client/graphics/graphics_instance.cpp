@@ -210,8 +210,7 @@ namespace love_engine {
         };
 
         // Validation layers
-        std::vector<const char *> validationLayers = { "VK_LAYER_KHRONOS_validation" };
-        _checkValidationLayerSupport(validationLayers);
+        _checkValidationLayerSupport(_validationLayers);
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
         if (_debugLogger.get() != nullptr) {
             debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -232,8 +231,8 @@ namespace love_engine {
             ;
             debugCreateInfo.pfnUserCallback = _logVulkan;
 
-            instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-            instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+            instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
+            instanceCreateInfo.ppEnabledLayerNames = _validationLayers.data();
             instanceCreateInfo.pNext = &debugCreateInfo;
         }
 

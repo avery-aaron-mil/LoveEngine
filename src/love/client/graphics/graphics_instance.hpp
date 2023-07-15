@@ -73,6 +73,7 @@ namespace love_engine {
                 VK_KHR_ANDROID_SURFACE_EXTENSION_NAME,
 #endif
             };
+            const std::vector<const char *> _validationLayers = { "VK_LAYER_KHRONOS_validation" };
 
             void _log(const std::string& message) const noexcept;
             void _loadVulkanLibrary() noexcept;
