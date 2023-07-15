@@ -30,14 +30,12 @@ namespace love_engine {
 
         // Get data for create info
         SwapChainSupportDetails swapChainSupport = querySwapChainSupport(_graphicsDevice.physicalDevice(), _window.surface());
-        VkSurfaceFormatKHR surfaceFormat = _chooseSwapChainFormat(swapChainSupport.surfaceFormats);
-        VkPresentModeKHR presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes);
-        VkExtent2D extent = _chooseSwapExtent(swapChainSupport.capabilities);
+        _surfaceFormat = _chooseSwapChainFormat(swapChainSupport.surfaceFormats);
+        _presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes);
+        _extent = _chooseSwapExtent(swapChainSupport.capabilities);
         const uint32_t graphicsQueueIndex = _graphicsDevice.queueFamilyIndices().graphicsQueue;
         const uint32_t presentQueueIndex = _graphicsDevice.queueFamilyIndices().presentQueue;
         const uint32_t queueFamilyIndices[] = {graphicsQueueIndex, presentQueueIndex};
-        vkGetDeviceQueue(_graphicsDevice.device(), graphicsQueueIndex, 0, &_graphicsQueue);
-        vkGetDeviceQueue(_graphicsDevice.device(), presentQueueIndex, 0, &_presentQueue);
 
         // Set image count
         // NOTE: Use minimum + 1 for avoid needing to wait for driver to complete operations
@@ -53,14 +51,14 @@ namespace love_engine {
             .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
             .surface = _window.surface(),
             .minImageCount = imageCount,
-            .imageFormat = surfaceFormat.format,
-            .imageColorSpace = surfaceFormat.colorSpace,
-            .imageExtent = extent,
+            .imageFormat = _surfaceFormat.format,
+            .imageColorSpace = _surfaceFormat.colorSpace,
+            .imageExtent = _extent,
             .imageArrayLayers = 1, // Layers of images to render to, always 1 unless using a stereoscopic application for VR/AR
             .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, // VK_IMAGE_USAGE_TRANSFER_DST_BIT for post-processing and HUDs
             .preTransform = swapChainSupport.capabilities.currentTransform, // Use currentt transform without any operations
             .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, // No alpha channel unless transparent window
-            .presentMode = presentMode,
+            .presentMode = _presentMode,
             .clipped = VK_TRUE // Clip pixels behind window
         };
 
@@ -72,6 +70,15 @@ namespace love_engine {
 
         if (vkCreateSwapchainKHR(_graphicsDevice.device(), &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
             Crash::crash("Failed to create swap chain.");
+        }
+
+        // Get swap chain images
+        if (vkGetSwapchainImagesKHR(_graphicsDevice.device(), _swapChain, &imageCount, nullptr) != VK_SUCCESS) {
+            Crash::crash("Failed to get swap chain images.");
+        }
+        _swapChainImages.resize(imageCount);
+        if (vkGetSwapchainImagesKHR(_graphicsDevice.device(), _swapChain, &imageCount, _swapChainImages.data()) != VK_SUCCESS) {
+            Crash::crash("Failed to get swap chain images.");
         }
 
         _log("Created swap chain.");

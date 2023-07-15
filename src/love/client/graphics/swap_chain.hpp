@@ -41,8 +41,11 @@ namespace love_engine {
             Window _window;
             Settings _settings;
             VkSwapchainKHR _swapChain = nullptr;
-            VkQueue _graphicsQueue = nullptr;
-            VkQueue _presentQueue = nullptr;
+            std::vector<VkImage> _swapChainImages;
+
+            VkSurfaceFormatKHR _surfaceFormat;
+            VkPresentModeKHR _presentMode;
+            VkExtent2D _extent;
 
             void _log(const std::string& message) const noexcept;
             void _initSwapChain(const GraphicsDevice& graphicsDevice) noexcept;
