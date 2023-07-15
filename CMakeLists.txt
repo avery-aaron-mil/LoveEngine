@@ -58,7 +58,7 @@ if(WIN32)
 
 set(CMAKE_L_FLAGS
     ${CMAKE_L_FLAGS}
-	-mwindows
+	-mwindows -static-libstdc++
 )
 
 else()
@@ -101,25 +101,36 @@ target_include_directories(launcher PRIVATE "lib/include/" "src/")
 target_link_directories(launcher PRIVATE "lib/" "build/")
 
 # link libraries
+if (WIN32)
+# use static libraries for Windows because Microsoft is lame...
+set(COMMON_LIBS
+	#-Wl,-Bstatic -lstdc++_libbacktrace
+	-Wl,-Bstatic -lgcc -lstdc++ -lpthread -llzma
+)
+set(SERVER_LIBS
+	-Wl,-Bdynamic -llove_common
+)
+set(CLIENT_LIBS
+	-Wl,-Bstatic -lglfw3 -lOpenAL32.dll -lsndfile
+	-Wl,-Bdynamic -llove_common -llove_server
+)
+else()
 set(COMMON_LIBS
 	#-Wl,-Bstatic -lstdc++_libbacktrace
 	-Wl,-Bdynamic -lgcc -lstdc++ -lpthread -llzma-5
 )
 set(SERVER_LIBS
-	${COMMON_LIBS}
 	-Wl,-Bdynamic -llove_common
 )
 set(CLIENT_LIBS
-	${SERVER_LIBS}
-	-Wl,-Bdynamic -lglfw3 -lsoft_oal -lsndfile -llove_server
+	-Wl,-Bdynamic -lglfw3 -lOpenAL32 -lsndfile -llove_common -llove_server
 )
+endif()
 set(GAME_LIBS
-	${CLIENT_LIBS}
-	-Wl,-Bdynamic -llove_client
+	-Wl,-Bdynamic -llove_client -llove_common -llove_server
 )
 set(HOST_LIBS
-	${SERVER_LIBS}
-	-Wl,-Bdynamic -llove_server
+	-Wl,-Bdynamic -llove_common -llove_server
 )
 
 target_link_libraries(love_common PRIVATE ${COMMON_LIBS})
