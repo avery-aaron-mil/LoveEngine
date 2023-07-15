@@ -35,11 +35,16 @@ namespace love_engine {
                 const VkSurfaceKHR& surface
             ) noexcept;
 
+            inline VkDevice device() const noexcept { return _graphicsDevice.device(); }
+            inline const std::vector<VkImage>* swapChainImages() const noexcept { return &_swapChainImages; }
+            inline VkFormat imageFormat() const noexcept { return _surfaceFormat.format; }
+
         private:
             std::shared_ptr<Logger> _logger;
             GraphicsDevice _graphicsDevice;
             Window _window;
             Settings _settings;
+            VkDevice _device = nullptr;
             VkSwapchainKHR _swapChain = nullptr;
             std::vector<VkImage> _swapChainImages;
 

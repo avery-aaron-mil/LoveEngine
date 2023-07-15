@@ -13,10 +13,13 @@ namespace love_engine {
         const Settings& settings,
         std::shared_ptr<Logger> logger)
     : _logger(logger), _graphicsDevice(graphicsDevice), _window(window), _settings(settings) {
+        _device = _graphicsDevice.device();
+        if (_device == nullptr) Crash::crash("Vulkan device passed to swap chain was null.");
+
         _createSwapChain();
     }
     SwapChain::~SwapChain() {
-        if (_swapChain) vkDestroySwapchainKHR(_graphicsDevice.device(), _swapChain, nullptr);
+        if (_swapChain) vkDestroySwapchainKHR(_device, _swapChain, nullptr);
     }
 
     void SwapChain::_log(const std::string& message) const noexcept {
@@ -68,16 +71,16 @@ namespace love_engine {
             createInfo.pQueueFamilyIndices = queueFamilyIndices;
         } else createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        if (vkCreateSwapchainKHR(_graphicsDevice.device(), &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
+        if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
             Crash::crash("Failed to create swap chain.");
         }
 
         // Get swap chain images
-        if (vkGetSwapchainImagesKHR(_graphicsDevice.device(), _swapChain, &imageCount, nullptr) != VK_SUCCESS) {
+        if (vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, nullptr) != VK_SUCCESS) {
             Crash::crash("Failed to get swap chain images.");
         }
         _swapChainImages.resize(imageCount);
-        if (vkGetSwapchainImagesKHR(_graphicsDevice.device(), _swapChain, &imageCount, _swapChainImages.data()) != VK_SUCCESS) {
+        if (vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, _swapChainImages.data()) != VK_SUCCESS) {
             Crash::crash("Failed to get swap chain images.");
         }
 
