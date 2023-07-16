@@ -5,6 +5,7 @@ CMakeFiles/
 build/
 lib/
 products/
+*.spv
 *.zip
 *.ico
 
