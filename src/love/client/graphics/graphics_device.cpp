@@ -161,9 +161,6 @@ namespace love_engine {
         VkPhysicalDeviceFeatures features;
         vkGetPhysicalDeviceFeatures(device, &features);
         if (!features.samplerAnisotropy) return std::string("Sampler anisotropy not supported.");
-        if (!features.geometryShader) return std::string("Geometry shaders not supported.");
-        if (!features.shaderInt64) return std::string("64-bit integers not supported.");
-        if (!features.shaderFloat64) return std::string("64-bit floats not supported.");
 
         // Check queue families
         QueueFamilyIndices queueIndices = _getDeviceQueueFamilyIndices(device);
