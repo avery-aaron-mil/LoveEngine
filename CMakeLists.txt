@@ -108,10 +108,10 @@ set(COMMON_LIBS
 	-Wl,-Bstatic -lgcc -lstdc++ -lpthread -llzma
 )
 set(SERVER_LIBS
-	-Wl,-Bdynamic -llove_common
+	-Wl,-Bdynamic -lgcc -lstdc++ -llove_common
 )
 set(CLIENT_LIBS
-	-Wl,-Bstatic -lglfw3 -lOpenAL32.dll -lsndfile
+	-Wl,-Bstatic -lgcc -lstdc++ -lglfw3 -lOpenAL32.dll -lsndfile
 	-Wl,-Bdynamic -llove_common -llove_server
 )
 else()
@@ -120,10 +120,10 @@ set(COMMON_LIBS
 	-Wl,-Bdynamic -lgcc -lstdc++ -lpthread -llzma-5
 )
 set(SERVER_LIBS
-	-Wl,-Bdynamic -llove_common
+	-Wl,-Bdynamic -lgcc -lstdc++ -llove_common
 )
 set(CLIENT_LIBS
-	-Wl,-Bdynamic -lglfw3 -lOpenAL32 -lsndfile -llove_common -llove_server
+	-Wl,-Bdynamic -lgcc -lstdc++ -lglfw3 -lOpenAL32 -lsndfile -llove_common -llove_server
 )
 endif()
 set(GAME_LIBS
