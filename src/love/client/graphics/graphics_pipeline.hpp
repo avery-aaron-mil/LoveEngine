@@ -22,12 +22,16 @@ namespace love_engine {
             };
             struct PipelineCreateInfo { // TODO Make an enum for each default pipeline type, with functions that set the default settings for each one of these infos.
                 std::shared_ptr<VkPipelineShaderStageCreateInfo> shaderStageInfo = nullptr;
+                std::vector<VkDynamicState> dynamicStates;
                 std::shared_ptr<VkPipelineDynamicStateCreateInfo> dynamicStateInfo = nullptr;
                 std::shared_ptr<VkPipelineVertexInputStateCreateInfo> vertexInputStateInfo = nullptr;
                 std::shared_ptr<VkPipelineInputAssemblyStateCreateInfo> inputAssemblyStateInfo = nullptr;
+                std::vector<VkViewport> viewports;
+                std::vector<VkRect2D> scissors;
                 std::shared_ptr<VkPipelineViewportStateCreateInfo> viewportStateInfo = nullptr;
                 std::shared_ptr<VkPipelineRasterizationStateCreateInfo> rasterizationStateInfo = nullptr;
                 std::shared_ptr<VkPipelineMultisampleStateCreateInfo> multisampleStateInfo = nullptr;
+                std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments;
                 std::shared_ptr<VkPipelineColorBlendStateCreateInfo> colorBlendStateInfo = nullptr;
                 std::shared_ptr<VkPipelineLayoutCreateInfo> pipelineLayoutInfo = nullptr;
             };

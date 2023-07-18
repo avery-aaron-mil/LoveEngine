@@ -58,7 +58,7 @@ if(WIN32)
 
 set(CMAKE_L_FLAGS
     ${CMAKE_L_FLAGS}
-	-mwindows -static-libstdc++
+	-mwindows
 )
 
 else()
@@ -105,14 +105,15 @@ if (WIN32)
 # use static libraries for Windows because Microsoft is lame...
 set(COMMON_LIBS
 	#-Wl,-Bstatic -lstdc++_libbacktrace
-	-Wl,-Bstatic -lgcc -lstdc++ -lpthread -llzma
+	-Wl,-Bstatic -lpthread -llzma
+	-Wl,-Bdynamic -lgcc -lstdc++ 
 )
 set(SERVER_LIBS
-	-Wl,-Bdynamic -lgcc -lstdc++ -llove_common
+	-Wl,-Bdynamic -llove_common
 )
 set(CLIENT_LIBS
-	-Wl,-Bstatic -lgcc -lstdc++ -lglfw3 -lOpenAL32.dll -lsndfile
-	-Wl,-Bdynamic -llove_common -llove_server
+	-Wl,-Bstatic -lglfw3 -lOpenAL32.dll -lsndfile
+	-Wl,-Bdynamic -lgcc -lstdc++ -llove_common -llove_server
 )
 else()
 set(COMMON_LIBS
