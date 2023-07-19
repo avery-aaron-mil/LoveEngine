@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <love/common/data/files/file_io.hpp>
 #include <love/common/data/files/logger.hpp>
 
 #include <vulkan/vulkan.h>
@@ -21,6 +20,7 @@ namespace love_engine {
                 VkShaderStageFlagBits stage = VK_SHADER_STAGE_VERTEX_BIT;
             };
             struct PipelineCreateInfo { // TODO Make an enum for each default pipeline type, with functions that set the default settings for each one of these infos.
+                std::vector<Shader> shaders;
                 std::shared_ptr<VkPipelineShaderStageCreateInfo> shaderStageInfo = nullptr;
                 std::vector<VkDynamicState> dynamicStates;
                 std::shared_ptr<VkPipelineDynamicStateCreateInfo> dynamicStateInfo = nullptr;
@@ -53,10 +53,12 @@ namespace love_engine {
             VkPipelineLayout _pipelineLayout = nullptr;
             std::vector<VkShaderModule> _shaderModules;
             std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo> _shaderStages;
+            VkPipeline _pipeline = nullptr;
 
             void _log(const std::string& message) const noexcept;
+            void _preparePipeline() noexcept;
             void _createPipeline() noexcept;
-            void _loadShaders(const std::vector<Shader>& shaders) noexcept;
+            void _loadShaders() noexcept;
     };
 }
 

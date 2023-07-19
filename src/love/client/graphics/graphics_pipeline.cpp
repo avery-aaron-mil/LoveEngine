@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 
+#include <love/common/data/files/file_io.hpp>
 #include <love/common/error/crash.hpp>
 
 #include "vulkan_functions.hpp"
@@ -11,11 +12,14 @@ namespace love_engine {
     GraphicsPipeline::GraphicsPipeline(const Settings& settings)
     : _logger(settings.logger), _device(settings.device), _extent(settings.extent), _createInfo(settings.createInfo) {
         if (_device == nullptr) Crash::crash("Device passed to graphics pipeline was null.");
+        _loadShaders();
+        _preparePipeline();
         _createPipeline();
     }
     GraphicsPipeline::~GraphicsPipeline() {
         for (auto shaderModule : _shaderModules) vkDestroyShaderModule(_device, shaderModule, nullptr);
         if (_pipelineLayout) vkDestroyPipelineLayout(_device, _pipelineLayout, nullptr);
+        if (_pipeline) vkDestroyPipeline(_device, _pipeline, nullptr);
     }
 
     void GraphicsPipeline::_log(const std::string& message) const noexcept {
@@ -24,7 +28,44 @@ namespace love_engine {
         }
     }
 
-    void GraphicsPipeline::_createPipeline() noexcept {
+    void GraphicsPipeline::_loadShaders() noexcept {
+        _log("Loading shaders modules...");
+
+        std::stringstream buffer;
+        for (auto shader : _createInfo->shaders) {
+            buffer.str();
+            buffer << "Loading shader named: " << shader.name;
+            _log(buffer.str());
+
+            auto shaderCode = FileIO::readFileContent(shader.path);
+            VkShaderModuleCreateInfo createInfo {
+                .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+                .codeSize = shaderCode.size(),
+                .pCode = reinterpret_cast<const uint32_t*>(shaderCode.data())
+            };
+
+            VkShaderModule shaderModule;
+            if (vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+                Crash::crash("Failed to create shader module.");
+            }
+            _shaderModules.push_back(shaderModule);
+
+            VkPipelineShaderStageCreateInfo shaderStageInfo {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+                .stage = shader.stage,
+                .module = _shaderModules.back(),
+                .pName = shader.entryPoint.c_str()
+            };
+            _shaderStages[shader.stage] = std::move(shaderStageInfo);
+
+            _log("Loaded shader.");
+        }
+
+        _log("Loaded shader modules.");
+    }
+
+    void GraphicsPipeline::_preparePipeline() noexcept {
+        _log("Preparing graphics pipeline...");
         if (_createInfo) {
             if (_createInfo->dynamicStateInfo.get() == nullptr) {
                 if (_createInfo->dynamicStates.empty()) {
@@ -153,41 +194,17 @@ namespace love_engine {
         if (vkCreatePipelineLayout(_device, _createInfo->pipelineLayoutInfo.get(), nullptr, &_pipelineLayout) != VK_SUCCESS) {
             Crash::crash("Failed to create pipeline layout.");
         }
+
+        _log("Prepared graphics pipeline.");
     }
 
-    void GraphicsPipeline::_loadShaders(const std::vector<Shader>& shaders) noexcept {
-        _log("Loading shaders modules...");
-
-        std::stringstream buffer;
-        for (auto shader : shaders) {
-            buffer.str();
-            buffer << "Loading shader named: " << shader.name;
-            _log(buffer.str());
-
-            auto shaderCode = FileIO::readFileContent(shader.path);
-            VkShaderModuleCreateInfo createInfo {
-                .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-                .codeSize = shaderCode.size(),
-                .pCode = reinterpret_cast<const uint32_t*>(shaderCode.data())
-            };
-
-            VkShaderModule shaderModule;
-            if (vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-                Crash::crash("Failed to create shader module.");
-            }
-            _shaderModules.emplace_back(std::move(shaderModule));
-
-            VkPipelineShaderStageCreateInfo shaderStageInfo {
-                .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-                .stage = shader.stage,
-                .module = _shaderModules.back(),
-                .pName = shader.entryPoint.c_str()
-            };
-            _shaderStages[shader.stage] = std::move(shaderStageInfo);
-
-            _log("Loaded shader.");
-        }
-
-        _log("Loaded shader modules.");
+    void GraphicsPipeline::_createPipeline() noexcept {
+        _log("Creating graphics pipeline...");
+        VkGraphicsPipelineCreateInfo pipelineInfo {
+            .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+            .stageCount = static_cast<uint32_t>(_shaderStages.size()),
+            .pStages = _shaderStages.data() // TODO Use vector
+        };
+        _log("Created graphics pipeline.");
     }
 }
