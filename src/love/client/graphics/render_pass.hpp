@@ -19,8 +19,10 @@ namespace love_engine {
             RenderPass(VkDevice device, VkFormat imageFormat, const Settings& settings);
             ~RenderPass();
 
+            VkRenderPass renderPass() const noexcept { return _renderPass; }
+
         private:
-            std::shared_ptr<Logger> _logger;
+            std::shared_ptr<Logger> _logger = nullptr;
             Settings _settings;
             VkDevice _device = nullptr;
             VkFormat _imageFormat;

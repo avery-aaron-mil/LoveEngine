@@ -3,8 +3,9 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
+
+#include "render_pass.hpp"
 
 #include <love/common/data/files/logger.hpp>
 
@@ -31,6 +32,7 @@ namespace love_engine {
                 std::shared_ptr<VkPipelineViewportStateCreateInfo> viewportStateInfo = nullptr;
                 std::shared_ptr<VkPipelineRasterizationStateCreateInfo> rasterizationStateInfo = nullptr;
                 std::shared_ptr<VkPipelineMultisampleStateCreateInfo> multisampleStateInfo = nullptr;
+                std::shared_ptr<VkPipelineDepthStencilStateCreateInfo> depthStencilStateInfo = nullptr;
                 std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments;
                 std::shared_ptr<VkPipelineColorBlendStateCreateInfo> colorBlendStateInfo = nullptr;
                 std::shared_ptr<VkPipelineLayoutCreateInfo> pipelineLayoutInfo = nullptr;
@@ -46,13 +48,14 @@ namespace love_engine {
             ~GraphicsPipeline();
 
         private:
-            std::shared_ptr<Logger> _logger;
+            std::shared_ptr<Logger> _logger = nullptr;
             VkDevice _device = nullptr;
             VkExtent2D _extent;
-            std::shared_ptr<PipelineCreateInfo> _createInfo;
+            std::shared_ptr<PipelineCreateInfo> _createInfo = nullptr;
             VkPipelineLayout _pipelineLayout = nullptr;
             std::vector<VkShaderModule> _shaderModules;
-            std::unordered_map<VkShaderStageFlagBits, VkPipelineShaderStageCreateInfo> _shaderStages;
+            std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;
+            std::unique_ptr<RenderPass> _renderPass;
             VkPipeline _pipeline = nullptr;
 
             void _log(const std::string& message) const noexcept;

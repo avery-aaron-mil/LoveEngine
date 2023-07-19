@@ -64,7 +64,7 @@ namespace love_engine {
             }
 
         private:
-            std::shared_ptr<Logger> _logger;
+            std::shared_ptr<Logger> _logger = nullptr;
             WindowProperties _properties;
             GLFWwindow* _window = nullptr;
             VkInstance _vulkanInstance = nullptr;

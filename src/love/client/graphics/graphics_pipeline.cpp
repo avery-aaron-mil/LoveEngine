@@ -56,7 +56,7 @@ namespace love_engine {
                 .module = _shaderModules.back(),
                 .pName = shader.entryPoint.c_str()
             };
-            _shaderStages[shader.stage] = std::move(shaderStageInfo);
+            _shaderStages.emplace_back(std::move(shaderStageInfo));
 
             _log("Loaded shader.");
         }
@@ -203,8 +203,25 @@ namespace love_engine {
         VkGraphicsPipelineCreateInfo pipelineInfo {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .stageCount = static_cast<uint32_t>(_shaderStages.size()),
-            .pStages = _shaderStages.data() // TODO Use vector
+            .pStages = _shaderStages.data(),
+            .pVertexInputState = _createInfo->vertexInputStateInfo.get(),
+            .pInputAssemblyState = _createInfo->inputAssemblyStateInfo.get(),
+            .pViewportState = _createInfo->viewportStateInfo.get(),
+            .pRasterizationState = _createInfo->rasterizationStateInfo.get(),
+            .pMultisampleState = _createInfo->multisampleStateInfo.get(),
+            .pDepthStencilState = _createInfo->depthStencilStateInfo.get(),
+            .pColorBlendState = _createInfo->colorBlendStateInfo.get(),
+            .pDynamicState = _createInfo->dynamicStateInfo.get(),
+            .layout = _pipelineLayout,
+            .renderPass = _renderPass.get()->renderPass(),
+            .subpass = 0,
+            .basePipelineHandle = nullptr,
+            .basePipelineIndex = -1
         };
+
+        if (vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline) != VK_SUCCESS) {
+            Crash::crash("Failed to create graphics pipeline.");
+        }
         _log("Created graphics pipeline.");
     }
 }

@@ -57,7 +57,7 @@ namespace love_engine {
             VkInstance instance() const noexcept { return _vulkanInstance; }
 
         private:
-            std::shared_ptr<Logger> _logger;
+            std::shared_ptr<Logger> _logger = nullptr;
             Library _vulkanLibrary;
             ApplicationInfo _applicationInfo;
             VkInstance _vulkanInstance = nullptr;

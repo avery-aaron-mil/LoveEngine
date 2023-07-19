@@ -43,7 +43,7 @@ namespace love_engine {
             inline std::string getDeviceName() const noexcept { return _settings.deviceName; }
 
         private:
-            std::shared_ptr<Logger> _logger;
+            std::shared_ptr<Logger> _logger = nullptr;
             Settings _settings;
             VkInstance _vulkanInstance = nullptr;
             VkSurfaceKHR _surface = nullptr;
