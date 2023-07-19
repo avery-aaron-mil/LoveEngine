@@ -7,7 +7,7 @@
 #include "../../error/stack_trace.hpp"
 
 namespace love_engine {
-    std::string& String::reverse(std::string& str) {
+    std::string& String::reverse(std::string& str) { // TODO Check assembly and improve with SIMD (Single Instruction Multiple Data)
         const size_t len = str.length();
         char *const dst = str.data();
 
