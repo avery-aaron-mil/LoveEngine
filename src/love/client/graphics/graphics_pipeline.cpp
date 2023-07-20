@@ -71,22 +71,22 @@ namespace love_engine {
         if (_properties.shaders.empty()) Crash::crash("No shaders passed to loadShaders().");
 
         std::stringstream buffer;
-        for (auto shader : _properties.shaders) {
+        for (size_t i = 0; i < _properties.shaders.size(); ++i) {
             buffer.str("");
-            buffer << "Loading shader: " << shader.name;
+            buffer << "Loading shader: " << _properties.shaders[i].name;
             _log(buffer.str());
 
-            if (shader.data.get() == nullptr) {
+            if (_properties.shaders[i].data.get() == nullptr) {
                 try {
-                    shader.data = std::make_shared<FileIO::FileContent>(FileIO::readFileContent(shader.path));
+                    _properties.shaders[i].data = std::make_shared<FileIO::FileContent>(FileIO::readFileContent(_properties.shaders[i].path));
                 } catch (std::runtime_error& e) {
                     Crash::crash(std::string("FileIO::readFileContent() failed to read shader data:\n\t") + e.what());
                 }
             }
             VkShaderModuleCreateInfo createInfo {
                 .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-                .codeSize = shader.data.get()->size(),
-                .pCode = reinterpret_cast<const uint32_t*>(shader.data.get()->data())
+                .codeSize = _properties.shaders[i].data.get()->size(),
+                .pCode = reinterpret_cast<const uint32_t*>(_properties.shaders[i].data.get()->data())
             };
 
             VkShaderModule shaderModule;
@@ -100,21 +100,21 @@ namespace love_engine {
 
             VkPipelineShaderStageCreateInfo shaderStageInfo {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-                .stage = shader.stage,
+                .stage = _properties.shaders[i].stage,
                 .module = _shaderModules.back(),
-                .pName = shader.entryPoint.c_str()
+                .pName = _properties.shaders[i].entryPoint.c_str()
             };
             _shaderStages.emplace_back(std::move(shaderStageInfo));
 
             buffer.str("");
-            buffer << "Loaded shader: " << shader.name;
+            buffer << "Loaded shader: " << _properties.shaders[i].name;
             _log(buffer.str());
         }
 
         _log("Loaded shader modules.");
     }
 
-    void GraphicsPipeline::_validatePipelineCreateInfo() noexcept { // TODO Default to triangle or logo 
+    void GraphicsPipeline::_validatePipelineCreateInfo() noexcept { // TODO Just load from default property loaders
         _log("Validating graphics pipeline create info...");
 
         if (_properties.createInfo.get() == nullptr) {
@@ -277,7 +277,7 @@ namespace love_engine {
         if (_properties.createInfo.get() == nullptr) Crash::crash("Create info struct was null.");
 
         const PipelineCreateInfo* createInfo = _properties.createInfo.get();
-        VkGraphicsPipelineCreateInfo pipelineInfo { // TODO Figure out which one of you are babies! Aghhhh! Kill them all? Good idea! Hahahaha! Sandvich!
+        VkGraphicsPipelineCreateInfo pipelineInfo {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .stageCount = static_cast<uint32_t>(_shaderStages.size()),
             .pStages = _shaderStages.data(),
