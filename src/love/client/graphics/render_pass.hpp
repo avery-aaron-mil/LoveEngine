@@ -10,11 +10,11 @@
 
 namespace love_engine {
     class RenderPass {
-        struct Properties {
-            std::shared_ptr<VkRenderPassCreateInfo> renderPassInfo = nullptr;
-        };
-
         public:
+            struct Properties {
+                std::shared_ptr<VkRenderPassCreateInfo> renderPassInfo = nullptr;
+            };
+
             RenderPass(VkDevice device, VkFormat imageFormat, const Properties& properties, std::shared_ptr<Logger> logger);
             ~RenderPass();
 

@@ -17,7 +17,8 @@ namespace love_engine {
         const ApplicationInfo& applicationInfo,
         const std::function<void(int, const char*)>& glfwErrorCallback,
         std::shared_ptr<Logger> logger
-    ) : _logger(logger), _applicationInfo(applicationInfo), _debugLogger(applicationInfo.debugLogger) {
+    ) : _logger(logger), _applicationInfo(applicationInfo) {
+        _debugLogger = applicationInfo.debugLogger;
         _loadVulkanLibrary();
         _initializeGLFW(glfwErrorCallback);
         _loadGlobalVulkanFunctions();

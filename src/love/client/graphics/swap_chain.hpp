@@ -11,17 +11,17 @@
 
 namespace love_engine {
     class SwapChain {
-        struct Properties {
-            VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
-        };
-
-        struct SwapChainSupportDetails {
-            VkSurfaceCapabilitiesKHR capabilities;
-            std::vector<VkSurfaceFormatKHR> surfaceFormats;
-            std::vector<VkPresentModeKHR> presentModes;
-        };
- 
         public:
+            struct Properties {
+                VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+            };
+
+            struct SwapChainSupportDetails {
+                VkSurfaceCapabilitiesKHR capabilities;
+                std::vector<VkSurfaceFormatKHR> surfaceFormats;
+                std::vector<VkPresentModeKHR> presentModes;
+            };
+
             SwapChain(
                 const GraphicsDevice& graphicsDevice,
                 const Window& window,
@@ -35,7 +35,6 @@ namespace love_engine {
                 const VkSurfaceKHR& surface
             ) noexcept;
 
-            inline VkDevice device() const noexcept { return _graphicsDevice.device(); }
             inline const std::vector<VkImage>* swapChainImages() const noexcept { return &_swapChainImages; }
             inline VkFormat imageFormat() const noexcept { return _surfaceFormat.format; }
 

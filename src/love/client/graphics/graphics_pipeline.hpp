@@ -13,44 +13,44 @@
 
 namespace love_engine {
     class GraphicsPipeline {
-        enum class PipelineType {
-            CUSTOM = 0,
-            DEFAULT_2D,
-            DEFAULT_3D,
-            MONOCHROME_2D,
-            MONOCHROME_3D,
-            CELL_SHADED_2D,
-            CELL_SHADED_3D,
-        };
-        struct Shader {
-            std::string name = "Unknown";
-            std::string path = "";
-            std::string entryPoint = "main";
-            VkShaderStageFlagBits stage = VK_SHADER_STAGE_VERTEX_BIT;
-        };
-        struct PipelineCreateInfo {
-            std::shared_ptr<VkPipelineShaderStageCreateInfo> shaderStageInfo = nullptr;
-            std::shared_ptr<VkPipelineDynamicStateCreateInfo> dynamicStateInfo = nullptr;
-            std::shared_ptr<VkPipelineVertexInputStateCreateInfo> vertexInputStateInfo = nullptr;
-            std::shared_ptr<VkPipelineInputAssemblyStateCreateInfo> inputAssemblyStateInfo = nullptr;
-            std::shared_ptr<VkPipelineViewportStateCreateInfo> viewportStateInfo = nullptr;
-            std::shared_ptr<VkPipelineRasterizationStateCreateInfo> rasterizationStateInfo = nullptr;
-            std::shared_ptr<VkPipelineMultisampleStateCreateInfo> multisampleStateInfo = nullptr;
-            std::shared_ptr<VkPipelineDepthStencilStateCreateInfo> depthStencilStateInfo = nullptr;
-            std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments;
-            std::shared_ptr<VkPipelineColorBlendStateCreateInfo> colorBlendStateInfo = nullptr;
-            std::shared_ptr<VkPipelineLayoutCreateInfo> pipelineLayoutInfo = nullptr;
-        };
-        struct Properties {
-            PipelineType type = DEFAULT_3D;
-            std::shared_ptr<PipelineCreateInfo> createInfo = nullptr;
-            std::vector<Shader> shaders;
-            std::vector<VkDynamicState> dynamicStates;
-            std::vector<VkViewport> viewports;
-            std::vector<VkRect2D> scissors;
-        };
- 
         public:
+            enum class PipelineType {
+                CUSTOM = 0,
+                DEFAULT_2D,
+                DEFAULT_3D,
+                MONOCHROME_2D,
+                MONOCHROME_3D,
+                CELL_SHADED_2D,
+                CELL_SHADED_3D,
+            };
+            struct Shader {
+                std::string name = "Unknown";
+                std::string path = "";
+                std::string entryPoint = "main";
+                VkShaderStageFlagBits stage = VK_SHADER_STAGE_VERTEX_BIT;
+            };
+            struct PipelineCreateInfo {
+                std::shared_ptr<VkPipelineShaderStageCreateInfo> shaderStageInfo = nullptr;
+                std::shared_ptr<VkPipelineDynamicStateCreateInfo> dynamicStateInfo = nullptr;
+                std::shared_ptr<VkPipelineVertexInputStateCreateInfo> vertexInputStateInfo = nullptr;
+                std::shared_ptr<VkPipelineInputAssemblyStateCreateInfo> inputAssemblyStateInfo = nullptr;
+                std::shared_ptr<VkPipelineViewportStateCreateInfo> viewportStateInfo = nullptr;
+                std::shared_ptr<VkPipelineRasterizationStateCreateInfo> rasterizationStateInfo = nullptr;
+                std::shared_ptr<VkPipelineMultisampleStateCreateInfo> multisampleStateInfo = nullptr;
+                std::shared_ptr<VkPipelineDepthStencilStateCreateInfo> depthStencilStateInfo = nullptr;
+                std::shared_ptr<VkPipelineColorBlendStateCreateInfo> colorBlendStateInfo = nullptr;
+                std::shared_ptr<VkPipelineLayoutCreateInfo> pipelineLayoutInfo = nullptr;
+            };
+            struct Properties {
+                PipelineType type = PipelineType::DEFAULT_3D;
+                std::shared_ptr<PipelineCreateInfo> createInfo = nullptr;
+                std::vector<Shader> shaders;
+                std::vector<VkDynamicState> dynamicStates;
+                std::vector<VkViewport> viewports;
+                std::vector<VkRect2D> scissors;
+                std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments;
+            };
+
             GraphicsPipeline(
                 VkDevice device,
                 VkExtent2D extent,

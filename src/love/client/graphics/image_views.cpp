@@ -5,11 +5,13 @@
 #include "vulkan_functions.hpp"
 
 namespace love_engine {
-    ImageViews::ImageViews(const SwapChain* swapChain) : _swapChain(swapChain) {
-        if (_swapChain == nullptr) Crash::crash("Swap chain passed to image views was null.");
-        _device = _swapChain->device();
+    ImageViews::ImageViews(
+        VkDevice device,
+        const std::vector<VkImage>* swapChainImages,
+        VkFormat imageFormat,
+        std::shared_ptr<Logger> logger
+    ) : _logger(logger), _device(device), _swapChainImages(swapChainImages), _imageFormat(imageFormat) {
         if (_device == nullptr) Crash::crash("Vulkan device passed to image views was null.");
-        _swapChainImages = _swapChain->swapChainImages();
         if (_swapChainImages == nullptr) Crash::crash("Swap chain images pointer passed to image views was null.");
 
         _createImageViews();
@@ -18,16 +20,23 @@ namespace love_engine {
         for (auto imageView : _swapChainImageViews) vkDestroyImageView(_device, imageView, nullptr);
     }
 
+    void ImageViews::_log(const std::string& message) const noexcept {
+        if (_logger.get() != nullptr) {
+            _logger.get()->log(message);
+        }
+    }
+
     void ImageViews::_createImageViews() noexcept {
+        _log("Creating image views...");
+
         const size_t swapChainImageCount = _swapChainImages->size();
         _swapChainImageViews.resize(swapChainImageCount);
-
         for (size_t i = 0; i < swapChainImageCount; ++i) {
             VkImageViewCreateInfo createInfo {
                 .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
                 .image = _swapChainImages->at(i),
                 .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                .format = _swapChain->imageFormat()
+                .format = _imageFormat
             };
             createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
             createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -43,5 +52,7 @@ namespace love_engine {
                 Crash::crash("Failed to create image view.");
             }
         }
+
+        _log("Created image views.");
     }
 }

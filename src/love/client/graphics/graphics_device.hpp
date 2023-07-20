@@ -15,20 +15,20 @@
 
 namespace love_engine {
     class GraphicsDevice {
-        struct Properties {
-            std::string deviceName = "";
-        };
-
-        struct QueueFamilyIndices {
-            bool hasGraphicsQueue = false;
-            bool hasPresentQueue = false;
-            uint32_t graphicsQueue;
-            uint32_t presentQueue;
-
-            inline bool hasAllQueues() const noexcept { return hasGraphicsQueue && hasPresentQueue; }
-        };
-
         public:
+            struct Properties {
+                std::string deviceName = "";
+            };
+
+            struct QueueFamilyIndices {
+                bool hasGraphicsQueue = false;
+                bool hasPresentQueue = false;
+                uint32_t graphicsQueue;
+                uint32_t presentQueue;
+
+                inline bool hasAllQueues() const noexcept { return hasGraphicsQueue && hasPresentQueue; }
+            };
+
             GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, const Properties& properties, std::shared_ptr<Logger> logger);
             ~GraphicsDevice();
 
@@ -44,7 +44,7 @@ namespace love_engine {
 
         private:
             std::shared_ptr<Logger> _logger = nullptr;
-            Settings _properties;
+            Properties _properties;
             VkInstance _vulkanInstance = nullptr;
             VkSurfaceKHR _surface = nullptr;
             VkPhysicalDevice _physicalDevice = nullptr;

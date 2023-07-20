@@ -4,6 +4,7 @@
 #include "graphics/graphics_instance.hpp"
 #include "graphics/graphics_device.hpp"
 #include "graphics/graphics_pipeline.hpp"
+#include "graphics/image_views.hpp"
 #include "graphics/swap_chain.hpp"
 #include "graphics/window.hpp"
 #include "client_state.hpp"
@@ -38,7 +39,7 @@ namespace love_engine {
             inline void setClientState(ClientState *clientState) noexcept { _nextClientState = clientState; }
 
         private:
-            std::shared_ptr<Logger> _logger;
+            std::shared_ptr<Logger> _logger = nullptr;
             Properties _properties;
             ClientState* _clientState = nullptr;
             ClientState* _nextClientState = nullptr;
@@ -47,7 +48,8 @@ namespace love_engine {
             Window _window{_graphicsInstance.instance(), _properties.windowProperties, _logger};
             GraphicsDevice _graphicsDevice{_graphicsInstance.instance(), _window.surface(), _properties.graphicsDeviceProperties, _logger};
             SwapChain _swapChain{_graphicsDevice, _window, _properties.swapChainProperties, _logger};
-            GraphicsPipeline _graphicsPipeline{_graphicsDevice, _window.extent(), _properties.graphicsPipelineProperties, _logger};
+            ImageViews _imageViews{_graphicsDevice.device(), _swapChain.swapChainImages(), _swapChain.imageFormat(), _logger};
+            GraphicsPipeline _graphicsPipeline{_graphicsDevice.device(), _window.extent(), _properties.graphicsPipelineProperties, _logger};
 
             void _log(const std::string& message) const noexcept;
             static void _defaultGLFWErrorCallback(int error, const char* description);

@@ -16,7 +16,7 @@ namespace love_engine {
         std::shared_ptr<Logger> logger
     ) : _logger(logger), _device(device), _extent(extent), _properties(properties) {
         if (_device == nullptr) Crash::crash("Device passed to graphics pipeline was null.");
-        if ((_properties.pipelineType != PipelineType::CUSTOM) || (_properties.createInfo.get() == nullptr)) {
+        if ((_properties.type != PipelineType::CUSTOM) || (_properties.createInfo.get() == nullptr)) {
             _loadDefaultProperties();
         } 
         _loadShaders();
@@ -37,23 +37,23 @@ namespace love_engine {
     }
     
     void GraphicsPipeline::_loadDefaultProperties() noexcept {
-        switch (_properties.pipelineType) {
-            case DEFAULT_2D: {
+        switch (_properties.type) {
+            case PipelineType::DEFAULT_2D: {
                 _loadPropertiesDefault2D();
             } break;
-            case DEFAULT_3D: {
+            case PipelineType::DEFAULT_3D: {
                 _loadPropertiesDefault3D();
             } break;
-            case MONOCHROME_2D: {
+            case PipelineType::MONOCHROME_2D: {
                 _loadPropertiesMonochrome2D();
             } break;
-            case MONOCHROME_3D: {
+            case PipelineType::MONOCHROME_3D: {
                 _loadPropertiesMonochrome3D();
             } break;
-            case CELL_SHADED_2D: {
-                _loadPropertiesCellShader2D();
+            case PipelineType::CELL_SHADED_2D: {
+                _loadPropertiesCellShaded2D();
             } break;
-            case CELL_SHADED_3D: {
+            case PipelineType::CELL_SHADED_3D: {
                 _loadPropertiesCellShaded3D();
             } break;
             default: {
@@ -206,7 +206,7 @@ namespace love_engine {
                             | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
                     };
 
-                    properties.colorBlendAttachments.emplace_back(std::move(colorBlendAttachment));
+                    _properties.colorBlendAttachments.emplace_back(std::move(colorBlendAttachment));
                 }
 
                 VkPipelineColorBlendStateCreateInfo colorBlending {
