@@ -91,7 +91,7 @@ namespace love_engine {
             time_t time = static_cast<time_t>(tv.tv_sec);
             now = std::localtime(&time);
             if (now != nullptr) {
-                std::snprintf(timeBuffer, sizeof(timeBuffer), "%d/%d/%d %d:%02d %s (+%02d.%6lds)",
+                std::snprintf(timeBuffer, sizeof(timeBuffer), "%d/%d/%d %d:%02d %s (+%d.%6lds)",
                     (now->tm_mon + 1), now->tm_mday, (now->tm_year - 100), // Date
                     (((now->tm_hour % 12) > 0) ? (now->tm_hour % 12) : 12), // Hour
                     now->tm_min, ((now->tm_hour < 12) ? "AM" : "PM"), now->tm_sec, tv.tv_usec // Time
