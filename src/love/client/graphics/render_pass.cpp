@@ -5,8 +5,8 @@
 #include "vulkan_functions.hpp"
 
 namespace love_engine {
-    RenderPass::RenderPass(VkDevice device, VkFormat imageFormat, const Settings& settings)
-     : _logger(settings.logger), _settings(settings), _device(device), _imageFormat(imageFormat) {
+    RenderPass::RenderPass(VkDevice device, VkFormat imageFormat, const Properties& properties, std::shared_ptr<Logger> logger)
+     : _logger(logger), _properties(properties), _device(device), _imageFormat(imageFormat) {
         if (_device == nullptr) Crash::crash("Device passed to graphics pipeline was null.");
         _createRenderPass();
     }
@@ -22,7 +22,8 @@ namespace love_engine {
 
     void RenderPass::_createRenderPass() noexcept {
         _log("Creating render pass...");
-        if (_settings.renderPassInfo.get() == nullptr) {
+
+        if (_properties.renderPassInfo.get() == nullptr) {
             VkAttachmentDescription colorAttachment {
                 .format = _imageFormat,
                 .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -53,12 +54,13 @@ namespace love_engine {
                 .pSubpasses = &subpass
             };
 
-            _settings.renderPassInfo = std::make_shared<VkRenderPassCreateInfo>(std::move(renderPassInfo));
+            _properties.renderPassInfo = std::make_shared<VkRenderPassCreateInfo>(std::move(renderPassInfo));
         }
 
-        if (vkCreateRenderPass(_device, _settings.renderPassInfo.get(), nullptr, &_renderPass) != VK_SUCCESS) {
+        if (vkCreateRenderPass(_device, _properties.renderPassInfo.get(), nullptr, &_renderPass) != VK_SUCCESS) {
             Crash::crash("Failed to create render pass.");
         }
+
         _log("Created render pass.");
     }
 }

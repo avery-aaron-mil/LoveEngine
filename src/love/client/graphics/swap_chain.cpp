@@ -10,9 +10,9 @@ namespace love_engine {
     SwapChain::SwapChain(
         const GraphicsDevice& graphicsDevice,
         const Window& window,
-        const Settings& settings,
+        const Properties& properties,
         std::shared_ptr<Logger> logger)
-    : _logger(logger), _graphicsDevice(graphicsDevice), _window(window), _settings(settings) {
+    : _logger(logger), _graphicsDevice(graphicsDevice), _window(window), _properties(properties) {
         _device = _graphicsDevice.device();
         if (_device == nullptr) Crash::crash("Vulkan device passed to swap chain was null.");
 
@@ -146,7 +146,7 @@ namespace love_engine {
         }
 
         for (const auto& presentMode : presentModes) {
-            if (presentMode == _settings.preferredPresentMode) {
+            if (presentMode == _properties.preferredPresentMode) {
                 return presentMode;
             }
         }

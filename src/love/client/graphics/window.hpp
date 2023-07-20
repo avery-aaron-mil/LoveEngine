@@ -12,34 +12,35 @@
 
 namespace love_engine {
     class Window {
+        enum class WindowType {
+            WINDOWED,
+            WINDOWED_BORDERLESS,
+            FULLSCREEN_BORDERLESS,
+            FULLSCREEN_MONITOR,
+        };
+
+        struct Properties {
+            public:
+            std::string title = "";
+            std::string iconPath = "";
+            int width = 0;
+            int height = 0;
+            int x = -1;
+            int y = -1;
+            int monitor = 0;
+            WindowType windowType = WindowType::WINDOWED;
+
+            protected:
+            friend class Window;
+            bool _resized = false;
+            bool _focused = false;
+            bool _fullscreen = false;
+            int _windowedWidth = 0;
+            int _windowedHeight = 0;
+        };
+
         public:
-            enum class WindowType {
-                WINDOWED,
-                WINDOWED_BORDERLESS,
-                FULLSCREEN_BORDERLESS,
-                FULLSCREEN_MONITOR,
-            };
-            struct WindowProperties {
-                public:
-                std::string title = "";
-                std::string iconPath = "";
-                int width = 0;
-                int height = 0;
-                int x = -1;
-                int y = -1;
-                int monitor = 0;
-                WindowType windowType = WindowType::WINDOWED;
-
-                protected:
-                friend class Window;
-                bool _resized = false;
-                bool _focused = false;
-                bool _fullscreen = false;
-                int _windowedWidth = 0;
-                int _windowedHeight = 0;
-            };
-
-            Window(VkInstance vulkanInstance, const WindowProperties& properties, std::shared_ptr<Logger> logger);
+            Window(VkInstance vulkanInstance, const Properties& properties, std::shared_ptr<Logger> logger);
             ~Window();
 
             void setIcon(const std::string& iconPath) noexcept;
@@ -65,7 +66,7 @@ namespace love_engine {
 
         private:
             std::shared_ptr<Logger> _logger = nullptr;
-            WindowProperties _properties;
+            Properties _properties;
             GLFWwindow* _window = nullptr;
             VkInstance _vulkanInstance = nullptr;
             VkSurfaceKHR _surface = nullptr;

@@ -12,7 +12,7 @@
 namespace love_engine {
     class SwapChain {
         public:
-            struct Settings {
+            struct Properties {
                 VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
             };
 
@@ -25,7 +25,7 @@ namespace love_engine {
             SwapChain(
                 const GraphicsDevice& graphicsDevice,
                 const Window& window,
-                const Settings& settings,
+                const Properties& properties,
                 std::shared_ptr<Logger> logger
             );
             ~SwapChain();
@@ -43,7 +43,7 @@ namespace love_engine {
             std::shared_ptr<Logger> _logger;
             GraphicsDevice _graphicsDevice;
             Window _window;
-            Settings _settings;
+            Properties _properties;
             VkDevice _device = nullptr;
             VkSwapchainKHR _swapChain = nullptr;
             std::vector<VkImage> _swapChainImages;

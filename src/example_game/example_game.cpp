@@ -33,12 +33,12 @@ int main(int argc, char** argv) {
         .versionPatch = 0,
         .debugLogger = logger
     };
-    Window::WindowProperties windowProperties;
+    Window::Properties windowProperties;
     windowProperties.title = "Game";
 
     // Start client
     ClientState_Loading loading_State;
-    ClientInstance client(&loading_State, ClientInstance::Settings{
+    ClientInstance client(&loading_State, ClientInstance::Properties{
         .applicationInfo = applicationInfo,
         .windowProperties = windowProperties,
         .glfwErrorCallback = glfwCallback,

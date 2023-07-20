@@ -20,15 +20,11 @@ namespace love_engine {
                 std::string entryPoint = "main";
                 VkShaderStageFlagBits stage = VK_SHADER_STAGE_VERTEX_BIT;
             };
-            struct PipelineCreateInfo { // TODO Make an enum for each default pipeline type, with functions that set the default settings for each one of these infos.
-                std::vector<Shader> shaders;
+            struct PipelineCreateInfo {
                 std::shared_ptr<VkPipelineShaderStageCreateInfo> shaderStageInfo = nullptr;
-                std::vector<VkDynamicState> dynamicStates;
                 std::shared_ptr<VkPipelineDynamicStateCreateInfo> dynamicStateInfo = nullptr;
                 std::shared_ptr<VkPipelineVertexInputStateCreateInfo> vertexInputStateInfo = nullptr;
                 std::shared_ptr<VkPipelineInputAssemblyStateCreateInfo> inputAssemblyStateInfo = nullptr;
-                std::vector<VkViewport> viewports;
-                std::vector<VkRect2D> scissors;
                 std::shared_ptr<VkPipelineViewportStateCreateInfo> viewportStateInfo = nullptr;
                 std::shared_ptr<VkPipelineRasterizationStateCreateInfo> rasterizationStateInfo = nullptr;
                 std::shared_ptr<VkPipelineMultisampleStateCreateInfo> multisampleStateInfo = nullptr;
@@ -37,21 +33,27 @@ namespace love_engine {
                 std::shared_ptr<VkPipelineColorBlendStateCreateInfo> colorBlendStateInfo = nullptr;
                 std::shared_ptr<VkPipelineLayoutCreateInfo> pipelineLayoutInfo = nullptr;
             };
-            struct Settings {
-                VkDevice device = nullptr;
-                VkExtent2D extent = {};
-                std::shared_ptr<PipelineCreateInfo> createInfo = {};
-                std::shared_ptr<Logger> logger;
+            struct Properties { // TODO Make an enum for each default pipeline type, with functions that set the default settings for each one of these infos.
+                std::shared_ptr<PipelineCreateInfo> createInfo = nullptr;
+                std::vector<Shader> shaders;
+                std::vector<VkDynamicState> dynamicStates;
+                std::vector<VkViewport> viewports;
+                std::vector<VkRect2D> scissors;
             };
 
-            GraphicsPipeline(const Settings& settings);
+            GraphicsPipeline(
+                VkDevice device,
+                VkExtent2D extent,
+                const Properties& properties,
+                std::shared_ptr<Logger> logger
+            );
             ~GraphicsPipeline();
 
         private:
             std::shared_ptr<Logger> _logger = nullptr;
             VkDevice _device = nullptr;
             VkExtent2D _extent;
-            std::shared_ptr<PipelineCreateInfo> _createInfo = nullptr;
+            Properties _properties;
             VkPipelineLayout _pipelineLayout = nullptr;
             std::vector<VkShaderModule> _shaderModules;
             std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;

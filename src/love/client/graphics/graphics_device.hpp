@@ -15,21 +15,21 @@
 
 namespace love_engine {
     class GraphicsDevice {
+        struct Properties {
+            std::string deviceName = "";
+        };
+
+        struct QueueFamilyIndices {
+            bool hasGraphicsQueue = false;
+            bool hasPresentQueue = false;
+            uint32_t graphicsQueue;
+            uint32_t presentQueue;
+
+            inline bool hasAllQueues() const noexcept { return hasGraphicsQueue && hasPresentQueue; }
+        };
+
         public:
-            struct Settings {
-                std::string deviceName = "";
-            };
-
-            struct QueueFamilyIndices {
-                bool hasGraphicsQueue = false;
-                bool hasPresentQueue = false;
-                uint32_t graphicsQueue;
-                uint32_t presentQueue;
-
-                inline bool hasAllQueues() const noexcept { return hasGraphicsQueue && hasPresentQueue; }
-            };
-
-            GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, const Settings& settings, std::shared_ptr<Logger> logger);
+            GraphicsDevice(VkInstance vulkanInstance, VkSurfaceKHR surface, const Properties& properties, std::shared_ptr<Logger> logger);
             ~GraphicsDevice();
 
             void addEnabledExtension(const char* extension) noexcept;
@@ -40,11 +40,11 @@ namespace love_engine {
             inline VkDevice device() const noexcept { return _device; }
             inline VkPhysicalDevice physicalDevice() const noexcept { return _physicalDevice; }
             inline const QueueFamilyIndices& queueFamilyIndices() const noexcept { return _queueFamilyIndices; }
-            inline std::string getDeviceName() const noexcept { return _settings.deviceName; }
+            inline std::string getDeviceName() const noexcept { return _properties.deviceName; }
 
         private:
             std::shared_ptr<Logger> _logger = nullptr;
-            Settings _settings;
+            Settings _properties;
             VkInstance _vulkanInstance = nullptr;
             VkSurfaceKHR _surface = nullptr;
             VkPhysicalDevice _physicalDevice = nullptr;

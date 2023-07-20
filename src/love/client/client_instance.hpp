@@ -17,16 +17,17 @@ namespace love_engine {
 
     class ClientInstance {
         public:
-            struct Settings {
+            struct Properties {
                 GraphicsInstance::ApplicationInfo applicationInfo{};
-                Window::WindowProperties windowProperties{};
-                GraphicsDevice::Settings graphicsDeviceSettings{};
-                SwapChain::Settings swapChainSettings{};
+                Window::Properties windowProperties{};
+                GraphicsDevice::Properties graphicsDeviceProperties{};
+                SwapChain::Properties swapChainProperties{};
+
                 std::function<void(int, const char*)> glfwErrorCallback = _defaultGLFWErrorCallback;
                 std::float32_t msPerTick = 20.f;
             };
 
-            ClientInstance(ClientState *const clientState, const Settings& settings, std::shared_ptr<Logger> logger);
+            ClientInstance(ClientState *const clientState, const Properties& properties, std::shared_ptr<Logger> logger);
             ~ClientInstance() = default;
 
             void init() noexcept;
@@ -36,14 +37,14 @@ namespace love_engine {
 
         private:
             std::shared_ptr<Logger> _logger;
-            Settings _settings;
+            Properties _properties;
             ClientState* _clientState = nullptr;
             ClientState* _nextClientState = nullptr;
             
-            GraphicsInstance _graphicsInstance{_settings.applicationInfo, _settings.glfwErrorCallback, _logger};
-            Window _window{_graphicsInstance.instance(), _settings.windowProperties, _logger};
-            GraphicsDevice _graphicsDevice{_graphicsInstance.instance(), _window.surface(), _settings.graphicsDeviceSettings, _logger};
-            SwapChain _swapChain{_graphicsDevice, _window, _settings.swapChainSettings, _logger};
+            GraphicsInstance _graphicsInstance{_properties.applicationInfo, _properties.glfwErrorCallback, _logger};
+            Window _window{_graphicsInstance.instance(), _properties.windowProperties, _logger};
+            GraphicsDevice _graphicsDevice{_graphicsInstance.instance(), _window.surface(), _properties.graphicsDeviceSettings, _logger};
+            SwapChain _swapChain{_graphicsDevice, _window, _properties.swapChainSettings, _logger};
 
             void _log(const std::string& message) const noexcept;
             static void _defaultGLFWErrorCallback(int error, const char* description);

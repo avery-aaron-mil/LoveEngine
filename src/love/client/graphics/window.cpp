@@ -12,7 +12,7 @@
 #include <stb_image.h>
 
 namespace love_engine {
-    Window::Window(VkInstance vulkanInstance, const WindowProperties& properties, std::shared_ptr<Logger> logger)
+    Window::Window(VkInstance vulkanInstance, const Properties& properties, std::shared_ptr<Logger> logger)
      : _logger(logger), _properties(properties), _vulkanInstance(vulkanInstance) {
         _createWindow();
     }

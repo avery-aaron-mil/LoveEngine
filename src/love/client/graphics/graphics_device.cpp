@@ -15,16 +15,16 @@ namespace love_engine {
     GraphicsDevice::GraphicsDevice(
         VkInstance vulkanInstance,
         VkSurfaceKHR surface,
-        const Settings& settings,
+        const Properties& properties,
         std::shared_ptr<Logger> logger
     )
-        : _logger(logger), _settings(settings), _vulkanInstance(vulkanInstance), _surface(surface)
+        : _logger(logger), _properties(properties), _vulkanInstance(vulkanInstance), _surface(surface)
     {
         // Input validation
         if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics Device was null.");
         if (_surface == nullptr) Crash::crash("Surface passed to Graphics Device was null.");
 
-        _initGraphicsDevice(_settings.deviceName);
+        _initGraphicsDevice(_properties.deviceName);
     }
 
     GraphicsDevice::~GraphicsDevice() {
@@ -314,7 +314,7 @@ namespace love_engine {
         // Log
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(device, &properties);
-        _settings.deviceName = properties.deviceName; // Don't forget to set used device name for users!
+        _properties.deviceName = properties.deviceName; // Don't forget to set used device name for users!
         std::stringstream buffer;
         buffer << "Using physical device: " << properties.deviceName;
         _log(buffer.str());

@@ -3,8 +3,8 @@
 #include <chrono>
 
 namespace love_engine {
-    ClientInstance::ClientInstance(ClientState *const clientState, const Settings& settings, std::shared_ptr<Logger> logger)
-    : _logger(logger), _settings(settings), _clientState(clientState) {
+    ClientInstance::ClientInstance(ClientState *const clientState, const Properties& properties, std::shared_ptr<Logger> logger)
+    : _logger(logger), _properties(properties), _clientState(clientState) {
         if (clientState == nullptr) Crash::crash("clientState must not be NULL.");
         init();
     }
@@ -31,7 +31,7 @@ namespace love_engine {
             lag += elapsedTime;
 
             // Prioritize game update when behind, skip to rendering when ahead
-            while (lag >= _settings.msPerTick) {
+            while (lag >= _properties.msPerTick) {
                 if (_nextClientState) {
                     _clientState = _nextClientState;
                     _nextClientState = nullptr;
@@ -39,10 +39,10 @@ namespace love_engine {
                 }
 
                 _clientState->update();
-                lag -= _settings.msPerTick;
+                lag -= _properties.msPerTick;
             }
 
-            _clientState->render(lag / _settings.msPerTick);
+            _clientState->render(lag / _properties.msPerTick);
 
             glfwPollEvents();
         }
