@@ -37,16 +37,16 @@
 
 namespace love_engine {
     class GraphicsInstance {
+        struct ApplicationInfo {
+            std::string name;
+            uint8_t versionMajor = 0;
+            uint8_t versionMinor = 0;
+            uint8_t versionPatch = 0;
+            std::shared_ptr<Logger> debugLogger;
+            bool verbose = false;
+        };
+ 
         public:
-            struct ApplicationInfo {
-                std::string name;
-                uint8_t versionMajor = 0;
-                uint8_t versionMinor = 0;
-                uint8_t versionPatch = 0;
-                std::shared_ptr<Logger> debugLogger;
-                bool verbose = false;
-            };
-
             GraphicsInstance(
                 const ApplicationInfo& applicationInfo,
                 const std::function<void(int, const char*)>& glfwErrorCallback,

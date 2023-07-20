@@ -3,6 +3,7 @@
 
 #include "graphics/graphics_instance.hpp"
 #include "graphics/graphics_device.hpp"
+#include "graphics/graphics_pipeline.hpp"
 #include "graphics/swap_chain.hpp"
 #include "graphics/window.hpp"
 #include "client_state.hpp"
@@ -22,6 +23,7 @@ namespace love_engine {
                 Window::Properties windowProperties{};
                 GraphicsDevice::Properties graphicsDeviceProperties{};
                 SwapChain::Properties swapChainProperties{};
+                GraphicsPipeline::Properties graphicsPipelineProperties{};
 
                 std::function<void(int, const char*)> glfwErrorCallback = _defaultGLFWErrorCallback;
                 std::float32_t msPerTick = 20.f;
@@ -43,8 +45,9 @@ namespace love_engine {
             
             GraphicsInstance _graphicsInstance{_properties.applicationInfo, _properties.glfwErrorCallback, _logger};
             Window _window{_graphicsInstance.instance(), _properties.windowProperties, _logger};
-            GraphicsDevice _graphicsDevice{_graphicsInstance.instance(), _window.surface(), _properties.graphicsDeviceSettings, _logger};
-            SwapChain _swapChain{_graphicsDevice, _window, _properties.swapChainSettings, _logger};
+            GraphicsDevice _graphicsDevice{_graphicsInstance.instance(), _window.surface(), _properties.graphicsDeviceProperties, _logger};
+            SwapChain _swapChain{_graphicsDevice, _window, _properties.swapChainProperties, _logger};
+            GraphicsPipeline _graphicsPipeline{_graphicsDevice, _window.extent(), _properties.graphicsPipelineProperties, _logger};
 
             void _log(const std::string& message) const noexcept;
             static void _defaultGLFWErrorCallback(int error, const char* description);
