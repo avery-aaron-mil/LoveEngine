@@ -32,7 +32,7 @@ namespace love_engine {
 
     void GraphicsPipeline::_log(const std::string& message) const noexcept {
         if (_logger.get() != nullptr) {
-            _logger.get()->log(message);
+            _logger.get()->log("(Love/Graphics): " + message);
         }
     }
     
@@ -69,15 +69,19 @@ namespace love_engine {
 
         std::stringstream buffer;
         for (auto shader : _properties.shaders) {
-            buffer.str();
-            buffer << "Loading shader named: " << shader.name;
+            buffer.str("");
+            buffer << "Loading shader: " << shader.name;
             _log(buffer.str());
 
-            auto shaderCode = FileIO::readFileContent(shader.path);
+            if (shader.data.get() == nullptr) {
+                try {
+                    shader.data = std::make_shared<FileIO::FileContent>(FileIO::readFileContent(shader.path));
+                } catch (std::runtime_error& e) { Crash::crash(std::string("Failed to read shader data: ") + e.what()); }
+            }
             VkShaderModuleCreateInfo createInfo {
                 .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-                .codeSize = shaderCode.size(),
-                .pCode = reinterpret_cast<const uint32_t*>(shaderCode.data())
+                .codeSize = shader.data.get()->size(),
+                .pCode = reinterpret_cast<const uint32_t*>(shader.data.get()->data())
             };
 
             VkShaderModule shaderModule;
@@ -94,7 +98,9 @@ namespace love_engine {
             };
             _shaderStages.emplace_back(std::move(shaderStageInfo));
 
-            _log("Loaded shader.");
+            buffer.str("");
+            buffer << "Loaded shader: " << shader.name;
+            _log(buffer.str());
         }
 
         _log("Loaded shader modules.");
@@ -103,9 +109,8 @@ namespace love_engine {
     void GraphicsPipeline::_preparePipeline() noexcept { // TODO Default to triangle or logo 
         _log("Preparing graphics pipeline...");
 
-        PipelineCreateInfo* createInfo = _properties.createInfo.get();
-        if (createInfo) {
-            if (createInfo->dynamicStateInfo.get() == nullptr) {
+        if (_properties.createInfo.get()) {
+            if (_properties.createInfo.get()->dynamicStateInfo.get() == nullptr) {
                 if (_properties.dynamicStates.empty()) {
                     _properties.dynamicStates.emplace_back(VK_DYNAMIC_STATE_VIEWPORT);
                     _properties.dynamicStates.emplace_back(VK_DYNAMIC_STATE_SCISSOR);
@@ -116,27 +121,30 @@ namespace love_engine {
                     .dynamicStateCount = static_cast<uint32_t>(_properties.dynamicStates.size()),
                     .pDynamicStates = _properties.dynamicStates.data()
                 };
-                createInfo->dynamicStateInfo = std::make_shared<VkPipelineDynamicStateCreateInfo>(dynamicStateInfo);
+                _properties.createInfo.get()->dynamicStateInfo =
+                    std::make_shared<VkPipelineDynamicStateCreateInfo>(dynamicStateInfo);
             }
 
-            if (createInfo->vertexInputStateInfo.get() == nullptr) {
+            if (_properties.createInfo.get()->vertexInputStateInfo.get() == nullptr) {
                 VkPipelineVertexInputStateCreateInfo vertexInputInfo {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
                 };
 
-                createInfo->vertexInputStateInfo = std::make_shared<VkPipelineVertexInputStateCreateInfo>(vertexInputInfo);
+                _properties.createInfo.get()->vertexInputStateInfo =
+                    std::make_shared<VkPipelineVertexInputStateCreateInfo>(vertexInputInfo);
             }
             
-            if (createInfo->inputAssemblyStateInfo.get() == nullptr) {
+            if (_properties.createInfo.get()->inputAssemblyStateInfo.get() == nullptr) {
                 VkPipelineInputAssemblyStateCreateInfo inputAssembly {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
                     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST
                 };
 
-                createInfo->inputAssemblyStateInfo = std::make_shared<VkPipelineInputAssemblyStateCreateInfo>(inputAssembly);
+                _properties.createInfo.get()->inputAssemblyStateInfo =
+                    std::make_shared<VkPipelineInputAssemblyStateCreateInfo>(inputAssembly);
             }
 
-            if (createInfo->viewportStateInfo.get() == nullptr) {
+            if (_properties.createInfo.get()->viewportStateInfo.get() == nullptr) {
                 if (_properties.viewports.empty()) {
                     VkViewport viewport {
                         .x = 0.f,
@@ -167,10 +175,11 @@ namespace love_engine {
                     .pScissors = _properties.scissors.data()
                 };
 
-                createInfo->viewportStateInfo = std::make_shared<VkPipelineViewportStateCreateInfo>(viewportState);
+                _properties.createInfo.get()->viewportStateInfo =
+                    std::make_shared<VkPipelineViewportStateCreateInfo>(viewportState);
             }
 
-            if (createInfo->rasterizationStateInfo.get() == nullptr) {
+            if (_properties.createInfo.get()->rasterizationStateInfo.get() == nullptr) {
                 VkPipelineRasterizationStateCreateInfo rasterizer {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
                     .polygonMode = VK_POLYGON_MODE_FILL,
@@ -179,20 +188,22 @@ namespace love_engine {
                     .lineWidth = 1.f
                 };
 
-                createInfo->rasterizationStateInfo = std::make_shared<VkPipelineRasterizationStateCreateInfo>(rasterizer);
+                _properties.createInfo.get()->rasterizationStateInfo =
+                    std::make_shared<VkPipelineRasterizationStateCreateInfo>(rasterizer);
             }
 
-            if (createInfo->multisampleStateInfo.get() == nullptr) {
+            if (_properties.createInfo.get()->multisampleStateInfo.get() == nullptr) {
                 VkPipelineMultisampleStateCreateInfo multisampling {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
                     .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
                     .minSampleShading = 1.f
                 };
 
-                createInfo->multisampleStateInfo = std::make_shared<VkPipelineMultisampleStateCreateInfo>(multisampling);
+                _properties.createInfo.get()->multisampleStateInfo =
+                    std::make_shared<VkPipelineMultisampleStateCreateInfo>(multisampling);
             }
 
-            if (createInfo->colorBlendStateInfo.get() == nullptr) {
+            if (_properties.createInfo.get()->colorBlendStateInfo.get() == nullptr) {
                 if (_properties.colorBlendAttachments.empty()) {
                     VkPipelineColorBlendAttachmentState colorBlendAttachment {
                         .blendEnable = VK_TRUE,
@@ -215,15 +226,17 @@ namespace love_engine {
                     .pAttachments = _properties.colorBlendAttachments.data()
                 };
 
-                createInfo->colorBlendStateInfo = std::make_shared<VkPipelineColorBlendStateCreateInfo>(colorBlending);
+                _properties.createInfo.get()->colorBlendStateInfo =
+                    std::make_shared<VkPipelineColorBlendStateCreateInfo>(colorBlending);
             }
 
-            if (createInfo->pipelineLayoutInfo.get() == nullptr) {
+            if (_properties.createInfo.get()->pipelineLayoutInfo.get() == nullptr) {
                 VkPipelineLayoutCreateInfo pipelineLayoutInfo {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
                 };
 
-                createInfo->pipelineLayoutInfo = std::make_shared<VkPipelineLayoutCreateInfo>(pipelineLayoutInfo);
+                _properties.createInfo.get()->pipelineLayoutInfo =
+                    std::make_shared<VkPipelineLayoutCreateInfo>(pipelineLayoutInfo);
             }
         } else {
             _properties.createInfo = std::make_shared<PipelineCreateInfo>();
@@ -234,7 +247,9 @@ namespace love_engine {
     
     void GraphicsPipeline::_createPipelineLayout() noexcept {
         _log("Creating graphics pipeline layout...");
-  
+
+        if (_properties.createInfo->pipelineLayoutInfo.get() == nullptr) Crash::crash("Pipeline layout info was null.");
+
         if (vkCreatePipelineLayout(
                 _device, _properties.createInfo->pipelineLayoutInfo.get(), nullptr, &_pipelineLayout
             ) != VK_SUCCESS

@@ -16,7 +16,7 @@ namespace love_engine {
 
     void RenderPass::_log(const std::string& message) const noexcept {
         if (_logger.get() != nullptr) {
-            _logger.get()->log(message);
+            _logger.get()->log("(Love Engine Graphics): " + message);
         }
     }
 

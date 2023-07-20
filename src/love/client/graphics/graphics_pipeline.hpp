@@ -7,6 +7,7 @@
 
 #include "render_pass.hpp"
 
+#include <love/common/data/files/file_io.hpp>
 #include <love/common/data/files/logger.hpp>
 
 #include <vulkan/vulkan.h>
@@ -24,10 +25,11 @@ namespace love_engine {
                 CELL_SHADED_3D,
             };
             struct Shader {
-                std::string name = "Unknown";
-                std::string path = "";
-                std::string entryPoint = "main";
-                VkShaderStageFlagBits stage = VK_SHADER_STAGE_VERTEX_BIT;
+                std::string name = "Unknown"; // The name of the shader
+                std::shared_ptr<FileIO::FileContent> data = nullptr; // The loaded code of the shader. Loads from path if this is null.
+                std::string path = ""; // The path to load the shader code from.
+                std::string entryPoint = "main"; // The name of the entry point function in the shader
+                VkShaderStageFlagBits stage = VK_SHADER_STAGE_VERTEX_BIT; // The Vulkan stage of the shader (vertex, fragment, compute, etc.)
             };
             struct PipelineCreateInfo {
                 std::shared_ptr<VkPipelineShaderStageCreateInfo> shaderStageInfo = nullptr;
