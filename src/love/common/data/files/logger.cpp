@@ -49,11 +49,7 @@ namespace love_engine {
         std::puts(outputMessage.c_str());
         if (!_logPath.empty()) {
             try {
-                Thread asyncLogThread(
-                    "ASYNC_LOG_OUTPUT",
-                    FileIO::appendFile,
-                    _logPath.c_str(), outputMessage
-                );
+                FileIO::appendFile(_logPath.c_str(), outputMessage);
             } catch (std::exception& e) {
                 std::stringstream error;
                 error << "FileIO::appendFile() failed. Error:\n\t" << e.what();

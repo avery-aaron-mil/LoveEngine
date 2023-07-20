@@ -79,7 +79,9 @@ namespace love_engine {
             if (shader.data.get() == nullptr) {
                 try {
                     shader.data = std::make_shared<FileIO::FileContent>(FileIO::readFileContent(shader.path));
-                } catch (std::runtime_error& e) { Crash::crash(std::string("Failed to read shader data: ") + e.what()); }
+                } catch (std::runtime_error& e) {
+                    Crash::crash(std::string("FileIO::readFileContent() failed to read shader data:\n\t") + e.what());
+                }
             }
             VkShaderModuleCreateInfo createInfo {
                 .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
