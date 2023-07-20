@@ -32,7 +32,7 @@ namespace love_engine {
 
     void GraphicsPipeline::_log(const std::string& message) const noexcept {
         if (_logger.get() != nullptr) {
-            _logger.get()->log("(Love/Graphics): " + message);
+            _logger.get()->log("(Love/GraphicsPipeline): " + message);
         }
     }
     

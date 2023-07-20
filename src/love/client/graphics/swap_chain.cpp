@@ -24,7 +24,7 @@ namespace love_engine {
 
     void SwapChain::_log(const std::string& message) const noexcept {
         if (_logger.get() != nullptr) {
-            _logger.get()->log("(Love Engine Graphics): " + message);
+            _logger.get()->log("(Love/SwapChain): " + message);
         }
     }
 

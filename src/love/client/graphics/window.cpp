@@ -23,7 +23,7 @@ namespace love_engine {
 
     void Window::_log(const std::string& message) const noexcept {
         if (_logger.get() != nullptr) {
-            _logger.get()->log("(Love Engine Graphics): " + message);
+            _logger.get()->log("(Love/Window): " + message);
         }
     }
 
