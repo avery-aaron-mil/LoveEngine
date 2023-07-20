@@ -13,6 +13,7 @@ namespace love_engine {
     class SwapChain {
         public:
             struct Properties {
+                std::shared_ptr<VkSwapchainCreateInfoKHR> swapChainInfo = nullptr;
                 VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;
             };
 

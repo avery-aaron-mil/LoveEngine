@@ -11,10 +11,15 @@
 namespace love_engine {
     class ImageViews {
         public:
+            struct Properties {
+                std::shared_ptr<VkImageViewCreateInfo> imageViewInfoTemplate = nullptr;
+            };
+
             ImageViews(
                 VkDevice device,
                 const std::vector<VkImage>* swapChainImages,
                 VkFormat imageFormat,
+                const Properties& properties,
                 std::shared_ptr<Logger> logger
             );
             ~ImageViews();
@@ -24,6 +29,7 @@ namespace love_engine {
             VkDevice _device = nullptr;
             const std::vector<VkImage>* _swapChainImages = nullptr;
             VkFormat _imageFormat;
+            Properties _properties;
             std::vector<VkImageView> _swapChainImageViews;
 
             void _log(const std::string& message) const noexcept;

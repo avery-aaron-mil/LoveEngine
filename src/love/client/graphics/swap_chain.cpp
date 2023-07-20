@@ -53,28 +53,31 @@ namespace love_engine {
             imageCount = swapChainSupport.capabilities.maxImageCount;
         }
 
-        VkSwapchainCreateInfoKHR createInfo {
-            .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-            .surface = _window.surface(),
-            .minImageCount = imageCount,
-            .imageFormat = _surfaceFormat.format,
-            .imageColorSpace = _surfaceFormat.colorSpace,
-            .imageExtent = _extent,
-            .imageArrayLayers = 1, // Layers of images to render to, always 1 unless using a stereoscopic application for VR/AR
-            .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, // VK_IMAGE_USAGE_TRANSFER_DST_BIT for post-processing and HUDs
-            .preTransform = swapChainSupport.capabilities.currentTransform, // Use currentt transform without any operations
-            .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, // No alpha channel unless transparent window
-            .presentMode = _presentMode,
-            .clipped = VK_TRUE // Clip pixels behind window
-        };
+        if (_properties.swapChainInfo.get() == nullptr) {
+            VkSwapchainCreateInfoKHR createInfo {
+                .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+                .surface = _window.surface(),
+                .minImageCount = imageCount,
+                .imageFormat = _surfaceFormat.format,
+                .imageColorSpace = _surfaceFormat.colorSpace,
+                .imageExtent = _extent,
+                .imageArrayLayers = 1, // Layers of images to render to, always 1 unless using a stereoscopic application for VR/AR
+                .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, // VK_IMAGE_USAGE_TRANSFER_DST_BIT for post-processing and HUDs
+                .preTransform = swapChainSupport.capabilities.currentTransform, // Use currentt transform without any operations
+                .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, // No alpha channel unless transparent window
+                .presentMode = _presentMode,
+                .clipped = VK_TRUE // Clip pixels behind window
+            };
+            _properties.swapChainInfo = std::make_shared<VkSwapchainCreateInfoKHR>(createInfo);
+        }
 
         if (graphicsQueueIndex != presentQueueIndex) {
-            createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-            createInfo.queueFamilyIndexCount = 2;
-            createInfo.pQueueFamilyIndices = queueFamilyIndices;
-        } else createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            _properties.swapChainInfo.get()->imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+            _properties.swapChainInfo.get()->queueFamilyIndexCount = 2;
+            _properties.swapChainInfo.get()->pQueueFamilyIndices = queueFamilyIndices;
+        } else _properties.swapChainInfo.get()->imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        auto result = vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain);
+        auto result = vkCreateSwapchainKHR(_device, _properties.swapChainInfo.get(), nullptr, &_swapChain);
         if (result != VK_SUCCESS) {
             std::stringstream crashBuffer;
             crashBuffer << "Failed to create swap chain: " << string_VkResult(result);

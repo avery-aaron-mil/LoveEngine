@@ -25,6 +25,7 @@ namespace love_engine {
                 Window::Properties windowProperties{};
                 GraphicsDevice::Properties graphicsDeviceProperties{};
                 SwapChain::Properties swapChainProperties{};
+                ImageViews::Properties imageViewProperties{};
                 RenderPass::Properties renderPassProperties{};
                 GraphicsPipeline::Properties graphicsPipelineProperties{};
 
@@ -72,6 +73,7 @@ namespace love_engine {
                 _graphicsDevice.device(),
                 _swapChain.swapChainImages(),
                 _swapChain.imageFormat(),
+                _properties.imageViewProperties,
                 _logger
             };
             RenderPass _renderPass{
