@@ -291,9 +291,9 @@ namespace love_engine {
             .pDynamicState = createInfo->dynamicStateInfo.get(),
             .layout = _pipelineLayout,
             .renderPass = _renderPass.renderPass(),
-            .subpass = 0,
-            .basePipelineHandle = nullptr,
-            .basePipelineIndex = -1
+            .subpass = _properties.subpassIndex,
+            .basePipelineHandle = _properties.basePipeline,
+            .basePipelineIndex = _properties.basePipelineIndex
         };
 
         auto result = vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline);

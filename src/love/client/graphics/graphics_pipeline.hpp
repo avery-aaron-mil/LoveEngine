@@ -51,6 +51,9 @@ namespace love_engine {
                 std::vector<VkViewport> viewports;
                 std::vector<VkRect2D> scissors;
                 std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments;
+                uint32_t subpassIndex = 0;
+                VkPipeline basePipeline = nullptr;
+                int32_t basePipelineIndex = -1;
             };
 
             GraphicsPipeline(
