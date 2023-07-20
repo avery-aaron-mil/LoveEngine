@@ -106,11 +106,13 @@ namespace love_engine {
         }
     }
 
-    void FileIO::validatePath(std::string& path) {
+    std::string FileIO::validatePath(std::string& path) {
         if (path.empty()) throw std::invalid_argument(StackTrace::appendStacktrace("The file path passed is empty."));
 
         path.assign(removeExcessDirectorySlashes(path));
         ensureParentDirectoryExists(path);
+
+        return path;
     }
 
     void FileIO::clearFile(std::string filePath) {

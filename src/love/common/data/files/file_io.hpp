@@ -27,7 +27,7 @@ namespace love_engine {
             static void ensureParentDirectoryExists(const std::string& path) noexcept;
             // Makes @p path valid if it is not already.
             // @throw std::invalid_argument If @p path is empty.
-            static void validatePath(std::string& path);
+            static std::string validatePath(std::string& path);
             // @throw std::invalid_argument If @p filePath is empty.
             // @throw std::runtime_error If a file error occurs.
             static void clearFile(std::string filePath);
