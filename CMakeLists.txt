@@ -106,7 +106,7 @@ if (WIN32)
 set(COMMON_LIBS
 	#-Wl,-Bstatic -lstdc++_libbacktrace
 	-Wl,-Bstatic -lpthread -llzma
-	-Wl,-Bdynamic -lgcc -lstdc++ 
+	-Wl,-Bdynamic -lgcc -lstdc++
 )
 set(SERVER_LIBS
 	-Wl,-Bdynamic -llove_common
