@@ -33,14 +33,19 @@ int main(int argc, char** argv) {
         .versionPatch = 0,
         .debugLogger = logger
     };
-    Window::Properties windowProperties;
-    windowProperties.title = "Game";
+    Window::Properties windowProperties {
+        .title = "Game" // TODO Check if this leaks memory
+    };
+    GraphicsPipeline::Properties graphicsPipelineProperties {
+        .pipelineType = GraphicsPipeline::PipelineTypes::CUSTOM
+    };
 
     // Start client
-    ClientState_Loading loading_State;
-    ClientInstance client(&loading_State, ClientInstance::Properties{
+    ClientState_Loading loadingState;
+    ClientInstance client(&loadingState, ClientInstance::Properties{
         .applicationInfo = applicationInfo,
         .windowProperties = windowProperties,
+        .graphicsPipelineProperties = graphicsPipelineProperties,
         .glfwErrorCallback = glfwCallback,
         .msPerTick = 50.f
     }, logger);

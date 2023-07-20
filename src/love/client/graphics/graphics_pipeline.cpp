@@ -16,11 +16,12 @@ namespace love_engine {
         std::shared_ptr<Logger> logger
     ) : _logger(logger), _device(device), _extent(extent), _properties(properties) {
         if (_device == nullptr) Crash::crash("Device passed to graphics pipeline was null.");
+        if (_properties.pipelineType != PipelineType::CUSTOM) _loadDefaultProperties();
         _loadShaders();
         _preparePipeline();
         _createPipeline();
     }
-    GraphicsPipeline::~GraphicsPipeline() {
+    GraphicsPipeline::~GraphicsPipeline() { 
         for (auto shaderModule : _shaderModules) vkDestroyShaderModule(_device, shaderModule, nullptr);
         if (_pipelineLayout) vkDestroyPipelineLayout(_device, _pipelineLayout, nullptr);
         if (_pipeline) vkDestroyPipeline(_device, _pipeline, nullptr);
@@ -31,6 +32,32 @@ namespace love_engine {
             _logger.get()->log(message);
         }
     }
+    
+    void GraphicsPipeline::_loadDefaultProperties() noexcept {
+        switch (_properties.pipelineType) {
+            case DEFAULT_2D: {
+                _loadPropertiesDefault2D();
+            } break;
+            case DEFAULT_3D: {
+                _loadPropertiesDefault3D();
+            } break;
+            case MONOCHROME_2D: {
+                _loadPropertiesMonochrome2D();
+            } break;
+            case MONOCHROME_3D: {
+                _loadPropertiesMonochrome3D();
+            } break;
+            case CELL_SHADED_2D: {
+                _loadPropertiesCellShader2D();
+            } break;
+            case CELL_SHADED_3D: {
+                _loadPropertiesCellShaded3D();
+            } break;
+            default: {
+                Crash::crash("Graphics pipeline type was not from the enum.");
+            } break;
+        }
+    } 
 
     void GraphicsPipeline::_loadShaders() noexcept {
         _log("Loading shaders modules...");
@@ -70,7 +97,7 @@ namespace love_engine {
         _log("Loaded shader modules.");
     }
 
-    void GraphicsPipeline::_preparePipeline() noexcept {
+    void GraphicsPipeline::_preparePipeline() noexcept { // TODO Default to triangle or logo 
         _log("Preparing graphics pipeline...");
         if (_properties.createInfo) {
             if (_properties.createInfo->dynamicStateInfo.get() == nullptr) {
@@ -239,5 +266,29 @@ namespace love_engine {
         }
 
         _log("Created graphics pipeline.");
+    }
+    
+    void GraphicsPipeline::_loadPropertiesDefault2D() noexcept {
+        // TODO
+    }
+    
+    void GraphicsPipeline::_loadPropertiesDefault3D() noexcept {
+        // TODO
+    }
+    
+    void GraphicsPipeline::_loadPropertiesMonochrome2D() noexcept {
+        // TODO
+    }
+    
+    void GraphicsPipeline::_loadPropertiesMonochrome3D() noexcept {
+        // TODO
+    }
+    
+    void GraphicsPipeline::_loadPropertiesCellShaded2D() noexcept {
+        // TODO
+    }
+    
+    void GraphicsPipeline::_loadPropertiesCellShaded3D() noexcept {
+        // TODO
     }
 }

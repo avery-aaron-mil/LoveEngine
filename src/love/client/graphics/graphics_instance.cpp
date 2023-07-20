@@ -17,8 +17,7 @@ namespace love_engine {
         const ApplicationInfo& applicationInfo,
         const std::function<void(int, const char*)>& glfwErrorCallback,
         std::shared_ptr<Logger> logger
-    ) : _logger(logger), _applicationInfo(applicationInfo) {
-        _debugLogger = applicationInfo.debugLogger;
+    ) : _logger(logger), _applicationInfo(applicationInfo), _debugLogger(applicationInfo.debugLogger) {
         _loadVulkanLibrary();
         _initializeGLFW(glfwErrorCallback);
         _loadGlobalVulkanFunctions();
@@ -71,6 +70,20 @@ namespace love_engine {
         _log("Loading Vulkan library...");
         _vulkanLibrary.loadLibrary("vulkan-1.dll");
         _log("Loaded Vulkan library.");
+    }
+
+    void GraphicsInstance::_initializeGLFW(const std::function<void(int, const char*)>& glfwErrorCallback) const noexcept {
+        _log("Initializing GLFW...");
+        if (!glfwInit()) {
+            Crash::crash("Failed to initialize GLFW.");
+        }
+        glfwSetErrorCallback(*(glfwErrorCallback.target<void(*)(int, const char*)>()));
+
+        if (!glfwVulkanSupported()) {
+            Crash::crash("Vulkan not supported.");
+        }
+
+        _log("Initialized GLFW.");
     }
 
     void GraphicsInstance::_loadGlobalVulkanFunctions() const noexcept {
@@ -241,19 +254,5 @@ namespace love_engine {
         }
 
         _log("Created Vulkan instance.");
-    }
-
-    void GraphicsInstance::_initializeGLFW(const std::function<void(int, const char*)>& glfwErrorCallback) const noexcept {
-        _log("Initializing GLFW...");
-        if (!glfwInit()) {
-            Crash::crash("Failed to initialize GLFW.");
-        }
-        glfwSetErrorCallback(*(glfwErrorCallback.target<void(*)(int, const char*)>()));
-
-        if (!glfwVulkanSupported()) {
-            Crash::crash("Vulkan not supported.");
-        }
-
-        _log("Initialized GLFW.");
     }
 }
