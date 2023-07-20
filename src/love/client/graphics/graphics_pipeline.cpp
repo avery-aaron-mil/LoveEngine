@@ -16,9 +16,12 @@ namespace love_engine {
         std::shared_ptr<Logger> logger
     ) : _logger(logger), _device(device), _extent(extent), _properties(properties) {
         if (_device == nullptr) Crash::crash("Device passed to graphics pipeline was null.");
-        if (_properties.pipelineType != PipelineType::CUSTOM) _loadDefaultProperties();
+        if ((_properties.pipelineType != PipelineType::CUSTOM) || (_properties.createInfo.get() == nullptr)) {
+            _loadDefaultProperties();
+        } 
         _loadShaders();
         _preparePipeline();
+        _createPipelineLayout();
         _createPipeline();
     }
     GraphicsPipeline::~GraphicsPipeline() { 
@@ -99,8 +102,10 @@ namespace love_engine {
 
     void GraphicsPipeline::_preparePipeline() noexcept { // TODO Default to triangle or logo 
         _log("Preparing graphics pipeline...");
-        if (_properties.createInfo) {
-            if (_properties.createInfo->dynamicStateInfo.get() == nullptr) {
+
+        PipelineCreateInfo* createInfo = _properties.createInfo.get();
+        if (createInfo) {
+            if (createInfo->dynamicStateInfo.get() == nullptr) {
                 if (_properties.dynamicStates.empty()) {
                     _properties.dynamicStates.emplace_back(VK_DYNAMIC_STATE_VIEWPORT);
                     _properties.dynamicStates.emplace_back(VK_DYNAMIC_STATE_SCISSOR);
@@ -111,29 +116,27 @@ namespace love_engine {
                     .dynamicStateCount = static_cast<uint32_t>(_properties.dynamicStates.size()),
                     .pDynamicStates = _properties.dynamicStates.data()
                 };
-                _properties.createInfo->dynamicStateInfo = std::make_shared<VkPipelineDynamicStateCreateInfo>(dynamicStateInfo);
+                createInfo->dynamicStateInfo = std::make_shared<VkPipelineDynamicStateCreateInfo>(dynamicStateInfo);
             }
 
-            if (_properties.createInfo->vertexInputStateInfo.get() == nullptr) {
+            if (createInfo->vertexInputStateInfo.get() == nullptr) {
                 VkPipelineVertexInputStateCreateInfo vertexInputInfo {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
                 };
 
-                _properties.createInfo->vertexInputStateInfo =
-                    std::make_shared<VkPipelineVertexInputStateCreateInfo>(vertexInputInfo);
+                createInfo->vertexInputStateInfo = std::make_shared<VkPipelineVertexInputStateCreateInfo>(vertexInputInfo);
             }
             
-            if (_properties.createInfo->inputAssemblyStateInfo.get() == nullptr) {
+            if (createInfo->inputAssemblyStateInfo.get() == nullptr) {
                 VkPipelineInputAssemblyStateCreateInfo inputAssembly {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
                     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST
                 };
 
-                _properties.createInfo->inputAssemblyStateInfo =
-                    std::make_shared<VkPipelineInputAssemblyStateCreateInfo>(inputAssembly);
+                createInfo->inputAssemblyStateInfo = std::make_shared<VkPipelineInputAssemblyStateCreateInfo>(inputAssembly);
             }
 
-            if (_properties.createInfo->viewportStateInfo.get() == nullptr) {
+            if (createInfo->viewportStateInfo.get() == nullptr) {
                 if (_properties.viewports.empty()) {
                     VkViewport viewport {
                         .x = 0.f,
@@ -164,10 +167,10 @@ namespace love_engine {
                     .pScissors = _properties.scissors.data()
                 };
 
-                _properties.createInfo->viewportStateInfo = std::make_shared<VkPipelineViewportStateCreateInfo>(viewportState);
+                createInfo->viewportStateInfo = std::make_shared<VkPipelineViewportStateCreateInfo>(viewportState);
             }
 
-            if (_properties.createInfo->rasterizationStateInfo.get() == nullptr) {
+            if (createInfo->rasterizationStateInfo.get() == nullptr) {
                 VkPipelineRasterizationStateCreateInfo rasterizer {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
                     .polygonMode = VK_POLYGON_MODE_FILL,
@@ -176,23 +179,21 @@ namespace love_engine {
                     .lineWidth = 1.f
                 };
 
-                _properties.createInfo->rasterizationStateInfo =
-                    std::make_shared<VkPipelineRasterizationStateCreateInfo>(rasterizer);
+                createInfo->rasterizationStateInfo = std::make_shared<VkPipelineRasterizationStateCreateInfo>(rasterizer);
             }
 
-            if (_properties.createInfo->multisampleStateInfo.get() == nullptr) {
+            if (createInfo->multisampleStateInfo.get() == nullptr) {
                 VkPipelineMultisampleStateCreateInfo multisampling {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
                     .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
                     .minSampleShading = 1.f
                 };
 
-                _properties.createInfo->multisampleStateInfo =
-                    std::make_shared<VkPipelineMultisampleStateCreateInfo>(multisampling);
+                createInfo->multisampleStateInfo = std::make_shared<VkPipelineMultisampleStateCreateInfo>(multisampling);
             }
 
-            if (_properties.createInfo->colorBlendStateInfo.get() == nullptr) {
-                if (_properties.createInfo->colorBlendAttachments.empty()) {
+            if (createInfo->colorBlendStateInfo.get() == nullptr) {
+                if (_properties.colorBlendAttachments.empty()) {
                     VkPipelineColorBlendAttachmentState colorBlendAttachment {
                         .blendEnable = VK_TRUE,
                         .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
@@ -205,30 +206,35 @@ namespace love_engine {
                             | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
                     };
 
-                    _properties.createInfo->colorBlendAttachments.emplace_back(std::move(colorBlendAttachment));
+                    properties.colorBlendAttachments.emplace_back(std::move(colorBlendAttachment));
                 }
 
                 VkPipelineColorBlendStateCreateInfo colorBlending {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-                    .attachmentCount = static_cast<uint32_t>(_properties.createInfo->colorBlendAttachments.size()),
-                    .pAttachments = _properties.createInfo->colorBlendAttachments.data()
+                    .attachmentCount = static_cast<uint32_t>(_properties.colorBlendAttachments.size()),
+                    .pAttachments = _properties.colorBlendAttachments.data()
                 };
 
-                _properties.createInfo->colorBlendStateInfo =
-                    std::make_shared<VkPipelineColorBlendStateCreateInfo>(colorBlending);
+                createInfo->colorBlendStateInfo = std::make_shared<VkPipelineColorBlendStateCreateInfo>(colorBlending);
             }
 
-            if (_properties.createInfo->pipelineLayoutInfo.get() == nullptr) {
+            if (createInfo->pipelineLayoutInfo.get() == nullptr) {
                 VkPipelineLayoutCreateInfo pipelineLayoutInfo {
                     .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
                 };
 
-                _properties.createInfo->pipelineLayoutInfo = std::make_shared<VkPipelineLayoutCreateInfo>(pipelineLayoutInfo);
+                createInfo->pipelineLayoutInfo = std::make_shared<VkPipelineLayoutCreateInfo>(pipelineLayoutInfo);
             }
         } else {
             _properties.createInfo = std::make_shared<PipelineCreateInfo>();
         }
 
+        _log("Prepared graphics pipeline.");
+    }
+    
+    void GraphicsPipeline::_createPipelineLayout() noexcept {
+        _log("Creating graphics pipeline layout...");
+  
         if (vkCreatePipelineLayout(
                 _device, _properties.createInfo->pipelineLayoutInfo.get(), nullptr, &_pipelineLayout
             ) != VK_SUCCESS
@@ -236,24 +242,25 @@ namespace love_engine {
             Crash::crash("Failed to create pipeline layout.");
         }
 
-        _log("Prepared graphics pipeline.");
+        _log("Created graphics pipeline layout."); 
     }
 
     void GraphicsPipeline::_createPipeline() noexcept {
         _log("Creating graphics pipeline...");
 
+        const PipelineCreateInfo* createInfo = _properties.createInfo.get();
         VkGraphicsPipelineCreateInfo pipelineInfo {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .stageCount = static_cast<uint32_t>(_shaderStages.size()),
             .pStages = _shaderStages.data(),
-            .pVertexInputState = _properties.createInfo->vertexInputStateInfo.get(),
-            .pInputAssemblyState = _properties.createInfo->inputAssemblyStateInfo.get(),
-            .pViewportState = _properties.createInfo->viewportStateInfo.get(),
-            .pRasterizationState = _properties.createInfo->rasterizationStateInfo.get(),
-            .pMultisampleState = _properties.createInfo->multisampleStateInfo.get(),
-            .pDepthStencilState = _properties.createInfo->depthStencilStateInfo.get(),
-            .pColorBlendState = _properties.createInfo->colorBlendStateInfo.get(),
-            .pDynamicState = _properties.createInfo->dynamicStateInfo.get(),
+            .pVertexInputState = createInfo->vertexInputStateInfo.get(),
+            .pInputAssemblyState = createInfo->inputAssemblyStateInfo.get(),
+            .pViewportState = createInfo->viewportStateInfo.get(),
+            .pRasterizationState = createInfo->rasterizationStateInfo.get(),
+            .pMultisampleState = createInfo->multisampleStateInfo.get(),
+            .pDepthStencilState = createInfo->depthStencilStateInfo.get(),
+            .pColorBlendState = createInfo->colorBlendStateInfo.get(),
+            .pDynamicState = createInfo->dynamicStateInfo.get(),
             .layout = _pipelineLayout,
             .renderPass = _renderPass.get()->renderPass(),
             .subpass = 0,
