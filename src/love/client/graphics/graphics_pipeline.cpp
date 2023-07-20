@@ -23,7 +23,7 @@ namespace love_engine {
             _loadDefaultProperties();
         } 
         _loadShaders();
-        _preparePipeline();
+        _validatePipelineCreateInfo();
         _createPipelineLayout();
         _createPipeline();
     }
@@ -114,8 +114,8 @@ namespace love_engine {
         _log("Loaded shader modules.");
     }
 
-    void GraphicsPipeline::_preparePipeline() noexcept { // TODO Default to triangle or logo 
-        _log("Preparing graphics pipeline...");
+    void GraphicsPipeline::_validatePipelineCreateInfo() noexcept { // TODO Default to triangle or logo 
+        _log("Validating graphics pipeline create info...");
 
         if (_properties.createInfo.get() == nullptr) {
             _properties.createInfo = std::make_shared<PipelineCreateInfo>();
@@ -250,7 +250,7 @@ namespace love_engine {
                 std::make_shared<VkPipelineLayoutCreateInfo>(pipelineLayoutInfo);
         }
 
-        _log("Prepared graphics pipeline.");
+        _log("Validated graphics pipeline create info.");
     }
     
     void GraphicsPipeline::_createPipelineLayout() noexcept {
@@ -277,7 +277,7 @@ namespace love_engine {
         if (_properties.createInfo.get() == nullptr) Crash::crash("Create info struct was null.");
 
         const PipelineCreateInfo* createInfo = _properties.createInfo.get();
-        VkGraphicsPipelineCreateInfo pipelineInfo {
+        VkGraphicsPipelineCreateInfo pipelineInfo { // TODO Figure out which one of you are babies! Aghhhh! Kill them all? Good idea! Hahahaha! Sandvich!
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .stageCount = static_cast<uint32_t>(_shaderStages.size()),
             .pStages = _shaderStages.data(),

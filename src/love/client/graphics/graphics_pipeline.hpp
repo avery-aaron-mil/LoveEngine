@@ -75,7 +75,7 @@ namespace love_engine {
 
             void _log(const std::string& message) const noexcept;
             void _loadDefaultProperties() noexcept;
-            void _preparePipeline() noexcept;
+            void _validatePipelineCreateInfo() noexcept;
             void _createPipelineLayout() noexcept;
             void _createPipeline() noexcept;
             void _loadShaders() noexcept;
