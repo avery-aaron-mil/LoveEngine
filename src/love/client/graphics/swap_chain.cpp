@@ -1,8 +1,11 @@
 #include "swap_chain.hpp"
 
 #include <algorithm>
+#include <sstream>
 
 #include <love/common/error/crash.hpp>
+
+#include <vulkan/vk_enum_string_helper.h>
 
 #include "vulkan_functions.hpp"
 
@@ -71,17 +74,26 @@ namespace love_engine {
             createInfo.pQueueFamilyIndices = queueFamilyIndices;
         } else createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
-            Crash::crash("Failed to create swap chain.");
+        auto result = vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to create swap chain: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
 
         // Get swap chain images
-        if (vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Failed to get swap chain images.");
+        result = vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, nullptr);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to get swap chain images: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
         _swapChainImages.resize(imageCount);
-        if (vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, _swapChainImages.data()) != VK_SUCCESS) {
-            Crash::crash("Failed to get swap chain images.");
+        result = vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, _swapChainImages.data());
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to get swap chain images: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
 
         _log("Created swap chain.");
@@ -92,36 +104,47 @@ namespace love_engine {
         const VkSurfaceKHR& surface
     ) noexcept {
         SwapChainSupportDetails details;
-        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities) != VK_SUCCESS) {
-            Crash::crash("Could not get surface capabilities for physical graphics device.");
+        auto result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to get surface capabilities for physical graphics device: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
 
         uint32_t formatCount;
-        if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Could not get surface formats for physical graphics device.");
+        result = vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to get surface formats for physical graphics device: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
 
         if (formatCount > 0) {
             details.surfaceFormats.resize(formatCount);
-            if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.surfaceFormats.data()) != VK_SUCCESS) {
-                Crash::crash("Could not get surface formats for physical graphics device.");
+            result = vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.surfaceFormats.data());
+            if (result != VK_SUCCESS) {
+                std::stringstream crashBuffer;
+                crashBuffer << "Failed to get surface formats for physical graphics device: " << string_VkResult(result);
+                Crash::crash(crashBuffer.str());
             }
         }
 
         uint32_t presentModeCount;
-        if (vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Could not get surface present modes for physical graphics device.");
+        result = vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to get surface present modes for physical graphics device: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
 
         if (presentModeCount > 0) {
             details.presentModes.resize(presentModeCount);
-            if (vkGetPhysicalDeviceSurfacePresentModesKHR(
-                    device,
-                    surface,
-                    &presentModeCount,
-                    details.presentModes.data()
-                ) != VK_SUCCESS
-            ) Crash::crash("Could not get surface present modes for physical graphics device.");
+            result = vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+            if (result != VK_SUCCESS) {
+                std::stringstream crashBuffer;
+                crashBuffer << "Failed to get surface present modes for physical graphics device: " << string_VkResult(result);
+                Crash::crash(crashBuffer.str());
+            }
         }
 
         return details;

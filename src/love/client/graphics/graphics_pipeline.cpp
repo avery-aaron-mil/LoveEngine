@@ -6,6 +6,8 @@
 #include <love/common/data/files/file_io.hpp>
 #include <love/common/error/crash.hpp>
 
+#include <vulkan/vk_enum_string_helper.h>
+
 #include "vulkan_functions.hpp"
 
 namespace love_engine {
@@ -86,8 +88,11 @@ namespace love_engine {
             };
 
             VkShaderModule shaderModule;
-            if (vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-                Crash::crash("Failed to create shader module.");
+            auto result = vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule);
+            if (result != VK_SUCCESS) {
+                std::stringstream crashBuffer;
+                crashBuffer << "Failed to create shader module: " << string_VkResult(result);
+                Crash::crash(crashBuffer.str());
             }
             _shaderModules.push_back(shaderModule);
 
@@ -251,11 +256,13 @@ namespace love_engine {
 
         if (_properties.createInfo.get()->pipelineLayoutInfo.get() == nullptr) Crash::crash("Pipeline layout info was null.");
 
-        if (vkCreatePipelineLayout(
-                _device, _properties.createInfo.get()->pipelineLayoutInfo.get(), nullptr, &_pipelineLayout
-            ) != VK_SUCCESS
-        ) {
-            Crash::crash("Failed to create pipeline layout.");
+        auto result = vkCreatePipelineLayout(
+            _device, _properties.createInfo.get()->pipelineLayoutInfo.get(), nullptr, &_pipelineLayout
+        );
+        if (result != VK_SUCCESS) {
+            std::stringstream buffer;
+            buffer << "Failed to create pipeline layout: " << string_VkResult(result);
+            Crash::crash(buffer.str());
         }
 
         _log("Created graphics pipeline layout."); 
@@ -287,8 +294,11 @@ namespace love_engine {
             .basePipelineIndex = -1
         };
 
-        if (vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline) != VK_SUCCESS) {
-            Crash::crash("Failed to create graphics pipeline.");
+        auto result = vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline);
+        if (result != VK_SUCCESS) {
+            std::stringstream buffer;
+            buffer << "Failed to create graphics pipeline: " << string_VkResult(result);
+            Crash::crash(buffer.str());
         }
 
         _log("Created graphics pipeline.");

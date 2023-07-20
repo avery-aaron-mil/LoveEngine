@@ -1,6 +1,10 @@
 #include "image_views.hpp"
 
+#include <sstream>
+
 #include <love/common/error/crash.hpp>
+
+#include <vulkan/vk_enum_string_helper.h>
 
 #include "vulkan_functions.hpp"
 
@@ -48,8 +52,11 @@ namespace love_engine {
             createInfo.subresourceRange.baseArrayLayer = 0;
             createInfo.subresourceRange.layerCount = 1;
             
-            if (vkCreateImageView(_device, &createInfo, nullptr, &_swapChainImageViews[i]) != VK_SUCCESS) {
-                Crash::crash("Failed to create image view.");
+            auto result = vkCreateImageView(_device, &createInfo, nullptr, &_swapChainImageViews[i]);
+            if (result != VK_SUCCESS) {
+                std::stringstream crashBuffer;
+                crashBuffer << "Failed to create image view: " << string_VkResult(result);
+                Crash::crash(crashBuffer.str());
             }
         }
 

@@ -6,6 +6,7 @@
 #include <cstring>
 #include <sstream>
 
+#include <vulkan/vk_enum_string_helper.h>
 #include <GLFW/glfw3.h>
 
 #include "vulkan_functions.hpp"
@@ -149,14 +150,20 @@ namespace love_engine {
         _log("Validating extensions...");
 
         uint32_t extensionCount;
-        if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Could not enumerate Vulkan instance extension properites.");
+        auto result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+        if (result != VK_SUCCESS) {
+            std::stringstream buffer;
+            buffer << "Could not enumerate Vulkan instance extension properites: " << string_VkResult(result);
+            Crash::crash(buffer.str());
         }
 
         // Get available extensions
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-        if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data()) != VK_SUCCESS) {
-            Crash::crash("Could not enumerate Vulkan instance extension properites.");
+        result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, availableExtensions.data());
+        if (result != VK_SUCCESS) {
+            std::stringstream buffer;
+            buffer << "Could not enumerate Vulkan instance extension properites: " << string_VkResult(result);
+            Crash::crash(buffer.str());
         }
 
         // Search extensions
@@ -184,17 +191,23 @@ namespace love_engine {
         _log("Creating Vulkan instance...");
         
         uint32_t apiVersion;
-        if (vkEnumerateInstanceVersion(&apiVersion) != VK_SUCCESS) {
-            Crash::crash("Failed to get Vulkan API version.");
+        auto result = vkEnumerateInstanceVersion(&apiVersion);
+        if (result != VK_SUCCESS) {
+            std::stringstream buffer;
+            buffer << "Failed to get Vulkan API version: " << string_VkResult(result);
+            Crash::crash(buffer.str());
         }
 
         // Extensions
         uint32_t glfwExtensionCount;
         const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+        std::stringstream buffer;
+        buffer << "Required GLFW extensions:";
         for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
             _enabledExtensions.emplace_back(glfwExtensions[i]);
-            _log(std::string(glfwExtensions[i]));
+            buffer << "\n\t" << glfwExtensions[i];
         }
+        _log(buffer.str());
         _validateEnabledExtensions();
 
         // Create info
@@ -250,8 +263,11 @@ namespace love_engine {
             instanceCreateInfo.pNext = &debugCreateInfo;
         }
 
-        if (vkCreateInstance(&instanceCreateInfo, nullptr, &_vulkanInstance) != VK_SUCCESS) {
-            Crash::crash("Failed to create Vulkan instance.");
+        result = vkCreateInstance(&instanceCreateInfo, nullptr, &_vulkanInstance);
+        if (result != VK_SUCCESS) {
+            buffer.str("");
+            buffer << "Failed to create Vulkan instance: " << string_VkResult(result);
+            Crash::crash(buffer.str());
         }
 
         _log("Created Vulkan instance.");

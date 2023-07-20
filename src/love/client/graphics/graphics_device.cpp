@@ -6,6 +6,7 @@
 
 #include <love/common/error/crash.hpp>
 
+#include <vulkan/vk_enum_string_helper.h>
 #include <GLFW/glfw3.h>
 
 #include "swap_chain.hpp"
@@ -53,16 +54,22 @@ namespace love_engine {
         _log("Getting physical graphics devices...");
 
         uint32_t deviceCount = 0;
-        if (vkEnumeratePhysicalDevices(_vulkanInstance, &deviceCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Failed to enumerate physical graphics devices.");
+        auto result = vkEnumeratePhysicalDevices(_vulkanInstance, &deviceCount, nullptr);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to enumerate physical graphics devices: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
         if (deviceCount == 0) {
             Crash::crash("Found no physical graphics devices.");
         }
 
         _physicalDevices.resize(deviceCount);
-        if (vkEnumeratePhysicalDevices(_vulkanInstance, &deviceCount, _physicalDevices.data()) != VK_SUCCESS) {
-            Crash::crash("Failed to enumerate physical graphics devices.");
+        result = vkEnumeratePhysicalDevices(_vulkanInstance, &deviceCount, _physicalDevices.data());
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to enumerate physical graphics devices: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
 
         for (size_t i = 0; i < deviceCount; ++i) {
@@ -94,8 +101,11 @@ namespace love_engine {
 
                 // Check if queue can be used for presenting
                 VkBool32 presentSupport = false;
-                if (vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport) != VK_SUCCESS) {
-                    Crash::crash("Could not get surface support of physical graphics device.");
+                auto result = vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
+                if (result != VK_SUCCESS) {
+                    std::stringstream crashBuffer;
+                    crashBuffer << "Failed to get surface support of physical graphics device: " << string_VkResult(result);
+                    Crash::crash(crashBuffer.str());
                 }
                 if (presentSupport) {
                     queueIndices.hasPresentQueue = true;
@@ -111,19 +121,21 @@ namespace love_engine {
     
     bool GraphicsDevice::_checkDeviceHasEnabledExtensions(const VkPhysicalDevice& device) const noexcept {
         uint32_t extensionCount;
-        if (vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr) != VK_SUCCESS) {
-            Crash::crash("Could not enumerate device extension properites for physical graphics device.");
+        auto result = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to enumerate device extension properites for physical graphics device: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
 
         // Get available extensions
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-        if (vkEnumerateDeviceExtensionProperties(
-                device,
-                nullptr,
-                &extensionCount,
-                availableExtensions.data()
-            ) != VK_SUCCESS
-        ) Crash::crash("Could not enumerate device extension properites for physical graphics device.");
+        result = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to enumerate device extension properites for physical graphics device: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
+        }
 
         // Search extensions
         for (const auto& extension : _enabledExtensions) {
@@ -256,9 +268,12 @@ namespace love_engine {
 
         // Create device
         VkDevice device;
-        if ((vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device) != VK_SUCCESS) ||
-            (device == nullptr)
-        ) Crash::crash("Failed to create Vulkan device.");
+        auto result = vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to create Vulkan device: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
+        }
 
         _log("Created Vulkan device.");
         return device;

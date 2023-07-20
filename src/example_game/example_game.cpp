@@ -26,7 +26,8 @@ ClientInstance::Properties setClientInstanceProperties() {
         .versionMajor = 1,
         .versionMinor = 0,
         .versionPatch = 0,
-        .debugLogger = logger
+        .debugLogger = logger,
+        .verbose = true
     };
 
     Window::Properties windowProperties;

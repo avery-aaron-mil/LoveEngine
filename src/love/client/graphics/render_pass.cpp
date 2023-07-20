@@ -1,8 +1,12 @@
 #include "render_pass.hpp"
 
+#include <sstream>
+
 #include <love/common/error/crash.hpp>
 
 #include "vulkan_functions.hpp"
+
+#include <vulkan/vk_enum_string_helper.h>
 
 namespace love_engine {
     RenderPass::RenderPass(VkDevice device, VkFormat imageFormat, const Properties& properties, std::shared_ptr<Logger> logger)
@@ -57,8 +61,11 @@ namespace love_engine {
             _properties.renderPassInfo = std::make_shared<VkRenderPassCreateInfo>(std::move(renderPassInfo));
         }
 
-        if (vkCreateRenderPass(_device, _properties.renderPassInfo.get(), nullptr, &_renderPass) != VK_SUCCESS) {
-            Crash::crash("Failed to create render pass.");
+        auto result = vkCreateRenderPass(_device, _properties.renderPassInfo.get(), nullptr, &_renderPass);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to create render pass: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
 
         _log("Created render pass.");

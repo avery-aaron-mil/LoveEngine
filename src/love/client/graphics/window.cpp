@@ -10,6 +10,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #endif
 #include <stb_image.h>
+#include <vulkan/vk_enum_string_helper.h>
 
 namespace love_engine {
     Window::Window(VkInstance vulkanInstance, const Properties& properties, std::shared_ptr<Logger> logger)
@@ -99,8 +100,11 @@ namespace love_engine {
     }
     
     void Window::_createWindowSurface() noexcept {
-        if (glfwCreateWindowSurface(_vulkanInstance, _window, nullptr, &_surface) != VK_SUCCESS) {
-            Crash::crash("Failed to create window surface.");
+        auto result = glfwCreateWindowSurface(_vulkanInstance, _window, nullptr, &_surface);
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to create window surface: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
         }
     }
 
