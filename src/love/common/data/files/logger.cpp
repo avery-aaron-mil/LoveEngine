@@ -28,9 +28,10 @@ namespace love_engine {
         }
 
         // Set log message
-        // [HH::MM:SS+UUUUUU] [THREAD/TYPE]: MESSAGE
-        char timeBuffer[sizeof("[HH:MM:SS+UUUUUU]")];
-        std::snprintf(timeBuffer, sizeof(timeBuffer), "[%02d:%02d:%02d+%06ld]",
+        // [YYMMDD_HH::MM:SS+UUUUUU] [THREAD/TYPE]: MESSAGE
+        char timeBuffer[sizeof("[YYMMDD_HH:MM:SS+UUUUUU]")];
+        std::snprintf(timeBuffer, sizeof(timeBuffer), "[%02d%02d%02d/%02d:%02d:%02d+%06ld]",
+            (now->tm_year - 100), (now->tm_mon + 1), now->tm_mday,
             now->tm_hour, now->tm_min, now->tm_sec, tv.tv_usec
         );
         std::stringstream outputMessageBuffer;

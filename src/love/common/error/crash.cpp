@@ -92,7 +92,7 @@ namespace love_engine {
             now = std::localtime(&time);
             if (now != nullptr) {
                 std::snprintf(timeBuffer, sizeof(timeBuffer), "%d/%d/%d %d:%02d %s (+%d.%06lds)",
-                    (now->tm_mon + 1), now->tm_mday, (now->tm_year - 100), // Date
+                    (now->tm_mon + 1), now->tm_mday, (now->tm_year + 1900), // Date
                     (((now->tm_hour % 12) > 0) ? (now->tm_hour % 12) : 12), // Hour
                     now->tm_min, ((now->tm_hour < 12) ? "AM" : "PM"), now->tm_sec, tv.tv_usec // Time
                 );
