@@ -51,8 +51,4 @@ namespace love_engine {
         if (_window.shouldClose()) _log("Window closed by user.");
         else if (_clientState->shouldExit()) _log("Client state exited program.");
     }
-
-    void ClientInstance::_defaultGLFWErrorCallback(int error, const char* description) {
-        Crash::crash(std::string("Caught GLFW error with no callback: ") + description);
-    }
 }

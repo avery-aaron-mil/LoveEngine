@@ -19,9 +19,9 @@ void glfwCallback(int e, const char*desc) {
     logger.get()->log("System Info:\n" + SystemInfo::getConsolidatedSystemInfo());
 }
 
-ClientInstance::Properties setClientInstanceProperties() {
+GraphicsInstance::Properties setGraphicsInstanceProperties() {
     // Set properties
-    GraphicsInstance::ApplicationInfo applicationInfo{
+    VulkanInstance::ApplicationInfo applicationInfo{
         .name = "Example Game",
         .versionMajor = 1,
         .versionMinor = 0,
@@ -50,12 +50,11 @@ ClientInstance::Properties setClientInstanceProperties() {
         .shaders = std::move(shaders)
     };
 
-    return ClientInstance::Properties{
+    return GraphicsInstance::Properties{
         .applicationInfo = std::move(applicationInfo),
         .windowProperties = std::move(windowProperties),
         .graphicsPipelineProperties = std::move(graphicsPipelineProperties),
-        .glfwErrorCallback = glfwCallback,
-        .msPerTick = 50.f
+        .glfwErrorCallback = glfwCallback
     };
 }
 
@@ -67,7 +66,11 @@ int main(int argc, char** argv) {
 
     // Start client
     ClientState_Loading loadingState;
-    ClientInstance client(&loadingState, setClientInstanceProperties(), logger);
+    ClientInstance::Properties clientInstanceProperties = {
+        .graphicsProperties = setGraphicsInstanceProperties(),
+        .msPerTick = 50.f
+    };
+    ClientInstance client(&loadingState, clientInstanceProperties, logger);
     client.run();
 
     logger.get()->log("Client exited. Closing.");

@@ -11,7 +11,7 @@
 
 #include <vulkan/vulkan.h>
 
-#include "graphics_instance.hpp"
+#include "vulkan_instance.hpp"
 
 namespace love_engine {
     class GraphicsDevice {
