@@ -1,6 +1,7 @@
 #ifndef LOVE_CLIENT_INSTANCE_HPP
 #define LOVE_CLIENT_INSTANCE_HPP
 
+#include "graphics/frame_buffers.hpp"
 #include "graphics/graphics_instance.hpp"
 #include "graphics/graphics_device.hpp"
 #include "graphics/graphics_pipeline.hpp"
@@ -28,6 +29,7 @@ namespace love_engine {
                 ImageViews::Properties imageViewProperties{};
                 RenderPass::Properties renderPassProperties{};
                 GraphicsPipeline::Properties graphicsPipelineProperties{};
+                FrameBuffers::Properties frameBufferProperties{};
 
                 std::function<void(int, const char*)> glfwErrorCallback = _defaultGLFWErrorCallback;
                 std::float32_t msPerTick = 20.f;
@@ -47,46 +49,54 @@ namespace love_engine {
             ClientState* _clientState = nullptr;
             ClientState* _nextClientState = nullptr;
             
-            GraphicsInstance _graphicsInstance{
+            GraphicsInstance _graphicsInstance {
                 _properties.applicationInfo,
                 _properties.glfwErrorCallback,
                 _logger
             };
-            Window _window{
+            Window _window {
                 _graphicsInstance.instance(),
                 _properties.windowProperties,
                 _logger
             };
-            GraphicsDevice _graphicsDevice{
+            GraphicsDevice _graphicsDevice {
                 _graphicsInstance.instance(),
                 _window.surface(),
                 _properties.graphicsDeviceProperties,
                 _logger
             };
-            SwapChain _swapChain{
+            SwapChain _swapChain {
                 _graphicsDevice,
                 _window,
                 _properties.swapChainProperties,
                 _logger
             };
-            ImageViews _imageViews{
+            ImageViews _imageViews {
                 _graphicsDevice.device(),
                 _swapChain.swapChainImages(),
                 _swapChain.imageFormat(),
                 _properties.imageViewProperties,
                 _logger
             };
-            RenderPass _renderPass{
+            RenderPass _renderPass {
                 _graphicsDevice.device(),
                 _swapChain.imageFormat(),
                 _properties.renderPassProperties,
                 _logger
             };
-            GraphicsPipeline _graphicsPipeline{
+            GraphicsPipeline _graphicsPipeline {
                 _graphicsDevice.device(),
+                _renderPass.renderPass(),
                 _window.extent(),
-                _renderPass,
                 _properties.graphicsPipelineProperties,
+                _logger
+            };
+            FrameBuffers _frameBuffers {
+                _graphicsDevice.device(),
+                _renderPass.renderPass(),
+                _window.extent(),
+                _imageViews.imageViews(),
+                _properties.frameBufferProperties,
                 _logger
             };
 

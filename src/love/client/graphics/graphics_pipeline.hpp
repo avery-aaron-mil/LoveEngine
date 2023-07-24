@@ -58,8 +58,8 @@ namespace love_engine {
 
             GraphicsPipeline(
                 VkDevice device,
+                VkRenderPass renderPass,
                 VkExtent2D extent,
-                const RenderPass& renderPass,
                 const Properties& properties,
                 std::shared_ptr<Logger> logger
             );
@@ -68,8 +68,8 @@ namespace love_engine {
         private:
             std::shared_ptr<Logger> _logger = nullptr;
             VkDevice _device = nullptr;
+            VkRenderPass _renderPass = nullptr;
             VkExtent2D _extent;
-            RenderPass _renderPass;
             Properties _properties;
             VkPipelineLayout _pipelineLayout = nullptr;
             std::vector<VkShaderModule> _shaderModules;

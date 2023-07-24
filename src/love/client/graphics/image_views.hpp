@@ -24,6 +24,8 @@ namespace love_engine {
             );
             ~ImageViews();
 
+            inline const std::vector<VkImageView> imageViews() const noexcept { return _swapChainImageViews; }
+
         private:
             std::shared_ptr<Logger> _logger;
             VkDevice _device = nullptr;

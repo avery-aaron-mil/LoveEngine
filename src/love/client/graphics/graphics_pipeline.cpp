@@ -13,12 +13,13 @@
 namespace love_engine {
     GraphicsPipeline::GraphicsPipeline(
         VkDevice device,
+        VkRenderPass renderPass,
         VkExtent2D extent,
-        const RenderPass& renderPass,
         const Properties& properties,
         std::shared_ptr<Logger> logger
-    ) : _logger(logger), _device(device), _extent(extent), _renderPass(renderPass), _properties(properties) {
+    ) : _logger(logger), _device(device), _renderPass(renderPass), _extent(extent), _properties(properties) {
         if (_device == nullptr) Crash::crash("Device passed to graphics pipeline was null.");
+        if (_renderPass == nullptr) Crash::crash("Render pass passed to graphics pipeline was null.");
         if ((_properties.type != PipelineType::CUSTOM) || (_properties.createInfo.get() == nullptr)) {
             _loadDefaultProperties();
         } 
@@ -273,7 +274,7 @@ namespace love_engine {
     void GraphicsPipeline::_createPipeline() noexcept {
         _log("Creating graphics pipeline...");
 
-        if (_renderPass.renderPass() == nullptr) Crash::crash("Render pass was null.");
+        if (_renderPass == nullptr) Crash::crash("Render pass was null.");
         if (_properties.createInfo.get() == nullptr) Crash::crash("Create info struct was null.");
 
         const PipelineCreateInfo* createInfo = _properties.createInfo.get();
@@ -290,7 +291,7 @@ namespace love_engine {
             .pColorBlendState = createInfo->colorBlendStateInfo.get(),
             .pDynamicState = createInfo->dynamicStateInfo.get(),
             .layout = _pipelineLayout,
-            .renderPass = _renderPass.renderPass(),
+            .renderPass = _renderPass,
             .subpass = _properties.subpassIndex,
             .basePipelineHandle = _properties.basePipeline,
             .basePipelineIndex = _properties.basePipelineIndex
