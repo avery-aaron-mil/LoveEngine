@@ -18,8 +18,8 @@ New ideas are always welcome.
 
 ## Links
 
-**[Trello](https://trello.com/b/K0QQLwM9/love-engine)** for updates and TODO list
+**[Trello](https://trello.com/b/K0QQLwM9/love-engine)** for updates and TODO list.
 
-**[Disord](https://discordapp.com/users/802206598042353714)** for contacting me directly
+**[Disord](https://discordapp.com/users/802206598042353714)** for contacting me directly.
 
-**[PayPal](https://paypal.me/averyaaaron)** if you're feeling generous ❤️
+**[PayPal](https://paypal.me/averyaaaron)** if you're feeling generous. ❤️
