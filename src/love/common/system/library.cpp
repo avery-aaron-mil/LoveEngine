@@ -10,7 +10,7 @@
 #endif
 
 namespace love_engine {
-    std::string _get_Error() {
+    std::string _getError() {
 #ifdef _WIN32
         auto errorCode = GetLastError();
         LPSTR messageBuffer = nullptr;
@@ -41,7 +41,7 @@ namespace love_engine {
 #endif
         if (_library == nullptr) {
             std::stringstream buffer;
-            buffer << "Could not load library \"" << library << "\": " << _get_Error();
+            buffer << "Could not load library \"" << library << "\": " << _getError();
             Crash::crash(buffer.str());
         }
     }
@@ -70,7 +70,7 @@ namespace love_engine {
 #endif
         if (address == nullptr) {
             std::stringstream buffer;
-            buffer << "Could not load library function \"" << function << "\": " << _get_Error();
+            buffer << "Could not load library function \"" << function << "\": " << _getError();
             Crash::crash(buffer.str());
         }
 
