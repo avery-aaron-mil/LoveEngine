@@ -2,6 +2,7 @@
 #define LOVE_GRAPHICS_INSTANCE_HPP
 
 #include "vulkan_instance.hpp"
+#include "command_pool.hpp"
 #include "frame_buffers.hpp"
 #include "graphics_device.hpp"
 #include "graphics_pipeline.hpp"
@@ -15,6 +16,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace love_engine {
     class GraphicsInstance {
@@ -28,8 +30,12 @@ namespace love_engine {
                 RenderPass::Properties renderPassProperties{};
                 GraphicsPipeline::Properties graphicsPipelineProperties{};
                 FrameBuffers::Properties frameBufferProperties{};
+                CommandPool::Properties commandPoolProperties{};
 
                 std::function<void(int, const char*)> glfwErrorCallback = _defaultGLFWErrorCallback;
+
+                std::vector<VkCommandBufferBeginInfo> commandBufferBeginInfo;
+                std::vector<VkRenderPassBeginInfo> renderPassBeginInfo;
             };
 
             GraphicsInstance(const Properties& properties, std::shared_ptr<Logger> logger);
@@ -89,6 +95,13 @@ namespace love_engine {
                 _window.extent(),
                 _imageViews.imageViews(),
                 _properties.frameBufferProperties,
+                _logger
+            };
+            CommandPool _commandPool {
+                _graphicsDevice.device(),
+                _renderPass.renderPass(),
+                _graphicsDevice.queueFamilyIndices(),
+                _properties.commandPoolProperties,
                 _logger
             };
 
