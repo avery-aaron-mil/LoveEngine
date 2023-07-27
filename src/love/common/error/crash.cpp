@@ -65,7 +65,8 @@ namespace love_engine {
         "Shall we play a game?",
         "Do you want to build a snowman?",
         "Would you like a hug?",
-        "git gud"
+        "git gud",
+        "No game? :("
     };
 
     void Crash::setCrashFunction(const std::function<void(const std::string&)>& crashFunction) noexcept {
