@@ -24,6 +24,7 @@ namespace love_engine {
     }
     SwapChain::~SwapChain() {
         if (_swapChain) vkDestroySwapchainKHR(_device, _swapChain, nullptr);
+        _log("Destroyed swap chain.");
     }
 
     void SwapChain::_log(const std::string& message) const noexcept {

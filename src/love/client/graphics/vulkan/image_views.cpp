@@ -22,6 +22,7 @@ namespace love_engine {
     }
     ImageViews::~ImageViews() {
         for (auto imageView : _swapChainImageViews) vkDestroyImageView(_device, imageView, nullptr);
+        _log("Destroyed image views.");
     }
 
     void ImageViews::_log(const std::string& message) const noexcept {

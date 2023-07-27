@@ -23,6 +23,7 @@ namespace love_engine {
     }
     FrameBuffers::~FrameBuffers() {
         for (auto frameBuffer : _swapChainFrameBuffers) vkDestroyFramebuffer(_device, frameBuffer, nullptr);
+        _log("Destroyed frame buffers.");
     }
 
     void FrameBuffers::_log(const std::string& message) const noexcept {

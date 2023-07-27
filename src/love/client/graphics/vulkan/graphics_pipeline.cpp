@@ -31,6 +31,7 @@ namespace love_engine {
         for (auto shaderModule : _shaderModules) vkDestroyShaderModule(_device, shaderModule, nullptr);
         if (_pipelineLayout) vkDestroyPipelineLayout(_device, _pipelineLayout, nullptr);
         if (_pipeline) vkDestroyPipeline(_device, _pipeline, nullptr);
+        _log("Destroyed graphics pipeline.");
     }
 
     void GraphicsPipeline::_log(const std::string& message) const noexcept {

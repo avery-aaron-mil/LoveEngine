@@ -19,6 +19,7 @@ namespace love_engine {
     Window::~Window() {
         if (_window) glfwDestroyWindow(_window);
         if (_surface) vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
+        _log("Destroyed window.");
     }
 
     void Window::_log(const std::string& message) const noexcept {

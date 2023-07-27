@@ -50,15 +50,18 @@ GraphicsInstance::Properties setGraphicsInstanceProperties() {
         .debugLogger = logger,
         .verbose = true
     };
-    VulkanInstance::Properties vulkanProperties {
+    VulkanObjects::Properties vulkanProperties {
         .windowProperties = std::move(windowProperties),
-        .graphicsPipelineProperties = std::move(pipelineProperties),
+        .graphicsPipelineProperties = std::move(pipelineProperties)
+    };
+    VulkanInstance::Properties instanceProperties {
+        .vulkanProperties = std::move(vulkanProperties),
         .glfwErrorCallback = glfwCallback
     };
 
     return GraphicsInstance::Properties{
         .applicationInfo = std::move(applicationInfo),
-        .vulkanProperties = std::move(vulkanProperties)
+        .instanceProperties = std::move(instanceProperties)
     };
 }
 

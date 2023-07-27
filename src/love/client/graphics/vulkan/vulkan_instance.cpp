@@ -24,12 +24,19 @@ namespace love_engine {
         _loadGlobalVulkanFunctions();
         _createVulkanInstance();
         _loadInstanceVulkanFunctions();
-        _createVulkanObjects();
+
+        _vulkanObjects = std::make_unique<VulkanObjects>(_vulkanInstance, _properties.vulkanProperties, _logger);
+        if (_vulkanObjects.get() == nullptr) Crash::crash("Failed to create VulkanObjects pointer.");
+        _vulkanObjects.get()->createVulkanObjects();
     }
     
     VulkanInstance::~VulkanInstance() {
         glfwTerminate();
+        _log("Terminated GLFW.");
+
+        if (_vulkanObjects.get()) _vulkanObjects.reset();
         if (_vulkanInstance) vkDestroyInstance(_vulkanInstance, nullptr);
+        _log("Destroyed Vulkan instance.");
     }
 
     void VulkanInstance::_defaultGLFWErrorCallback(int error, const char* description) {
@@ -277,79 +284,5 @@ namespace love_engine {
         #undef VK_INSTANCE_LEVEL_FUNCTION
 
         _log("Loaded Vulkan instance functions.");
-    }
-
-    void VulkanInstance::_createVulkanObjects() noexcept {
-        _log("Creating Vulkan objects...");
-
-        _window = std::make_unique<Window>(
-            _vulkanInstance,
-            _properties.windowProperties,
-            _logger
-        );
-        if (_window.get() == nullptr) Crash::crash("Failed to create window object.");
-
-        _graphicsDevice = std::make_unique<GraphicsDevice>(
-            _vulkanInstance,
-            _window.get()->surface(),
-            _properties.graphicsDeviceProperties,
-            _logger
-        );
-        if (_graphicsDevice.get() == nullptr) Crash::crash("Failed to create graphics device object.");
-
-        _swapChain = std::make_unique<SwapChain>(
-            _graphicsDevice.get(),
-            _window.get(),
-            _properties.swapChainProperties,
-            _logger
-        );
-        if (_swapChain.get() == nullptr) Crash::crash("Failed to create swap chain object.");
-
-        _imageViews = std::make_unique<ImageViews>(
-            _graphicsDevice.get()->device(),
-            _swapChain.get()->swapChainImages(),
-            _swapChain.get()->imageFormat(),
-            _properties.imageViewProperties,
-            _logger
-        );
-        if (_imageViews.get() == nullptr) Crash::crash("Failed to create image views object.");
-
-        _renderPass = std::make_unique<RenderPass>(
-            _graphicsDevice.get()->device(),
-            _swapChain.get()->imageFormat(),
-            _properties.renderPassProperties,
-            _logger
-        );
-        if (_renderPass.get() == nullptr) Crash::crash("Failed to create render pass object.");
-
-        _graphicsPipeline = std::make_unique<GraphicsPipeline>(
-            _graphicsDevice.get()->device(),
-            _renderPass.get()->renderPass(),
-            _window.get()->extent(),
-            _properties.graphicsPipelineProperties,
-            _logger
-        );
-        if (_graphicsPipeline.get() == nullptr) Crash::crash("Failed to create pipeline object.");
-
-        _frameBuffers = std::make_unique<FrameBuffers>(
-            _graphicsDevice.get()->device(),
-            _renderPass.get()->renderPass(),
-            _window.get()->extent(),
-            _imageViews.get()->imageViews(),
-            _properties.frameBufferProperties,
-            _logger
-        );
-        if (_frameBuffers.get() == nullptr) Crash::crash("Failed to create frame buffers object.");
-
-        _commandPool = std::make_unique<CommandPool>(
-            _graphicsDevice.get()->device(),
-            _renderPass.get()->renderPass(),
-            _graphicsDevice.get()->queueFamilyIndices(),
-            _properties.commandPoolProperties,
-            _logger
-        );
-        if (_commandPool.get() == nullptr) Crash::crash("Failed to create command pool object.");
-
-        _log("Created Vulkan objects.");
     }
 }

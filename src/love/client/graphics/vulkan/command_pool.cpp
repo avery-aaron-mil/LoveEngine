@@ -22,7 +22,9 @@ namespace love_engine {
         _allocateCommandBuffers();
     }
     CommandPool::~CommandPool() {
+        vkFreeCommandBuffers(_device, _commandPool, _commandBuffers.size(), _commandBuffers.data());
         if (_commandPool) vkDestroyCommandPool(_device, _commandPool, nullptr);
+        _log("Destroyed command pool.");
     }
 
     void CommandPool::_log(const std::string& message) const noexcept {

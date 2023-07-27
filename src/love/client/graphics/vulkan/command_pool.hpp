@@ -28,6 +28,8 @@ namespace love_engine {
             );
             ~CommandPool();
 
+            inline VkCommandPool commandPool() const noexcept { return _commandPool; }
+
         private:
             std::shared_ptr<Logger> _logger = nullptr;
             Properties _properties;

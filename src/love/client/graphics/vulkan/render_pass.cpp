@@ -15,6 +15,7 @@ namespace love_engine {
     }
     RenderPass::~RenderPass() {
         if (_renderPass) vkDestroyRenderPass(_device, _renderPass, nullptr);
+        _log("Destroyed render pass.");
     }
 
     void RenderPass::_log(const std::string& message) const noexcept {

@@ -29,6 +29,7 @@ namespace love_engine {
 
     GraphicsDevice::~GraphicsDevice() {
         if (_device) vkDestroyDevice(_device, nullptr);
+        _log("Destroyed graphics device.");
     }
 
     void GraphicsDevice::_initDevice(const std::string& deviceName) noexcept {

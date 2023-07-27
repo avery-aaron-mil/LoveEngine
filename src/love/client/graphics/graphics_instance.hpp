@@ -14,7 +14,7 @@ namespace love_engine {
         public:
             struct Properties {
                 VulkanInstance::ApplicationInfo applicationInfo{};
-                VulkanInstance::Properties vulkanProperties{};
+                VulkanInstance::Properties instanceProperties{};
             };
 
             GraphicsInstance(const Properties& properties, std::shared_ptr<Logger> logger);
@@ -28,7 +28,7 @@ namespace love_engine {
 
             VulkanInstance _vulkanInstance {
                 _properties.applicationInfo,
-                _properties.vulkanProperties,
+                _properties.instanceProperties,
                 _logger
             };
 
