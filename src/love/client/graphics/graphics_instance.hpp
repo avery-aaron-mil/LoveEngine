@@ -4,10 +4,8 @@
 #include <love/client/graphics/vulkan/vulkan_instance.hpp>
 #include <love/common/data/files/logger.hpp>
 
-#include <functional>
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace love_engine {
     class GraphicsInstance {
@@ -20,17 +18,13 @@ namespace love_engine {
             GraphicsInstance(const Properties& properties, std::shared_ptr<Logger> logger);
             ~GraphicsInstance() = default;
 
-            inline Window* window() const noexcept { return _vulkanInstance.window(); }
+            inline Window* window() const noexcept { return _vulkanInstance.get()->window(); }
 
         private:
             std::shared_ptr<Logger> _logger = nullptr;
             Properties _properties;
 
-            VulkanInstance _vulkanInstance {
-                _properties.applicationInfo,
-                _properties.instanceProperties,
-                _logger
-            };
+            std::unique_ptr<VulkanInstance> _vulkanInstance = nullptr;
 
             void _log(const std::string& message) const noexcept;
     };

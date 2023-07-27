@@ -20,7 +20,7 @@ namespace love_engine {
     }
 
     void ClientInstance::run() noexcept {
-        _log("Running client...");
+        _log("Running client...\n\n==================== LOVE ENGINE CLIENT RUNNING ====================\n");
 
         auto previousTime = std::chrono::high_resolution_clock::now();
         std::float128_t lag = 0.0f;
@@ -50,6 +50,7 @@ namespace love_engine {
         _window->hide();
         if (_window->shouldClose()) _log("Window closed by user.");
         else if (_clientState->shouldExit()) _log("Client state exited program.");
+        _log("Client closing...\n\n==================== LOVE ENGINE CLIENT CLOSING ====================\n");
         _graphicsInstance.~GraphicsInstance();
     }
 }
