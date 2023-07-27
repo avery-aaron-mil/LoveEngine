@@ -5,11 +5,10 @@
 #include <string>
 #include <vector>
 
+#include <love/client/graphics/vulkan/graphics_device.hpp>
 #include <love/common/data/files/logger.hpp>
 
 #include <vulkan/vulkan.h>
-
-#include "graphics_device.hpp"
 
 namespace love_engine {
     class CommandPool {

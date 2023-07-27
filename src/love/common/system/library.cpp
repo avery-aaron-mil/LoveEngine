@@ -1,6 +1,6 @@
-#include "library.hpp"
+#include <love/common/system/library.hpp>
 
-#include "../error/crash.hpp"
+#include <love/common/error/crash.hpp>
 
 #include <sstream>
 #include <string>

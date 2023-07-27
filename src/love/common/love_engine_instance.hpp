@@ -1,8 +1,8 @@
 #ifndef LOVE_LOVE_ENGINE_INSTANCE_HPP
 #define LOVE_LOVE_ENGINE_INSTANCE_HPP
 
-#include "data/files/file_io.hpp"
-#include "system/library.hpp"
+#include <love/common/data/files/file_io.hpp>
+#include <love/common/system/library.hpp>
 
 #include <functional>
 

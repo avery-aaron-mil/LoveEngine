@@ -1,16 +1,15 @@
-#include "graphics_device.hpp"
+#include <love/client/graphics/vulkan/graphics_device.hpp>
 
 #include <cstring>
 #include <sstream>
 #include <unordered_set>
 
+#include <love/client/graphics/vulkan/swap_chain.hpp>
+#include <love/client/graphics/vulkan/vulkan_functions.hpp>
 #include <love/common/error/crash.hpp>
 
 #include <vulkan/vk_enum_string_helper.h>
 #include <GLFW/glfw3.h>
-
-#include "swap_chain.hpp"
-#include "vulkan_functions.hpp"
 
 namespace love_engine {
     GraphicsDevice::GraphicsDevice(
@@ -22,17 +21,17 @@ namespace love_engine {
         : _logger(logger), _properties(properties), _vulkanInstance(vulkanInstance), _surface(surface)
     {
         // Input validation
-        if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics Device was null.");
-        if (_surface == nullptr) Crash::crash("Surface passed to Graphics Device was null.");
+        if (_vulkanInstance == nullptr) Crash::crash("Vulkan instance passed to Graphics GraphicsDevice was null.");
+        if (_surface == nullptr) Crash::crash("Surface passed to Graphics GraphicsDevice was null.");
 
-        _initGraphicsDevice(_properties.deviceName);
+        _initDevice(_properties.deviceName);
     }
 
     GraphicsDevice::~GraphicsDevice() {
         if (_device) vkDestroyDevice(_device, nullptr);
     }
 
-    void GraphicsDevice::_initGraphicsDevice(const std::string& deviceName) noexcept {
+    void GraphicsDevice::_initDevice(const std::string& deviceName) noexcept {
         _getPhysicalDevices();
         try {
             VkPhysicalDevice device = deviceName.empty() ? getBestDevice() : getPhysicalDeviceFromName(deviceName);
@@ -186,7 +185,7 @@ namespace love_engine {
         if (swapChainSupport.surfaceFormats.empty()) return std::string("No swap chain formats supported.");
         if (swapChainSupport.presentModes.empty()) return std::string("No swap chain present modes supported.");
 
-        // Device suitable; no reason to report
+        // GraphicsDevice suitable; no reason to report
         return std::string();
     }
 
@@ -286,7 +285,7 @@ namespace love_engine {
         if (!(fun = (PFN_##fun) vkGetDeviceProcAddr(_device, #fun))) {\
             Crash::crash("Could not load Vulkan device function: " #fun);\
         }
-        #include "vulkan_functions.inl"
+        #include <love/client/graphics/vulkan/vulkan_functions.inl>
         #undef VK_DEVICE_LEVEL_FUNCTION
 
         _log("Loaded Vulkan device functions.");
@@ -324,7 +323,7 @@ namespace love_engine {
 
     void GraphicsDevice::usePhysicalDevice(const VkPhysicalDevice& device) noexcept {
         // Input validation
-        if (device == nullptr) Crash::crash("Device passed to usePhysicalDevice() was null.");
+        if (device == nullptr) Crash::crash("Vulkan device to usePhysicalDevice() was null.");
 
         // Log
         VkPhysicalDeviceProperties properties;

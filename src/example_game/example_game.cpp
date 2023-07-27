@@ -5,7 +5,7 @@
 #include <love/client/client_instance.hpp>
 #include <love/client/graphics/graphics_instance.hpp>
 
-#include "client/client_states/client_state_loading.hpp"
+#include <example_game/client/client_states/client_state_loading.hpp>
 
 #include <cstdlib>
 #include <memory>
@@ -21,15 +21,6 @@ void glfwCallback(int e, const char*desc) {
 
 GraphicsInstance::Properties setGraphicsInstanceProperties() {
     // Set properties
-    VulkanInstance::ApplicationInfo applicationInfo{
-        .name = "Example Game",
-        .versionMajor = 1,
-        .versionMinor = 0,
-        .versionPatch = 0,
-        .debugLogger = logger,
-        .verbose = true
-    };
-
     Window::Properties windowProperties;
     windowProperties.title = "Game";
 
@@ -45,16 +36,29 @@ GraphicsInstance::Properties setGraphicsInstanceProperties() {
     };
     std::vector<GraphicsPipeline::Shader> shaders{vertexShader, fragmentShader};
 
-    GraphicsPipeline::Properties graphicsPipelineProperties {
+    GraphicsPipeline::Properties pipelineProperties {
         .type = GraphicsPipeline::PipelineType::DEFAULT_3D,
         .shaders = std::move(shaders)
     };
 
+    // Vulkan properties
+    VulkanInstance::ApplicationInfo applicationInfo {
+        .name = "Example Game",
+        .versionMajor = 1,
+        .versionMinor = 0,
+        .versionPatch = 0,
+        .debugLogger = logger,
+        .verbose = true
+    };
+    VulkanInstance::Properties vulkanProperties {
+        .windowProperties = std::move(windowProperties),
+        .graphicsPipelineProperties = std::move(pipelineProperties),
+        .glfwErrorCallback = glfwCallback
+    };
+
     return GraphicsInstance::Properties{
         .applicationInfo = std::move(applicationInfo),
-        .windowProperties = std::move(windowProperties),
-        .graphicsPipelineProperties = std::move(graphicsPipelineProperties),
-        .glfwErrorCallback = glfwCallback
+        .vulkanProperties = std::move(vulkanProperties)
     };
 }
 

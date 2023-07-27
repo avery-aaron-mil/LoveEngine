@@ -1,4 +1,4 @@
-#include "system_info.hpp"
+#include <love/common/system/system_info.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -10,7 +10,7 @@
   #define _WIN32_DCOM
   #endif
   #include <Windows.h>
-  #include "windows_registry.hpp"
+  #include <love/common/system/windows_registry.hpp>
 #elif defined(__APPLE__)
   #include <mach-o/dyld.h>
   #include <sys/utsname.h>

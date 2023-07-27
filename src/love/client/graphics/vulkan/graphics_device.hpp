@@ -1,5 +1,5 @@
-#ifndef LOVE_GRAPHICS_DEVICE_HPP
-#define LOVE_GRAPHICS_DEVICE_HPP
+#ifndef LOVE_GRAPGICS_DEVICE_HPP
+#define LOVE_GRAPGICS_DEVICE_HPP
 
 #include <cstdint>
 #include <memory>
@@ -10,8 +10,6 @@
 #include <love/common/data/files/logger.hpp>
 
 #include <vulkan/vulkan.h>
-
-#include "vulkan_instance.hpp"
 
 namespace love_engine {
     class GraphicsDevice {
@@ -66,8 +64,8 @@ namespace love_engine {
                 const VkPhysicalDeviceFeatures& deviceFeatures
             ) const noexcept;
             void _loadDeviceVulkanFunctions() const noexcept;
-            void _initGraphicsDevice(const std::string& deviceName) noexcept;
+            void _initDevice(const std::string& deviceName) noexcept;
     };
 }
 
-#endif // LOVE_GRAPHICS_DEVICE_HPP
+#endif // LOVE_GRAPGICS_DEVICE_HPP

@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "render_pass.hpp"
-
+#include <love/client/graphics/vulkan/render_pass.hpp>
 #include <love/common/data/files/file_io.hpp>
 #include <love/common/data/files/logger.hpp>
 

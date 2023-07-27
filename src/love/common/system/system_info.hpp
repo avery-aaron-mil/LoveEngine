@@ -1,5 +1,5 @@
-#ifndef LOVE_DEVICE_INFO_HPP
-#define LOVE_DEVICE_INFO_HPP
+#ifndef LOVE_SYSTEM_INFO_HPP
+#define LOVE_SYSTEM_INFO_HPP
 
 #include <string>
 #include <vector>
@@ -46,4 +46,4 @@ namespace love_engine {
 
 }
 
-#endif // LOVE_DEVICE_INFO_HPP
+#endif // LOVE_SYSTEM_INFO_HPP

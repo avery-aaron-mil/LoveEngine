@@ -1,14 +1,13 @@
-#include "graphics_pipeline.hpp"
+#include <love/client/graphics/vulkan/graphics_pipeline.hpp>
 
 #include <sstream>
 #include <vector>
 
+#include <love/client/graphics/vulkan/vulkan_functions.hpp>
 #include <love/common/data/files/file_io.hpp>
 #include <love/common/error/crash.hpp>
 
 #include <vulkan/vk_enum_string_helper.h>
-
-#include "vulkan_functions.hpp"
 
 namespace love_engine {
     GraphicsPipeline::GraphicsPipeline(
@@ -18,7 +17,7 @@ namespace love_engine {
         const Properties& properties,
         std::shared_ptr<Logger> logger
     ) : _logger(logger), _device(device), _renderPass(renderPass), _extent(extent), _properties(properties) {
-        if (_device == nullptr) Crash::crash("Device passed to graphics pipeline was null.");
+        if (_device == nullptr) Crash::crash("Vulkan device to graphics pipeline was null.");
         if (_renderPass == nullptr) Crash::crash("Render pass passed to graphics pipeline was null.");
         if ((_properties.type != PipelineType::CUSTOM) || (_properties.createInfo.get() == nullptr)) {
             _loadDefaultProperties();

@@ -1,4 +1,4 @@
-#include "server_instance.hpp"
+#include <love/server/server_instance.hpp>
 
 namespace love_engine {
     

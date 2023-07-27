@@ -1,4 +1,4 @@
-#include "client_instance.hpp"
+#include <love/client/client_instance.hpp>
 
 #include <chrono>
 
@@ -10,7 +10,7 @@ namespace love_engine {
     }
 
     void ClientInstance::init() noexcept {
-        _window.show();
+        _window->show();
     }
     
     void ClientInstance::_log(const std::string& message) const noexcept {
@@ -24,7 +24,7 @@ namespace love_engine {
 
         auto previousTime = std::chrono::high_resolution_clock::now();
         std::float128_t lag = 0.0f;
-        while (!_window.shouldClose() && !_clientState->shouldExit()) {
+        while (!_window->shouldClose() && !_clientState->shouldExit()) {
             auto currentTime = std::chrono::high_resolution_clock::now();
             std::float128_t elapsedTime = std::chrono::duration<std::float128_t, std::chrono::milliseconds::period>(currentTime - previousTime).count();
             previousTime = currentTime;
@@ -47,8 +47,9 @@ namespace love_engine {
             glfwPollEvents();
         }
 
-        _window.hide();
-        if (_window.shouldClose()) _log("Window closed by user.");
+        _window->hide();
+        if (_window->shouldClose()) _log("Window closed by user.");
         else if (_clientState->shouldExit()) _log("Client state exited program.");
+        _graphicsInstance.~GraphicsInstance();
     }
 }

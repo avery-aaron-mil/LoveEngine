@@ -1,4 +1,4 @@
-#include "thread.hpp"
+#include <love/common/system/thread.hpp>
 
 #include <chrono>
 #include <cstdint>

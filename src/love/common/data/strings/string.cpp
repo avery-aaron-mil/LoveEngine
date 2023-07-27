@@ -1,10 +1,10 @@
-#include "string.hpp"
+#include <love/common/data/strings/string.hpp>
 
 #include <cstring>
 #include <memory>
 #include <stdexcept>
 
-#include "../../error/stack_trace.hpp"
+#include <love/common/error/stack_trace.hpp>
 
 namespace love_engine {
     std::string& String::reverse(std::string& str) { // TODO Check assembly and improve with SIMD (Single Instruction Multiple Data)

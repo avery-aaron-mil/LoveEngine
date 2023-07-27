@@ -1,4 +1,4 @@
-#include "file_io.hpp"
+#include <love/common/data/files/file_io.hpp>
 
 #include <cerrno>
 #include <cstdio>
@@ -20,8 +20,8 @@
   #include <unistd.h>
 #endif
 
-#include "../../error/crash.hpp"
-#include "../../error/stack_trace.hpp"
+#include <love/common/error/crash.hpp>
+#include <love/common/error/stack_trace.hpp>
 
 namespace love_engine {
     static std::mutex _fileMutex;

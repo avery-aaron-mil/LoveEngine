@@ -1,7 +1,7 @@
-#include "logger.hpp"
+#include <love/common/data/files/logger.hpp>
 
-#include "../../error/crash.hpp"
-#include "../../system/thread.hpp"
+#include <love/common/error/crash.hpp>
+#include <love/common/system/thread.hpp>
 
 #include <cerrno>
 #include <cstdio>

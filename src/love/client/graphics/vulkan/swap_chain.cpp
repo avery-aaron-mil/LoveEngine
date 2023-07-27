@@ -1,22 +1,23 @@
-#include "swap_chain.hpp"
+#include <love/client/graphics/vulkan/swap_chain.hpp>
 
 #include <algorithm>
 #include <sstream>
 
+#include <love/client/graphics/vulkan/vulkan_functions.hpp>
 #include <love/common/error/crash.hpp>
 
 #include <vulkan/vk_enum_string_helper.h>
 
-#include "vulkan_functions.hpp"
-
 namespace love_engine {
     SwapChain::SwapChain(
-        const GraphicsDevice& graphicsDevice,
-        const Window& window,
+        GraphicsDevice* device,
+        Window* window,
         const Properties& properties,
         std::shared_ptr<Logger> logger)
-    : _logger(logger), _graphicsDevice(graphicsDevice), _window(window), _properties(properties) {
-        _device = _graphicsDevice.device();
+    : _logger(logger), _graphicsDevice(device), _window(window), _properties(properties) {
+        if (_graphicsDevice == nullptr) Crash::crash("Vulkan device to swap chain was null.");
+        if (_window == nullptr) Crash::crash("Window passed to swap chain was null.");
+        _device = _graphicsDevice->device();
         if (_device == nullptr) Crash::crash("Vulkan device passed to swap chain was null.");
 
         _createSwapChain();
@@ -35,12 +36,12 @@ namespace love_engine {
         _log("Creating swap chain...");
 
         // Get data for create info
-        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(_graphicsDevice.physicalDevice(), _window.surface());
+        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(_graphicsDevice->physicalDevice(), _window->surface());
         _surfaceFormat = _chooseSwapChainFormat(swapChainSupport.surfaceFormats);
         _presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes);
         _extent = _chooseSwapExtent(swapChainSupport.capabilities);
-        const uint32_t graphicsQueueIndex = _graphicsDevice.queueFamilyIndices().graphicsQueue;
-        const uint32_t presentQueueIndex = _graphicsDevice.queueFamilyIndices().presentQueue;
+        const uint32_t graphicsQueueIndex = _graphicsDevice->queueFamilyIndices().graphicsQueue;
+        const uint32_t presentQueueIndex = _graphicsDevice->queueFamilyIndices().presentQueue;
         const uint32_t queueFamilyIndices[] = {graphicsQueueIndex, presentQueueIndex};
 
         // Set image count
@@ -56,7 +57,7 @@ namespace love_engine {
         if (_properties.swapChainInfo.get() == nullptr) {
             VkSwapchainCreateInfoKHR createInfo {
                 .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-                .surface = _window.surface(),
+                .surface = _window->surface(),
                 .minImageCount = imageCount,
                 .imageFormat = _surfaceFormat.format,
                 .imageColorSpace = _surfaceFormat.colorSpace,
@@ -184,7 +185,7 @@ namespace love_engine {
         if (capabilities.currentExtent.width != UINT32_MAX) {
             return capabilities.currentExtent;
         } else {
-            VkExtent2D actualExtent = _window.extent();
+            VkExtent2D actualExtent = _window->extent();
             actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
             actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 

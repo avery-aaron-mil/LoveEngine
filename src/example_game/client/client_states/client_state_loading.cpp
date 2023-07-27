@@ -1,4 +1,4 @@
-#include "client_state_loading.hpp"
+#include <example_game/client/client_states/client_state_loading.hpp>
 
 namespace example_game {
 

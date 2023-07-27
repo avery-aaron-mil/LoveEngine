@@ -1,11 +1,11 @@
 #ifdef _WIN32
-#include "windows_registry.hpp"
+#include <love/common/system/windows_registry.hpp>
 
 #include <codecvt>
 #include <locale>
 #include <Windows.h>
 
-#include "../error/crash.hpp"
+#include <love/common/error/crash.hpp>
 
 namespace love_engine {
     using convert_utf8 = std::codecvt_utf8<wchar_t>;

@@ -22,7 +22,7 @@ VK_GLOBAL_LEVEL_FUNCTION(vkEnumerateInstanceLayerProperties)
 #undef VK_GLOBAL_LEVEL_FUNCTION
 
 // Instance functions
-// Device-finding functions
+// GraphicsDevice-finding functions
 #ifndef VK_INSTANCE_LEVEL_FUNCTION
 #define VK_INSTANCE_LEVEL_FUNCTION(fun)
 #endif
@@ -44,7 +44,7 @@ VK_INSTANCE_LEVEL_FUNCTION(vkDestroySurfaceKHR)
 
 #undef VK_INSTANCE_LEVEL_FUNCTION
 
-// Device functions
+// GraphicsDevice functions
 // The (hopefully) highly-optimised drawing functions
 #ifndef VK_DEVICE_LEVEL_FUNCTION
 #define VK_DEVICE_LEVEL_FUNCTION(fun)

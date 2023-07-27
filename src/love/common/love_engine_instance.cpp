@@ -1,12 +1,12 @@
-#include "love_engine_instance.hpp"
+#include <love/common/love_engine_instance.hpp>
 
 #include <csignal>
 #include <stack>
 #include <thread>
 
-#include "error/crash.hpp"
-#include "system/system_info.hpp"
-#include "system/thread.hpp"
+#include <love/common/error/crash.hpp>
+#include <love/common/system/system_info.hpp>
+#include <love/common/system/thread.hpp>
 
 namespace love_engine {
     static std::stack<std::function<void()>> _callbacks;

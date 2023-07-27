@@ -6,8 +6,8 @@
 
 #include <vulkan/vulkan.h>
 
-#include "graphics_device.hpp"
-#include "window.hpp"
+#include <love/client/graphics/vulkan/graphics_device.hpp>
+#include <love/client/graphics/window/window.hpp>
 
 namespace love_engine {
     class SwapChain {
@@ -24,8 +24,8 @@ namespace love_engine {
             };
 
             SwapChain(
-                const GraphicsDevice& graphicsDevice,
-                const Window& window,
+                GraphicsDevice* device,
+                Window* window,
                 const Properties& properties,
                 std::shared_ptr<Logger> logger
             );
@@ -41,8 +41,8 @@ namespace love_engine {
 
         private:
             std::shared_ptr<Logger> _logger;
-            GraphicsDevice _graphicsDevice;
-            Window _window;
+            GraphicsDevice* _graphicsDevice = nullptr;
+            Window* _window = nullptr;
             Properties _properties;
             VkDevice _device = nullptr;
             VkSwapchainKHR _swapChain = nullptr;
@@ -53,7 +53,7 @@ namespace love_engine {
             VkExtent2D _extent;
 
             void _log(const std::string& message) const noexcept;
-            void _initSwapChain(const GraphicsDevice& graphicsDevice) noexcept;
+            void _initSwapChain(const GraphicsDevice& device) noexcept;
             void _createSwapChain() noexcept;
             static VkSurfaceFormatKHR _chooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR>& formats) noexcept;
             VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& presentModes) const noexcept;

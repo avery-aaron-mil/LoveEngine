@@ -1,6 +1,6 @@
-#include "file_compression.hpp"
+#include <love/common/data/files/file_compression.hpp>
 
-#include "../../error/stack_trace.hpp"
+#include <love/common/error/stack_trace.hpp>
 
 #include <cerrno>
 #include <cstdio>

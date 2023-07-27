@@ -1,10 +1,10 @@
-#include "crash.hpp"
+#include <love/common/error/crash.hpp>
 
-#include "../love_engine_instance.hpp"
-#include "../data/files/file_io.hpp"
-#include "../system/system_info.hpp"
-#include "../system/thread.hpp"
-#include "stack_trace.hpp"
+#include <love/common/love_engine_instance.hpp>
+#include <love/common/data/files/file_io.hpp>
+#include <love/common/system/system_info.hpp>
+#include <love/common/system/thread.hpp>
+#include <love/common/error/stack_trace.hpp>
 
 #include <cerrno>
 #include <cstdio>

@@ -1,7 +1,7 @@
 #ifndef LOVE_FILE_COMPRESSION_HPP
 #define LOVE_FILE_COMPRESSION_HPP
 
-#include "file_io.hpp"
+#include <love/common/data/files/file_io.hpp>
 
 #include <cstdint>
 

@@ -1,7 +1,7 @@
 #ifndef LOVE_LOGGER_HPP
 #define LOVE_LOGGER_HPP
 
-#include "file_io.hpp"
+#include <love/common/data/files/file_io.hpp>
 
 #include <string>
 #include <thread>

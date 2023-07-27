@@ -1,12 +1,11 @@
-#include "command_pool.hpp"
+#include <love/client/graphics/vulkan/command_pool.hpp>
 
 #include <sstream>
 
+#include <love/client/graphics/vulkan/vulkan_functions.hpp>
 #include <love/common/error/crash.hpp>
 
 #include <vulkan/vk_enum_string_helper.h>
-
-#include "vulkan_functions.hpp"
 
 namespace love_engine {
     CommandPool::CommandPool(
@@ -16,7 +15,7 @@ namespace love_engine {
         const Properties& properties,
         std::shared_ptr<Logger> logger
     ) : _logger(logger), _properties(properties), _device(device), _renderPass(renderPass) {
-        if (_device == nullptr) Crash::crash("Device passed to command pool was null.");
+        if (_device == nullptr) Crash::crash("Vulkan device to command pool was null.");
         if (_renderPass == nullptr) Crash::crash("Render pass passed to command pool was null.");
 
         _createCommandPool(queueFamilyIndices);

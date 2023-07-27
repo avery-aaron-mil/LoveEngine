@@ -37,7 +37,7 @@ namespace love_engine {
 #define VK_INSTANCE_LEVEL_FUNCTION( fun ) extern PFN_##fun fun;
 #define VK_DEVICE_LEVEL_FUNCTION( fun ) extern PFN_##fun fun;
 
-#include "vulkan_functions.inl"
+#include <love/client/graphics/vulkan/vulkan_functions.inl>
 
 }
 

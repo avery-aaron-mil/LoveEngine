@@ -1,12 +1,11 @@
-#include "frame_buffers.hpp"
+#include <love/client/graphics/vulkan/frame_buffers.hpp>
 
 #include <sstream>
 
+#include <love/client/graphics/vulkan/vulkan_functions.hpp>
 #include <love/common/error/crash.hpp>
 
 #include <vulkan/vk_enum_string_helper.h>
-
-#include "vulkan_functions.hpp"
 
 namespace love_engine {
     FrameBuffers::FrameBuffers(
@@ -18,7 +17,7 @@ namespace love_engine {
         std::shared_ptr<Logger> logger
     )
     : _logger(logger), _properties(properties), _device(device), _renderPass(renderPass), _extent(extent) {
-        if (_device == nullptr) Crash::crash("Device passed to swap chain frame buffers was null.");
+        if (_device == nullptr) Crash::crash("Vulkan device to swap chain frame buffers was null.");
         if (_renderPass == nullptr) Crash::crash("Render pass passed to swap chain frame buffers was null.");
         _createFrameBuffers(imageViews);
     }

@@ -1,17 +1,16 @@
-#include "render_pass.hpp"
+#include <love/client/graphics/vulkan/render_pass.hpp>
 
 #include <sstream>
 
+#include <love/client/graphics/vulkan/vulkan_functions.hpp>
 #include <love/common/error/crash.hpp>
-
-#include "vulkan_functions.hpp"
 
 #include <vulkan/vk_enum_string_helper.h>
 
 namespace love_engine {
     RenderPass::RenderPass(VkDevice device, VkFormat imageFormat, const Properties& properties, std::shared_ptr<Logger> logger)
      : _logger(logger), _properties(properties), _device(device), _imageFormat(imageFormat) {
-        if (_device == nullptr) Crash::crash("Device passed to graphics pipeline was null.");
+        if (_device == nullptr) Crash::crash("Vulkan device to graphics pipeline was null.");
         _createRenderPass();
     }
     RenderPass::~RenderPass() {

@@ -1,4 +1,4 @@
-#include "graphics_instance.hpp"
+#include <love/client/graphics/graphics_instance.hpp>
 
 #include <love/common/error/crash.hpp>
 
@@ -10,9 +10,5 @@ namespace love_engine {
         if (_logger.get() != nullptr) {
             _logger.get()->log("(Love/GraphicsInstance): " + message);
         }
-    }
-
-    void GraphicsInstance::_defaultGLFWErrorCallback(int error, const char* description) {
-        Crash::crash(std::string("Caught GLFW error with no callback: ") + description);
     }
 }

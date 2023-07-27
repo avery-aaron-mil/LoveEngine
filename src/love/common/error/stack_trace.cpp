@@ -1,5 +1,4 @@
-#include "stack_trace.hpp"
-
+#include <love/common/error/stack_trace.hpp>
 
 namespace love_engine {
     std::string StackTrace::appendStacktrace(const std::string& message) noexcept {

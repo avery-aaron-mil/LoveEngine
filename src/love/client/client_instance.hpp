@@ -1,9 +1,8 @@
 #ifndef LOVE_CLIENT_INSTANCE_HPP
 #define LOVE_CLIENT_INSTANCE_HPP
 
-#include "client_state.hpp"
-#include "graphics/graphics_instance.hpp"
-
+#include <love/client/client_state.hpp>
+#include <love/client/graphics/graphics_instance.hpp>
 #include <love/common/data/files/logger.hpp>
 #include <love/common/error/crash.hpp>
 
@@ -34,7 +33,7 @@ namespace love_engine {
             ClientState* _nextClientState = nullptr;
 
             GraphicsInstance _graphicsInstance {_properties.graphicsProperties, _logger};
-            Window _window = _graphicsInstance.window();
+            Window* _window = _graphicsInstance.window();
 
             void _log(const std::string& message) const noexcept;
     };
