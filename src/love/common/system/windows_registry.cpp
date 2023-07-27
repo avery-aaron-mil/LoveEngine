@@ -11,7 +11,7 @@ namespace love_engine {
     using convert_utf8 = std::codecvt_utf8<wchar_t>;
     std::wstring_convert<convert_utf8, wchar_t> _wstrConverter;
 
-    std::string _get_System_Message(LSTATUS resultCode) noexcept {
+    std::string _getSystemMessage(LSTATUS resultCode) noexcept {
         LPSTR systemMessageBuffer = nullptr;
         FormatMessageA(
             FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -38,7 +38,7 @@ namespace love_engine {
             &parentKey
         );
         if (rc != ERROR_SUCCESS) {
-            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _get_System_Message(rc));
+            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
         }
 
         size_t bufferSize = BUFSIZ;
@@ -83,7 +83,7 @@ namespace love_engine {
             else if (rc == ERROR_NO_MORE_ITEMS) break;
             else {
                 RegCloseKey(parentKey);
-                Crash::crash("Could not enumerate registry key. Windows system error code: " + std::to_string(rc) + ": " + _get_System_Message(rc));
+                Crash::crash("Could not enumerate registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
             }
         }
 
@@ -131,7 +131,7 @@ namespace love_engine {
         } else if (rc == ERROR_FILE_NOT_FOUND) {
             return "Not found";
         } else {
-            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _get_System_Message(rc));
+            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
         }
     }
     
@@ -152,7 +152,7 @@ namespace love_engine {
         } else if (rc == ERROR_FILE_NOT_FOUND) {
             return -1;
         } else {
-            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _get_System_Message(rc));
+            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
         }
     }
 
@@ -173,7 +173,7 @@ namespace love_engine {
         } else if (rc == ERROR_FILE_NOT_FOUND) {
             return -1;
         } else {
-            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _get_System_Message(rc));
+            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
         }
     }
 }
