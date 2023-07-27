@@ -16,7 +16,8 @@ namespace love_engine {
         public:
             struct Properties {
                 std::shared_ptr<VkCommandPoolCreateInfo> commandPoolInfo = nullptr;
-                std::vector<VkCommandBufferAllocateInfo> commandBufferAllocateInfo;
+                std::shared_ptr<VkCommandBufferAllocateInfo> commandBufferAllocateInfo = nullptr;
+                uint32_t commandBufferCount = 1;
             };
 
             CommandPool(
@@ -34,9 +35,11 @@ namespace love_engine {
             VkDevice _device = nullptr;
             VkRenderPass _renderPass = nullptr;
             VkCommandPool _commandPool = nullptr;
+            std::vector<VkCommandBuffer> _commandBuffers;
 
             void _log(const std::string& message) const noexcept;
             void _createCommandPool(const GraphicsDevice::QueueFamilyIndices& queueFamilyIndices) noexcept;
+            void _allocateCommandBuffers() noexcept;
     };
 }
 

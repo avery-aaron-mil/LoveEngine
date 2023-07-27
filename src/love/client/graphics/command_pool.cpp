@@ -20,6 +20,7 @@ namespace love_engine {
         if (_renderPass == nullptr) Crash::crash("Render pass passed to command pool was null.");
 
         _createCommandPool(queueFamilyIndices);
+        _allocateCommandBuffers();
     }
     CommandPool::~CommandPool() {
         if (_commandPool) vkDestroyCommandPool(_device, _commandPool, nullptr);
@@ -52,5 +53,30 @@ namespace love_engine {
         }
 
         _log("Created command pool.");
+    }
+
+    void CommandPool::_allocateCommandBuffers() noexcept {
+        _log("Allocating command buffers...");
+
+        if (_properties.commandBufferAllocateInfo.get() == nullptr) {
+            VkCommandBufferAllocateInfo allocInfo {
+                .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+                .commandPool = _commandPool,
+                .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+                .commandBufferCount = _properties.commandBufferCount
+            };
+
+            _properties.commandBufferAllocateInfo = std::make_shared<VkCommandBufferAllocateInfo>(allocInfo);
+        }
+
+        _commandBuffers.resize(_properties.commandBufferAllocateInfo.get()->commandBufferCount);
+        auto result = vkAllocateCommandBuffers(_device, _properties.commandBufferAllocateInfo.get(), _commandBuffers.data());
+        if (result != VK_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Failed to allocate command buffers: " << string_VkResult(result);
+            Crash::crash(crashBuffer.str());
+        }
+
+        _log("Allocated command buffers.");
     }
 }
