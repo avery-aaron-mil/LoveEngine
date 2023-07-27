@@ -31,12 +31,12 @@ namespace love_engine {
     }
     
     VulkanInstance::~VulkanInstance() {
-        glfwTerminate();
-        _log("Terminated GLFW.");
-
         if (_vulkanObjects.get()) _vulkanObjects.reset();
         if (_vulkanInstance) vkDestroyInstance(_vulkanInstance, nullptr);
         _log("Destroyed Vulkan instance.");
+
+        glfwTerminate();
+        _log("Terminated GLFW.");
     }
 
     void VulkanInstance::_defaultGLFWErrorCallback(int error, const char* description) {

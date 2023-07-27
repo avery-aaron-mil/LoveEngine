@@ -9,14 +9,17 @@
 
 #include <cstdlib>
 #include <memory>
+#include <sstream>
 
 using namespace love_engine;
 using namespace example_game;
 
 std::shared_ptr<Logger> logger;
 
-void glfwCallback(int e, const char*desc) {
-    logger.get()->log("System Info:\n" + SystemInfo::getConsolidatedSystemInfo());
+void glfwErrorCallback(int e, const char*desc) {
+    std::stringstream buffer;
+    buffer << "(GLFW): " << desc;
+    logger.get()->log(LogStatus::ERROR_, buffer.str());
 }
 
 GraphicsInstance::Properties setGraphicsInstanceProperties() {
@@ -56,7 +59,7 @@ GraphicsInstance::Properties setGraphicsInstanceProperties() {
     };
     VulkanInstance::Properties instanceProperties {
         .vulkanProperties = std::move(vulkanProperties),
-        .glfwErrorCallback = glfwCallback
+        .glfwErrorCallback = glfwErrorCallback
     };
 
     return GraphicsInstance::Properties{

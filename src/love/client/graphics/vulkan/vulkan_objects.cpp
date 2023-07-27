@@ -44,7 +44,7 @@ namespace love_engine {
         );
         if (_graphicsDevice.get() == nullptr) Crash::crash("Failed to create graphics device object.");
 
-        /*_swapChain = std::make_unique<SwapChain>(
+        _swapChain = std::make_unique<SwapChain>(
             _graphicsDevice.get(),
             _window.get(),
             _properties.swapChainProperties,
@@ -95,7 +95,7 @@ namespace love_engine {
             _properties.commandPoolProperties,
             _logger
         );
-        if (_commandPool.get() == nullptr) Crash::crash("Failed to create command pool object.");*/
+        if (_commandPool.get() == nullptr) Crash::crash("Failed to create command pool object.");
 
         _log("Created Vulkan objects.");
     }
