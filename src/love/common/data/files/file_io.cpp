@@ -9,7 +9,7 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #elif defined(__APPLE__)
   #include <execinfo.h>
   #include <iterator>
@@ -60,7 +60,7 @@ namespace love_engine {
 #endif
             std::string path = &buffer[0];
             std::filesystem::path p = path;
-#ifdef __WIN32__
+#ifdef __WIN32
             _executableDirectory.assign(p.parent_path().string() + "\\");
 #else
             _executableDirectory.assign(p.parent_path().string() + "/");

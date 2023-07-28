@@ -9,7 +9,7 @@
   #ifndef _WIN32_DCOM
   #define _WIN32_DCOM
   #endif
-  #include <Windows.h>
+  #include <windows.h>
   #include <love/common/system/windows_registry.hpp>
 #elif defined(__APPLE__)
   #include <mach-o/dyld.h>

@@ -19,8 +19,8 @@ namespace love_engine {
     static volatile bool _crashed = false;
     static std::string _crashDir(".");
     static std::string _crashPath;
-    static void _default_Crash_Function(const std::string& message);
-    static std::function<void(const std::string&)> _crashFunction = _default_Crash_Function;
+    static void _defaultCrashFunction(const std::string& message);
+    static std::function<void(const std::string&)> _crashFunction = _defaultCrashFunction;
     static std::vector<std::string> _flavorTexts = {
         "Everything's going to plan. No, really, that was supposed to happen.",
         "Sorry :(",
@@ -84,7 +84,7 @@ namespace love_engine {
         _flavorTexts = flavorTexts;
     }
 
-    std::string _generate_Crash_Report(const std::string& message, std::tm*& now) noexcept {
+    std::string _generateCrashReport(const std::string& message, std::tm*& now) noexcept {
         // Get time
         char timeBuffer[] = "MM/DD/YYYY HH:mm XM (+SS.UUUUUUs)"; // 2/17/2008 7:35 AM (+20.276508s)
 
@@ -117,7 +117,7 @@ namespace love_engine {
         return outputMessageBuffer.str();
     }
 
-    std::string _get_Crash_Path(std::tm* now) noexcept {
+    std::string _getCrashPath(std::tm* now) noexcept {
         if (!_crashPath.empty()) return _crashPath;
         
         char crashFileBuffer[] = "crash-YYYY-MM-DD_HH.mm.SS.txt";
@@ -132,8 +132,8 @@ namespace love_engine {
         return crashPath.str();
     }
 
-    void _log_Crash_Report(const std::string& report, std::tm* now) noexcept {
-        std::string crashPath = _get_Crash_Path(now);
+    void _logCrashReport(const std::string& report, std::tm* now) noexcept {
+        std::string crashPath = _getCrashPath(now);
 
         std::fputs(report.c_str(), stderr);
         try {
@@ -143,22 +143,22 @@ namespace love_engine {
         }
     }
 
-    void _cleanup_and_Exit() noexcept {
+    void _cleanupExit() noexcept {
         LoveEngineInstance::cleanup();
         exit(EXIT_FAILURE);
     }
 
-    void _default_Crash_Function(const std::string& message) {
+    void _defaultCrashFunction(const std::string& message) {
         std::tm* time;
-        std::string crashReport = _generate_Crash_Report(message.empty() ? std::string(std::strerror(errno)) : message, time);
-        _log_Crash_Report(crashReport, time);
+        std::string crashReport = _generateCrashReport(message.empty() ? std::string(std::strerror(errno)) : message, time);
+        _logCrashReport(crashReport, time);
     }
 
     [[noreturn]] void Crash::crash(const std::string& message) {
         if (!_crashed) {
             _crashed = true;
             _crashFunction(message);
-            _cleanup_and_Exit();
+            _cleanupExit();
         }
         throw std::logic_error(StackTrace::appendStacktrace(message));
     }
