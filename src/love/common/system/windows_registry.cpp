@@ -1,52 +1,42 @@
 #ifdef _WIN32
 #include <love/common/system/windows_registry.hpp>
 
+#include <sstream>
+
 #include <codecvt>
 #include <locale>
-#include <Windows.h>
+#include <windows.h>
 
 #include <love/common/error/crash.hpp>
+#include <love/common/error/win32_error.hpp>
 
 namespace love_engine {
     using convert_utf8 = std::codecvt_utf8<wchar_t>;
     std::wstring_convert<convert_utf8, wchar_t> _wstrConverter;
 
-    std::string _getSystemMessage(LSTATUS resultCode) noexcept {
-        LPSTR systemMessageBuffer = nullptr;
-        FormatMessageA(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
-            0,
-            resultCode,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            systemMessageBuffer,
-            0,
-            nullptr
-        );
-        std::string systemMessage(systemMessageBuffer);
-        LocalFree(systemMessageBuffer);
-        return systemMessage;
-    }
-
     std::vector<std::wstring> WindowsRegistry::getHKLMChildren(const std::wstring& registryKey) noexcept {
         std::vector<std::wstring> children;
         HKEY parentKey;
-        auto rc = RegOpenKeyExW(
+        auto result = RegOpenKeyExW(
             HKEY_LOCAL_MACHINE,
             registryKey.c_str(),
             0,
             KEY_ENUMERATE_SUB_KEYS,
             &parentKey
         );
-        if (rc != ERROR_SUCCESS) {
-            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
+        if (result != ERROR_SUCCESS) {
+            std::stringstream crashBuffer;
+            crashBuffer << "Could not find registry key. Windows system error (" <<
+                std::to_string(result) << "): " << Win32Error::getSystemMessage(result);
+            Crash::crash(crashBuffer.str());
         }
 
         size_t bufferSize = BUFSIZ;
         std::wstring childKeyBuf;
         DWORD cchName = static_cast<DWORD>(bufferSize * sizeof(wchar_t));
         childKeyBuf.resize(bufferSize);
-        for (DWORD i = 0; rc == ERROR_SUCCESS; ++i) {
-            rc = RegEnumKeyExW(
+        for (DWORD i = 0; result == ERROR_SUCCESS; ++i) {
+            result = RegEnumKeyExW(
                 parentKey,
                 i,
                 reinterpret_cast<LPWSTR>(childKeyBuf.data()),
@@ -56,7 +46,7 @@ namespace love_engine {
                 nullptr,
                 nullptr
             );
-            if (rc == ERROR_MORE_DATA) {
+            if (result == ERROR_MORE_DATA) {
                 cchName /= sizeof(wchar_t);
                 if (cchName > static_cast<DWORD>(bufferSize)) { // Check for overflow
                     bufferSize = static_cast<size_t>(cchName);
@@ -65,7 +55,7 @@ namespace love_engine {
                     cchName = static_cast<DWORD>(bufferSize * sizeof(wchar_t));
                 }
                 childKeyBuf.resize(bufferSize);
-                rc = RegEnumKeyExW(
+                result = RegEnumKeyExW(
                     parentKey,
                     i,
                     reinterpret_cast<LPWSTR>(childKeyBuf.data()),
@@ -76,14 +66,17 @@ namespace love_engine {
                     nullptr
                 );
             }
-            if (rc == ERROR_SUCCESS) {
+            if (result == ERROR_SUCCESS) {
                 children.push_back(std::move(childKeyBuf));
                 continue;
             }
-            else if (rc == ERROR_NO_MORE_ITEMS) break;
+            else if (result == ERROR_NO_MORE_ITEMS) break;
             else {
                 RegCloseKey(parentKey);
-                Crash::crash("Could not enumerate registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
+                std::stringstream crashBuffer;
+                crashBuffer << "Could not enumerate registry key. Windows system error (" <<
+                    std::to_string(result) << "): " << Win32Error::getSystemMessage(result);
+                Crash::crash(crashBuffer.str());
             }
         }
 
@@ -96,7 +89,7 @@ namespace love_engine {
         size_t bufferSize = BUFSIZ;
         valueBuf.resize(bufferSize);
         DWORD cbData = static_cast<DWORD>(bufferSize * sizeof(wchar_t));
-        auto rc = RegGetValueW(
+        auto result = RegGetValueW(
             HKEY_LOCAL_MACHINE,
             registryKey.c_str(),
             registryValue.c_str(),
@@ -105,7 +98,7 @@ namespace love_engine {
             reinterpret_cast<void*>(valueBuf.data()),
             &cbData
         );
-        while (rc == ERROR_MORE_DATA) {
+        while (result == ERROR_MORE_DATA) {
             cbData /= sizeof(wchar_t);
             if (cbData > static_cast<DWORD>(bufferSize)) { // Check for overflow
                 bufferSize = static_cast<size_t>(cbData);
@@ -114,7 +107,7 @@ namespace love_engine {
                 cbData = static_cast<DWORD>(bufferSize * sizeof(wchar_t));
             }
             valueBuf.resize(bufferSize);
-            rc = RegGetValueW(
+            result = RegGetValueW(
                 HKEY_LOCAL_MACHINE,
                 registryKey.c_str(),
                 registryValue.c_str(),
@@ -124,21 +117,24 @@ namespace love_engine {
                 &cbData
             );
         }
-        if (rc == ERROR_SUCCESS) {
+        if (result == ERROR_SUCCESS) {
             cbData /= sizeof(wchar_t);
             valueBuf.resize(static_cast<size_t>(cbData - 1));
             return _wstrConverter.to_bytes(valueBuf);
-        } else if (rc == ERROR_FILE_NOT_FOUND) {
+        } else if (result == ERROR_FILE_NOT_FOUND) {
             return "Not found";
         } else {
-            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
+            std::stringstream crashBuffer;
+            crashBuffer << "Could not find registry key. Windows system error (" <<
+                std::to_string(result) << "): " << Win32Error::getSystemMessage(result);
+            Crash::crash(crashBuffer.str());
         }
     }
     
     int64_t WindowsRegistry::getHKLMValueI64(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
         int64_t value = 0;
         DWORD cbData = static_cast<DWORD>(sizeof(int64_t));
-        auto rc = RegGetValueW(
+        auto result = RegGetValueW(
             HKEY_LOCAL_MACHINE,
             registryKey.c_str(),
             registryValue.c_str(),
@@ -147,19 +143,22 @@ namespace love_engine {
             reinterpret_cast<void*>(&value),
             &cbData
         );
-        if (rc == ERROR_SUCCESS) {
+        if (result == ERROR_SUCCESS) {
             return value;
-        } else if (rc == ERROR_FILE_NOT_FOUND) {
+        } else if (result == ERROR_FILE_NOT_FOUND) {
             return -1;
         } else {
-            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
+            std::stringstream crashBuffer;
+            crashBuffer << "Could not find registry key. Windows system error (" <<
+                std::to_string(result) << "): " << Win32Error::getSystemMessage(result);
+            Crash::crash(crashBuffer.str());
         }
     }
 
     int32_t WindowsRegistry::getHKLMValueI32(const std::wstring& registryKey, const std::wstring& registryValue) noexcept {
         int32_t value = 0;
         DWORD cbData = static_cast<DWORD>(sizeof(int32_t));
-        auto rc = RegGetValueW(
+        auto result = RegGetValueW(
             HKEY_LOCAL_MACHINE,
             registryKey.c_str(),
             registryValue.c_str(),
@@ -168,12 +167,15 @@ namespace love_engine {
             reinterpret_cast<void*>(&value),
             &cbData
         );
-        if (rc == ERROR_SUCCESS) {
+        if (result == ERROR_SUCCESS) {
             return value;
-        } else if (rc == ERROR_FILE_NOT_FOUND) {
+        } else if (result == ERROR_FILE_NOT_FOUND) {
             return -1;
         } else {
-            Crash::crash("Could not find registry key. Windows system error code: " + std::to_string(rc) + ": " + _getSystemMessage(rc));
+            std::stringstream crashBuffer;
+            crashBuffer << "Could not find registry key. Windows system error (" <<
+                std::to_string(result) << "): " << Win32Error::getSystemMessage(result);
+            Crash::crash(crashBuffer.str());
         }
     }
 }
