@@ -16,12 +16,8 @@ namespace love_engine {
 #endif
         public:
             Library() = default;
-            Library(const char*const library) {
-                loadLibrary(library);
-            }
-            ~Library() {
-                unloadLibrary();
-            }
+            Library(const char*const library) { loadLibrary(library); }
+            ~Library();
 
             void loadLibrary(const char*const library) noexcept;
             void unloadLibrary() noexcept;

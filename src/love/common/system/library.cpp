@@ -5,31 +5,24 @@
 #include <sstream>
 #include <string>
 
-#ifdef __unix__
+#ifdef _WIN32
+#include <love/common/error/win32_error.hpp>
+#elif defined(__unix__)
   #include <dlfcn.h>
 #endif
 
 namespace love_engine {
+    Library::~Library() {
+        unloadLibrary();
+    }
+
     std::string _getError() {
 #ifdef _WIN32
-        auto errorCode = GetLastError();
-        LPSTR messageBuffer = nullptr;
-        FormatMessageA(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
-            0,
-            errorCode,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            messageBuffer,
-            0,
-            nullptr
-        );
-        std::string errorString(messageBuffer);
-        LocalFree(messageBuffer);
+        return Win32Error::getLastError();
 #elif defined(__unix__)
         const char* errorMsg = std::dlerror();
-        std::string errorString(errorMsg);
+        return std::string(errorMsg);
 #endif
-        return errorString;
     }
 
     void Library::loadLibrary(const char*const library) noexcept {

@@ -9,6 +9,7 @@
 namespace love_engine {
     class Win32Error {
         public:
+            static std::string getLastError() noexcept;
             static std::string getSystemMessage(LSTATUS resultCode) noexcept;
     };
 }

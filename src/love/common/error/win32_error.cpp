@@ -1,6 +1,11 @@
 #include <love/common/error/win32_error.hpp>
 
 namespace love_engine {
+    std::string Win32Error::getLastError() noexcept {
+        auto errorCode = GetLastError();
+        return getSystemMessage(errorCode);
+    }
+
     std::string Win32Error::getSystemMessage(LSTATUS resultCode) noexcept {
         LPSTR systemMessageBuffer = nullptr;
         FormatMessageA(
