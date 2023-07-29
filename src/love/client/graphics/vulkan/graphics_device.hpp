@@ -1,5 +1,6 @@
 #ifndef LOVE_GRAPGICS_DEVICE_HPP
 #define LOVE_GRAPGICS_DEVICE_HPP
+#include <love/client/love_client.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -12,7 +13,7 @@
 #include <vulkan/vulkan.h>
 
 namespace love_engine {
-    class GraphicsDevice {
+    class LV_ENG_CLI GraphicsDevice {
         public:
             struct Properties {
                 std::string deviceName = "";

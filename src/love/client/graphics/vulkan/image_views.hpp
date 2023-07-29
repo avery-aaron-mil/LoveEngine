@@ -1,5 +1,6 @@
 #ifndef LOVE_IMAGE_VIEWS_HPP
 #define LOVE_IMAGE_VIEWS_HPP
+#include <love/client/love_client.hpp>
 
 #include <memory>
 #include <vector>
@@ -9,7 +10,7 @@
 #include <vulkan/vulkan.h>
 
 namespace love_engine {
-    class ImageViews {
+    class LV_ENG_CLI ImageViews {
         public:
             struct Properties {
                 std::shared_ptr<VkImageViewCreateInfo> imageViewInfoTemplate = nullptr;

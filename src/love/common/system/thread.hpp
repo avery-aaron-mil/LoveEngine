@@ -1,12 +1,13 @@
 #ifndef LOVE_THREADS_HPP
 #define LOVE_THREADS_HPP
+#include <love/common/love_common.hpp>
 
 #include <functional>
 #include <string>
 #include <thread>
 
 namespace love_engine {
-    class Thread {
+    class LV_ENG_COM Thread {
         public:
             template<class F, class... Args>
             Thread(const std::string& name, F&& f, Args&&... args) {

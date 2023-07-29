@@ -1,12 +1,13 @@
 #ifndef LOVE_LIBRARY_HPP
 #define LOVE_LIBRARY_HPP
+#include <love/common/love_common.hpp>
 
 #ifdef _WIN32
   #include <windows.h>
 #endif
 
 namespace love_engine {
-    class Library {
+    class LV_ENG_COM Library {
 #ifdef _WIN32
         typedef HMODULE library_t;
         typedef FARPROC function_t;

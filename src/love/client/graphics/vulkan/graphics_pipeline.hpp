@@ -1,5 +1,6 @@
 #ifndef LOVE_GRAPHICS_PIPELINE_HPP
 #define LOVE_GRAPHICS_PIPELINE_HPP
+#include <love/client/love_client.hpp>
 
 #include <memory>
 #include <string>
@@ -12,7 +13,7 @@
 #include <vulkan/vulkan.h>
 
 namespace love_engine {
-    class GraphicsPipeline {
+    class LV_ENG_CLI GraphicsPipeline {
         public:
             enum class PipelineType {
                 CUSTOM = 0,

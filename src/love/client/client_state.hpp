@@ -1,11 +1,12 @@
 #ifndef LOVE_CLIENT_STATE_HPP
 #define LOVE_CLIENT_STATE_HPP
+#include <love/client/love_client.hpp>
 
 #include <stdfloat>
 
 namespace love_engine {
 
-    class ClientState {
+    class LV_ENG_CLI ClientState {
         public:
             // Tick/update the client state.
             virtual void update() noexcept = 0;

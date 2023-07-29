@@ -1,5 +1,6 @@
 #ifndef LOVE_GRAPHICS_INSTANCE_HPP
 #define LOVE_GRAPHICS_INSTANCE_HPP
+#include <love/client/love_client.hpp>
 
 #include <love/client/graphics/vulkan/vulkan_instance.hpp>
 #include <love/common/data/files/logger.hpp>
@@ -8,7 +9,7 @@
 #include <string>
 
 namespace love_engine {
-    class GraphicsInstance {
+    class LV_ENG_CLI GraphicsInstance {
         public:
             struct Properties {
                 VulkanInstance::ApplicationInfo applicationInfo{};

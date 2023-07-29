@@ -1,5 +1,6 @@
 #ifndef LOVE_FILE_IO_HPP
 #define LOVE_FILE_IO_HPP
+#include <love/common/love_common.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -7,7 +8,7 @@
 #include <vector>
 
 namespace love_engine {
-    class FileIO {
+    class LV_ENG_COM FileIO {
         public:
             class FileContent {
                 public:

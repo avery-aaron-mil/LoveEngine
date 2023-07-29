@@ -1,12 +1,13 @@
 #ifndef LOVE_FILE_COMPRESSION_HPP
 #define LOVE_FILE_COMPRESSION_HPP
+#include <love/common/love_common.hpp>
 
 #include <love/common/data/files/file_io.hpp>
 
 #include <cstdint>
 
 namespace love_engine {
-    class FileCompression {
+    class LV_ENG_COM FileCompression {
         public:
             // @throw std::runtime_error If a file error occurs.
             static void compressFile(const char*const filePath, const std::string& content) {

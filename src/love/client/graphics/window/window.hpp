@@ -1,5 +1,6 @@
 #ifndef LOVE_WINDOW_HPP
 #define LOVE_WINDOW_HPP
+#include <love/client/love_client.hpp>
 
 #include <functional>
 #include <memory>
@@ -11,7 +12,7 @@
 #include <GLFW/glfw3.h>
 
 namespace love_engine {
-    class Window {
+    class LV_ENG_CLI Window {
         public:
             enum class WindowType {
                 WINDOWED,

@@ -1,5 +1,6 @@
 #ifndef LOVE_SWAP_CHAIN_HPP
 #define LOVE_SWAP_CHAIN_HPP
+#include <love/client/love_client.hpp>
 
 #include <memory>
 #include <vector>
@@ -10,7 +11,7 @@
 #include <love/client/graphics/window/window.hpp>
 
 namespace love_engine {
-    class SwapChain {
+    class LV_ENG_CLI SwapChain {
         public:
             struct Properties {
                 std::shared_ptr<VkSwapchainCreateInfoKHR> swapChainInfo = nullptr;

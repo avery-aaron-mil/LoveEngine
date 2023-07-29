@@ -1,5 +1,6 @@
 #ifndef LOVE_LOGGER_HPP
 #define LOVE_LOGGER_HPP
+#include <love/common/love_common.hpp>
 
 #include <love/common/data/files/file_io.hpp>
 
@@ -7,7 +8,6 @@
 #include <thread>
 
 namespace love_engine {
-
     enum class LogStatus {
         IGNORED,
         STATUS,
@@ -20,7 +20,7 @@ namespace love_engine {
         FATAL,
     };
 
-   class Logger {
+   class LV_ENG_COM Logger {
         static constexpr const char* LOG_TYPE_STRINGS[] = {
             "IGNORED",
             "STATUS",

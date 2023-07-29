@@ -1,5 +1,6 @@
 #ifndef LOVE_VULKAN_INSTANCE_HPP
 #define LOVE_VULKAN_INSTANCE_HPP
+#include <love/client/love_client.hpp>
 
 #include <love/client/graphics/vulkan/vulkan_objects.hpp>
 #include <love/common/data/files/logger.hpp>
@@ -37,7 +38,7 @@
 #endif
 
 namespace love_engine {
-    class VulkanInstance {
+    class LV_ENG_CLI VulkanInstance {
         public:
             struct ApplicationInfo {
                 std::string name;

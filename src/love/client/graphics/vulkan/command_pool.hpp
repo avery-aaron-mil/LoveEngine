@@ -1,5 +1,6 @@
 #ifndef LOVE_COMMAND_POOL_HPP
 #define LOVE_COMMAND_POOL_HPP
+#include <love/client/love_client.hpp>
 
 #include <memory>
 #include <string>
@@ -11,7 +12,7 @@
 #include <vulkan/vulkan.h>
 
 namespace love_engine {
-    class CommandPool {
+    class LV_ENG_CLI CommandPool {
         public:
             struct Properties {
                 std::shared_ptr<VkCommandPoolCreateInfo> commandPoolInfo = nullptr;

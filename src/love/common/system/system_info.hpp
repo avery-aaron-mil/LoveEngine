@@ -1,12 +1,12 @@
 #ifndef LOVE_SYSTEM_INFO_HPP
 #define LOVE_SYSTEM_INFO_HPP
+#include <love/common/love_common.hpp>
 
 #include <string>
 #include <vector>
 
 namespace love_engine {
-
-    class SystemInfo {
+    class LV_ENG_COM SystemInfo {
         public:
             struct CPUInfo {
                 std::string name;

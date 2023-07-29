@@ -1,5 +1,6 @@
 #ifndef LOVE_LOVE_ENGINE_INSTANCE_HPP
 #define LOVE_LOVE_ENGINE_INSTANCE_HPP
+#include <love/common/love_common.hpp>
 
 #include <love/common/data/files/file_io.hpp>
 #include <love/common/system/library.hpp>
@@ -7,7 +8,7 @@
 #include <functional>
 
 namespace love_engine {
-    class LoveEngineInstance {
+    class LV_ENG_COM LoveEngineInstance {
         public:
             LoveEngineInstance();
             LoveEngineInstance(const std::string& crashDirectory);

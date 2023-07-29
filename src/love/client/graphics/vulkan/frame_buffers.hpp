@@ -1,5 +1,6 @@
 #ifndef LOVE_FRAME_BUFFERS_HPP
 #define LOVE_FRAME_BUFFERS_HPP
+#include <love/client/love_client.hpp>
 
 #include <memory>
 #include <vector>
@@ -9,7 +10,7 @@
 #include <vulkan/vulkan.h>
 
 namespace love_engine {
-    class FrameBuffers {
+    class LV_ENG_CLI FrameBuffers {
         public:
             struct Properties {
                 std::vector<VkFramebufferCreateInfo> frameBufferInfo;

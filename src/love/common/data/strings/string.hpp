@@ -1,11 +1,12 @@
 #ifndef LOVE_STRING_HPP
 #define LOVE_STRING_HPP
+#include <love/common/love_common.hpp>
 
 #include <cstdint>
 #include <string>
 
 namespace love_engine {
-    class String {
+    class LV_ENG_COM String {
         public:
             static std::string& reverse(std::string& str);
 

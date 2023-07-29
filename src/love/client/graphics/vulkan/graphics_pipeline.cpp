@@ -250,6 +250,7 @@ namespace love_engine {
             _properties.createInfo.get()->pipelineLayoutInfo =
                 std::make_shared<VkPipelineLayoutCreateInfo>(pipelineLayoutInfo);
         }
+        Crash::crash("test");
 
         _log("Validated graphics pipeline create info.");
     }

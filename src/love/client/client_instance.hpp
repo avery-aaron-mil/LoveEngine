@@ -1,5 +1,6 @@
 #ifndef LOVE_CLIENT_INSTANCE_HPP
 #define LOVE_CLIENT_INSTANCE_HPP
+#include <love/client/love_client.hpp>
 
 #include <love/client/client_state.hpp>
 #include <love/client/graphics/graphics_instance.hpp>
@@ -11,7 +12,7 @@
 
 namespace love_engine {
 
-    class ClientInstance {
+    class LV_ENG_CLI ClientInstance {
         public:
             struct Properties {
                 GraphicsInstance::Properties graphicsProperties;

@@ -1,5 +1,6 @@
 #ifndef LOVE_VULKAN_OBJECTS_HPP
 #define LOVE_VULKAN_OBJECTS_HPP
+#include <love/client/love_client.hpp>
 
 #include <love/client/graphics/vulkan/command_pool.hpp>
 #include <love/client/graphics/vulkan/frame_buffers.hpp>
@@ -15,7 +16,7 @@
 #include <memory>
 
 namespace love_engine {
-    class VulkanObjects {
+    class LV_ENG_CLI VulkanObjects {
         public:
             struct Properties {
                 Window::Properties windowProperties{};

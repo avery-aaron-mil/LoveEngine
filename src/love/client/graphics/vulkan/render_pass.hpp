@@ -1,5 +1,6 @@
 #ifndef LOVE_RENDER_PASS_HPP
 #define LOVE_RENDER_PASS_HPP
+#include <love/client/love_client.hpp>
 
 #include <memory>
 #include <vector>
@@ -9,7 +10,7 @@
 #include <vulkan/vulkan.h>
 
 namespace love_engine {
-    class RenderPass {
+    class LV_ENG_CLI RenderPass {
         public:
             struct Properties {
                 std::shared_ptr<VkRenderPassCreateInfo> renderPassInfo = nullptr;

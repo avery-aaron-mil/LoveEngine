@@ -1,12 +1,13 @@
 #ifndef LOVE_CRASH_HPP
 #define LOVE_CRASH_HPP
+#include <love/common/love_common.hpp>
 
 #include <functional>
 #include <string>
 #include <vector>
 
 namespace love_engine {
-    class Crash {
+    class LV_ENG_COM Crash {
         public:
             static void setCrashFunction(const std::function<void(const std::string&)>& crashFunction) noexcept;
             static void setCrashDirectory(const std::string& directory) noexcept;
