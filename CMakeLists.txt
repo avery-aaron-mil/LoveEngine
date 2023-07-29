@@ -24,34 +24,15 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # set compiler flags
-if(CMAKE_BUILD_TYPE EQUAL DEBUG)
-
-message(STATUS "Compiling in debug mode")
-
 set(CMAKE_CPP_FLAGS
+	-pipe
 	-Wall -Werror -Wno-volatile
-	-O0 -pipe -m64
-	-Og -g -DDEBUG
+	-m64 -Ofast -Os
+	-Og -g -fno-eliminate-unused-debug-symbols
 	-std=c++23
-	#--enable-libstdcxx-backtrace=yes
 )
 set(CMAKE_L_FLAGS
-	-Wl,--export-all-symbol
-)
-
-else()
-
-message(STATUS "Compiling in release mode")
-
-set(CMAKE_CPP_FLAGS
-	-Wall -Werror -Wno-volatile
-	-Ofast -pipe -m64
-	-Os -fdata-sections -ffunction-sections
-	-std=c++23
-	#--enable-libstdcxx-backtrace=yes
-)
-set(CMAKE_L_FLAGS
-    -s -Wl,--gc-sections
+    -s
 )
 
 if(WIN32)
@@ -67,13 +48,11 @@ else()
 
 endif()
 
-endif()
-
-target_compile_options(love_client PRIVATE ${CMAKE_CPP_FLAGS})
+target_compile_options(love_client PRIVATE ${CMAKE_CPP_FLAGS} -DBUILDING_LOVE_CLIENT)
 target_link_options(love_client PRIVATE ${CMAKE_L_FLAGS})
-target_compile_options(love_server PRIVATE ${CMAKE_CPP_FLAGS})
+target_compile_options(love_server PRIVATE ${CMAKE_CPP_FLAGS} -DBUILDING_LOVE_SERVER)
 target_link_options(love_server PRIVATE ${CMAKE_L_FLAGS})
-target_compile_options(love_common PRIVATE ${CMAKE_CPP_FLAGS})
+target_compile_options(love_common PRIVATE ${CMAKE_CPP_FLAGS} -DBUILDING_LOVE_COMMON)
 target_link_options(love_common PRIVATE ${CMAKE_L_FLAGS})
 
 target_compile_options(game PRIVATE ${CMAKE_CPP_FLAGS})
@@ -104,20 +83,21 @@ target_link_directories(launcher PRIVATE "lib/" "build/")
 if (WIN32)
 # use static libraries for Windows because Microsoft is lame...
 set(COMMON_LIBS
-	#-Wl,-Bstatic -lstdc++_libbacktrace
+	-Wl,--out-implib,liblove_common.dll.a
 	-Wl,-Bstatic -lpthread -llzma
-	-Wl,-Bdynamic -lgcc -lstdc++
+	-Wl,-Bdynamic -lgcc -lstdc++ -ldbghelp
 )
 set(SERVER_LIBS
+	-Wl,--out-implib,liblove_server.dll.a
 	-Wl,-Bdynamic -llove_common
 )
 set(CLIENT_LIBS
-	-Wl,-Bstatic -lglfw3 -lOpenAL32.dll -lsndfile
+	-Wl,--out-implib,liblove_client.dll.a
+	-Wl,-Bstatic -lglfw3 -lsndfile -lOpenAL32.dll
 	-Wl,-Bdynamic -lgcc -lstdc++ -llove_common -llove_server
 )
 else()
 set(COMMON_LIBS
-	#-Wl,-Bstatic -lstdc++_libbacktrace
 	-Wl,-Bdynamic -lgcc -lstdc++ -lpthread -llzma-5
 )
 set(SERVER_LIBS
@@ -128,7 +108,7 @@ set(CLIENT_LIBS
 )
 endif()
 set(GAME_LIBS
-	-Wl,-Bdynamic -llove_client -llove_common -llove_server
+	-Wl,-Bdynamic -llove_common -llove_client -llove_server
 )
 set(HOST_LIBS
 	-Wl,-Bdynamic -llove_common -llove_server
